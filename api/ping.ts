@@ -26,6 +26,52 @@ function sendJson(res: any, statusCode: number, data: any) {
   }
 }
 
+function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null } {
+  const directCandidates = [
+    'GEMINI_API_KEY',
+    'GOOGLE_API_KEY',
+    'VITE_GEMINI_API_KEY',
+    'GEMINI_KEY',
+    'GOOGLE_GEMINI_API_KEY',
+    'GEMINI_APIKEY'
+  ];
+
+  for (const name of directCandidates) {
+    const val = process.env[name];
+    if (typeof val === 'string' && val.trim().length > 0) {
+      return {
+        apiKey: val.replace(/^["']|["']$/g, '').trim(),
+        matchedKeyName: name
+      };
+    }
+  }
+
+  // Case-insensitive & trimmed search across ALL process.env keys (tránh lỗi viết thường hoặc khoảng trắng)
+  for (const [key, val] of Object.entries(process.env)) {
+    if (typeof val !== 'string' || val.trim().length === 0) continue;
+    const cleanKey = key.trim().toUpperCase();
+    if (
+      cleanKey === 'GEMINI_API_KEY' ||
+      cleanKey === 'GOOGLE_API_KEY' ||
+      cleanKey === 'VITE_GEMINI_API_KEY' ||
+      cleanKey === 'GEMINI_KEY' ||
+      cleanKey === 'GOOGLE_GEMINI_API_KEY' ||
+      cleanKey === 'GEMINI_APIKEY' ||
+      cleanKey.startsWith('GEMINI_API_KEY') ||
+      cleanKey.startsWith('VITE_GEMINI_API_KEY') ||
+      (cleanKey.includes('GEMINI') && cleanKey.includes('KEY')) ||
+      (cleanKey.includes('GOOGLE') && cleanKey.includes('KEY'))
+    ) {
+      return {
+        apiKey: val.replace(/^["']|["']$/g, '').trim(),
+        matchedKeyName: key
+      };
+    }
+  }
+
+  return { apiKey: '', matchedKeyName: null };
+}
+
 export default async function handler(req: any, res?: any) {
   if (res && typeof res.setHeader === 'function') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -73,12 +119,11 @@ export default async function handler(req: any, res?: any) {
       body = req.body;
     }
 
-    // SERVER-SIDE ONLY: Đọc duy nhất từ biến môi trường server
-    const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
-    const apiKey = rawKey.replace(/^["']|["']$/g, '').trim();
-
+    // SERVER-SIDE ONLY: Đọc duy nhất từ biến môi trường server với giải thuật linh hoạt
+    const { apiKey, matchedKeyName } = resolveServerApiKey();
     const hasGeminiKey = Boolean(apiKey);
-    console.log('[PING_DIAGNOSTIC]', { hasGeminiKey });
+
+    console.log('[PING_DIAGNOSTIC]', { hasGeminiKey, matchedKeyName });
 
     let rawModel = body.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
@@ -87,10 +132,19 @@ export default async function handler(req: any, res?: any) {
     const model = rawModel;
 
     if (!apiKey) {
-      console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
+      const detectedKeys = Object.keys(process.env).filter(k => {
+        const u = k.toUpperCase();
+        return u.includes('GEMINI') || u.includes('GOOGLE') || u.includes('KEY') || u.includes('VERCEL');
+      });
+
+      console.error('[FACT_CHECK] GEMINI_API_KEY is missing. Detected keys:', detectedKeys);
       return sendJson(res, 500, {
         success: false,
-        message: 'Gemini API chưa được cấu hình trên máy chủ (Thiếu GEMINI_API_KEY trong Vercel Environment Variables).'
+        message: 'Gemini API chưa được cấu hình trên máy chủ (Thiếu GEMINI_API_KEY trong Vercel Environment Variables). Hãy đảm bảo đã tích chọn Production và Preview trong Settings rồi bấm Redeploy deployment mới nhất.',
+        diagnostics: {
+          hasGeminiKey: false,
+          detectedKeys
+        }
       });
     }
 
@@ -173,7 +227,8 @@ export default async function handler(req: any, res?: any) {
       message: isSwitched
         ? `✅ Kết nối thành công với Google ${resolvedModel}! (Lưu ý: ${model} tạm quá tải trên AI Studio, hệ thống đã tự động kết nối qua ${resolvedModel})`
         : `✅ Kết nối thành công với Google ${resolvedModel}! (${reply.trim()})`,
-      resolvedModel
+      resolvedModel,
+      matchedKeyName: matchedKeyName || undefined
     });
   } catch (err: any) {
     return sendJson(res, 500, {

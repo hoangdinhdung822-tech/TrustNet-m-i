@@ -24,6 +24,52 @@ function sendJson(res: any, statusCode: number, data: any) {
   }
 }
 
+function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null } {
+  const directCandidates = [
+    'GEMINI_API_KEY',
+    'GOOGLE_API_KEY',
+    'VITE_GEMINI_API_KEY',
+    'GEMINI_KEY',
+    'GOOGLE_GEMINI_API_KEY',
+    'GEMINI_APIKEY'
+  ];
+
+  for (const name of directCandidates) {
+    const val = process.env[name];
+    if (typeof val === 'string' && val.trim().length > 0) {
+      return {
+        apiKey: val.replace(/^["']|["']$/g, '').trim(),
+        matchedKeyName: name
+      };
+    }
+  }
+
+  // Case-insensitive & trimmed search across ALL process.env keys
+  for (const [key, val] of Object.entries(process.env)) {
+    if (typeof val !== 'string' || val.trim().length === 0) continue;
+    const cleanKey = key.trim().toUpperCase();
+    if (
+      cleanKey === 'GEMINI_API_KEY' ||
+      cleanKey === 'GOOGLE_API_KEY' ||
+      cleanKey === 'VITE_GEMINI_API_KEY' ||
+      cleanKey === 'GEMINI_KEY' ||
+      cleanKey === 'GOOGLE_GEMINI_API_KEY' ||
+      cleanKey === 'GEMINI_APIKEY' ||
+      cleanKey.startsWith('GEMINI_API_KEY') ||
+      cleanKey.startsWith('VITE_GEMINI_API_KEY') ||
+      (cleanKey.includes('GEMINI') && cleanKey.includes('KEY')) ||
+      (cleanKey.includes('GOOGLE') && cleanKey.includes('KEY'))
+    ) {
+      return {
+        apiKey: val.replace(/^["']|["']$/g, '').trim(),
+        matchedKeyName: key
+      };
+    }
+  }
+
+  return { apiKey: '', matchedKeyName: null };
+}
+
 export default async function handler(req: any, res?: any) {
   // CORS Preflight
   if (res && typeof res.setHeader === 'function') {
@@ -43,18 +89,26 @@ export default async function handler(req: any, res?: any) {
     return new Response(null, { status: 204 });
   }
 
-  // Server-side diagnostic an toàn (Chỉ kiểm tra boolean, tuyệt đối không log key)
-  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 0);
-  const hasGoogleKey = Boolean(process.env.GOOGLE_API_KEY && process.env.GOOGLE_API_KEY.trim().length > 0);
+  // Server-side diagnostic an toàn (Chỉ kiểm tra boolean và tên biến, TUYỆT ĐỐI không log key)
+  const { apiKey, matchedKeyName } = resolveServerApiKey();
+  const hasGeminiKey = Boolean(apiKey);
+
+  const detectedKeys = Object.keys(process.env).filter(k => {
+    const u = k.toUpperCase();
+    return u.includes('GEMINI') || u.includes('GOOGLE') || u.includes('KEY') || u.includes('VERCEL');
+  });
 
   console.log('[HEALTH_CHECK]', {
     hasGeminiKey,
-    hasGoogleKey
+    matchedKeyName,
+    detectedKeys
   });
 
   return sendJson(res, 200, {
     status: 'ok',
     hasGeminiKey,
+    matchedKeyName: matchedKeyName || null,
+    detectedKeys,
     service: 'TrustNet Serverless Health',
     environment: {
       vercelEnv: process.env.VERCEL_ENV || 'local',

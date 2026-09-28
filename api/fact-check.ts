@@ -298,6 +298,50 @@ function sendJson(res: any, statusCode: number, data: any) {
       }
     });
   }
+function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null } {
+  const directCandidates = [
+    'GEMINI_API_KEY',
+    'GOOGLE_API_KEY',
+    'VITE_GEMINI_API_KEY',
+    'GEMINI_KEY',
+    'GOOGLE_GEMINI_API_KEY',
+    'GEMINI_APIKEY'
+  ];
+
+  for (const name of directCandidates) {
+    const val = process.env[name];
+    if (typeof val === 'string' && val.trim().length > 0) {
+      return {
+        apiKey: val.replace(/^["']|["']$/g, '').trim(),
+        matchedKeyName: name
+      };
+    }
+  }
+
+  // Case-insensitive & trimmed search across ALL process.env keys (tránh lỗi viết thường hoặc khoảng trắng)
+  for (const [key, val] of Object.entries(process.env)) {
+    if (typeof val !== 'string' || val.trim().length === 0) continue;
+    const cleanKey = key.trim().toUpperCase();
+    if (
+      cleanKey === 'GEMINI_API_KEY' ||
+      cleanKey === 'GOOGLE_API_KEY' ||
+      cleanKey === 'VITE_GEMINI_API_KEY' ||
+      cleanKey === 'GEMINI_KEY' ||
+      cleanKey === 'GOOGLE_GEMINI_API_KEY' ||
+      cleanKey === 'GEMINI_APIKEY' ||
+      cleanKey.startsWith('GEMINI_API_KEY') ||
+      cleanKey.startsWith('VITE_GEMINI_API_KEY') ||
+      (cleanKey.includes('GEMINI') && cleanKey.includes('KEY')) ||
+      (cleanKey.includes('GOOGLE') && cleanKey.includes('KEY'))
+    ) {
+      return {
+        apiKey: val.replace(/^["']|["']$/g, '').trim(),
+        matchedKeyName: key
+      };
+    }
+  }
+
+  return { apiKey: '', matchedKeyName: null };
 }
 
 export default async function handler(req: any, res?: any) {
@@ -389,17 +433,16 @@ export default async function handler(req: any, res?: any) {
     }
 
     // 5. Kiểm tra GEMINI_API_KEY ở SERVER-SIDE ONLY (Không bao giờ đọc từ headers / client)
-    const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
-    const apiKey = rawKey.replace(/^["']|["']$/g, '').trim();
-
+    const { apiKey, matchedKeyName } = resolveServerApiKey();
     const hasGeminiKey = Boolean(apiKey);
-    console.log('[FACT_CHECK_DIAGNOSTIC]', { hasGeminiKey });
+
+    console.log('[FACT_CHECK_DIAGNOSTIC]', { hasGeminiKey, matchedKeyName });
 
     if (!apiKey) {
       console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
       return sendJson(res, 500, {
         success: false,
-        error: 'Gemini API is not configured on the server.'
+        error: 'Gemini API is not configured on the server. Vui lòng đảm bảo đã thêm GEMINI_API_KEY cho cả 3 môi trường (Production, Preview, Development) trên Vercel Settings rồi bấm Redeploy deployment mới nhất.'
       });
     }
 
