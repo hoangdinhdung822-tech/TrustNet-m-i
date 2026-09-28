@@ -305,6 +305,8 @@ function sendJson(res: any, statusCode: number, data: any) {
       }
     });
   }
+}
+
 function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null } {
   const directCandidates = [
     'GEMINI_API_KEY',
