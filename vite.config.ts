@@ -44,7 +44,11 @@ function trustnetApiPlugin(): Plugin {
           const parsed = body ? JSON.parse(body) : {};
           const userApiKey = (req.headers['x-gemini-api-key'] as string) || parsed?.apiKey;
           const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
-          const model = parsed?.model || process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+          let rawModel = parsed?.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+          if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
+            rawModel = 'gemini-2.5-flash';
+          }
+          const model = rawModel;
 
           if (!apiKey) {
             res.statusCode = 400;
@@ -74,13 +78,12 @@ function trustnetApiPlugin(): Plugin {
 
           const candidateModels = [
             model,
-            ...discoveredModels.filter(m => m.includes('flash')),
-            ...discoveredModels.filter(m => !m.includes('flash')),
             'gemini-2.5-flash',
             'gemini-2.0-flash',
             'gemini-1.5-flash',
-            'gemini-3.8-flash'
-          ].filter(Boolean);
+            ...discoveredModels.filter(m => m.includes('flash')),
+            ...discoveredModels.filter(m => !m.includes('flash'))
+          ].filter(m => m && m !== 'gemini-3.8-flash');
           const uniqueModels = Array.from(new Set(candidateModels));
 
           let resolvedModel = model;
@@ -109,7 +112,6 @@ function trustnetApiPlugin(): Plugin {
               if (msg.includes('API_KEY_INVALID') || msg.includes('API key not valid')) {
                 throw new Error('Khóa Gemini API Key không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.');
               }
-              console.warn(`[Ping] Model ${m} lỗi: ${msg.slice(0, 100)}... Thử model tiếp theo...`);
               continue;
             }
           }
@@ -135,7 +137,7 @@ function trustnetApiPlugin(): Plugin {
           res.end(JSON.stringify({
             success: true,
             message: isSwitched
-              ? `✅ Kết nối thành công với Google ${resolvedModel}! (Lưu ý: ${model} tạm quá tải 503 trên AI Studio, hệ thống đã tự động kết nối qua ${resolvedModel})`
+              ? `✅ Kết nối thành công với Google ${resolvedModel}! (Lưu ý: ${model} tạm quá tải trên AI Studio, hệ thống đã tự động kết nối qua ${resolvedModel})`
               : `✅ Kết nối thành công với Google ${resolvedModel}! (${reply.trim()})`,
             resolvedModel
           }));
@@ -159,24 +161,78 @@ function trustnetApiPlugin(): Plugin {
         try {
           res.setHeader('Access-Control-Allow-Origin', '*');
           const parsed = body ? JSON.parse(body) : {};
+          const claim = (parsed.claim || parsed.text || '').trim();
+          const url = (parsed.url || parsed.sourceUrl || '').trim();
+          const model = parsed.model;
           const userApiKey = req.headers['x-gemini-api-key'] as string | undefined;
+
+          if (!claim && !url) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({
+              success: false,
+              error: 'Vui lòng cung cấp nội dung phát ngôn (claim) hoặc đường dẫn bài viết (url) cần kiểm chứng.'
+            }));
+            return;
+          }
+
+          if (url) {
+            try {
+              const parsedUrl = new URL(url);
+              if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'Địa chỉ URL không hợp lệ. Chỉ chấp nhận giao thức http:// hoặc https://.'
+                }));
+                return;
+              }
+            } catch {
+              res.statusCode = 400;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({
+                success: false,
+                error: 'Địa chỉ URL không đúng định dạng.'
+              }));
+              return;
+            }
+          }
+
+          const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+          if (!apiKey) {
+            console.error('[FACT-CHECK ERROR] GEMINI_API_KEY is not configured');
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({
+              success: false,
+              error: 'GEMINI_API_KEY is not configured'
+            }));
+            return;
+          }
 
           const { FactCheckService } = await import('./backend/services/factCheckService.ts');
           const result = await FactCheckService.verifyClaim({
-            text: parsed.text || '',
-            sourceUrl: parsed.sourceUrl || undefined,
+            claim: claim || undefined,
+            text: claim || undefined,
+            url: url || undefined,
+            sourceUrl: url || undefined,
             userApiKey: userApiKey || undefined,
-            requestedModel: parsed.model || undefined
+            requestedModel: model || undefined
           });
 
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ success: true, result }));
         } catch (err: any) {
+          console.error('[FACT-CHECK ERROR]', {
+            message: err instanceof Error ? err.message : String(err),
+            stack: err instanceof Error ? err.stack : undefined
+          });
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({
             success: false,
-            error: err?.message || 'Lỗi kiểm chứng trên máy chủ.'
+            error: err instanceof Error ? err.message : 'Unknown server error'
           }));
         }
       });

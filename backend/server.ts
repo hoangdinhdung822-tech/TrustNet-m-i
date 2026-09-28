@@ -108,27 +108,63 @@ app.post(['/api/v1/posts/verify-and-create', '/v1/posts/verify-and-create'], ver
 
 // [POST] /api/v1/fact-check & /v1/fact-check - Kiểm chứng độc lập bằng Google Search Grounding
 app.post(['/api/v1/fact-check', '/v1/fact-check', '/fact-check'], async (req: Request, res: Response) => {
-  const { text, sourceUrl, model } = req.body;
+  const claim = (req.body?.claim || req.body?.text || '').trim();
+  const url = (req.body?.url || req.body?.sourceUrl || '').trim();
+  const model = req.body?.model;
   const userApiKey = req.headers['x-gemini-api-key'] as string | undefined;
 
-  if (!text && !sourceUrl) {
-    return res.status(400).json({ error: 'Vui lòng cung cấp nội dung hoặc đường dẫn nguồn cần kiểm chứng.' });
+  if (!claim && !url) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'Vui lòng cung cấp nội dung phát ngôn (claim) hoặc đường dẫn bài viết (url) cần kiểm chứng.' 
+    });
+  }
+
+  if (url) {
+    try {
+      const parsedUrl = new URL(url);
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        return res.status(400).json({
+          success: false,
+          error: 'Địa chỉ URL không hợp lệ. Chỉ chấp nhận giao thức http:// hoặc https://.'
+        });
+      }
+    } catch {
+      return res.status(400).json({
+        success: false,
+        error: 'Địa chỉ URL không đúng định dạng.'
+      });
+    }
+  }
+
+  const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+  if (!apiKey) {
+    console.error('[FACT-CHECK ERROR] GEMINI_API_KEY is not configured');
+    return res.status(500).json({
+      success: false,
+      error: 'GEMINI_API_KEY is not configured'
+    });
   }
 
   try {
     const result = await FactCheckService.verifyClaim({
-      text: text || '',
-      sourceUrl: sourceUrl || undefined,
+      claim: claim || undefined,
+      text: claim || undefined,
+      url: url || undefined,
+      sourceUrl: url || undefined,
       userApiKey: userApiKey || undefined,
       requestedModel: model || undefined
     });
 
     res.json({ success: true, result });
   } catch (err: any) {
-    console.error('FactCheck API Error:', err?.message || err);
+    console.error('[FACT-CHECK ERROR]', {
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined
+    });
     res.status(500).json({ 
       success: false, 
-      error: err?.message || 'Lỗi máy chủ trong quá trình kiểm chứng thông tin.' 
+      error: err instanceof Error ? err.message : 'Unknown server error' 
     });
   }
 });
@@ -137,7 +173,11 @@ app.post(['/api/v1/fact-check', '/v1/fact-check', '/fact-check'], async (req: Re
 app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'], async (req: Request, res: Response) => {
   const userApiKey = (req.headers['x-gemini-api-key'] as string) || req.body?.apiKey;
   const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
-  const model = req.body?.model || process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+  let rawModel = req.body?.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
+    rawModel = 'gemini-2.5-flash';
+  }
+  const model = rawModel;
 
   if (!apiKey) {
     return res.status(400).json({ 

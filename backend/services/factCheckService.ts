@@ -25,23 +25,41 @@ const MAJOR_NEWS_DOMAINS = [
 ];
 
 export interface VerifyOptions {
-  text: string;
+  text?: string;
+  claim?: string;
   sourceUrl?: string;
+  url?: string;
   userApiKey?: string;
   requestedModel?: string;
 }
 
 export class FactCheckService {
   /**
+   * Chuẩn hóa tên mô hình Gemini hợp lệ (thay thế gemini-3.8-flash không tồn tại bằng gemini-2.5-flash)
+   */
+  public static normalizeModelName(model?: string): string {
+    if (!model) return 'gemini-2.5-flash';
+    let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
+    if (clean.startsWith('models/')) {
+      clean = clean.replace('models/', '');
+    }
+    if (clean === 'gemini-3.8-flash' || clean === 'gemini-3.5-flash' || !clean) {
+      return 'gemini-2.5-flash';
+    }
+    return clean;
+  }
+
+  /**
    * Làm sạch văn bản đầu vào và ngăn chặn prompt injection cơ bản
    */
-  public static sanitizeInput(input: string): string {
+  public static sanitizeInput(input?: string): string {
     if (!input) return '';
     return input
       .trim()
       .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F]/g, '') // loại bỏ control characters
       .slice(0, 10000); // giới hạn độ dài hợp lý
   }
+
 
   /**
    * Kiểm tra URL có phải là địa chỉ nội bộ (Private / Loopback / Localhost) để chống SSRF
@@ -297,19 +315,29 @@ export class FactCheckService {
    * BỘ MÁY KIỂM CHỨNG FACT-CHECKING HOÀN CHỈNH BẰNG GEMINI VỚI GOOGLE SEARCH GROUNDING
    */
   public static async verifyClaim(options: VerifyOptions): Promise<AiVerificationResult> {
-    const { text, sourceUrl, userApiKey, requestedModel } = options;
+    const rawClaim = options.claim || options.text || '';
+    const rawSourceUrl = options.url || options.sourceUrl || '';
+    const { userApiKey, requestedModel } = options;
 
-    const sanitizedText = this.sanitizeInput(text);
+    const sanitizedText = this.sanitizeInput(rawClaim);
+    const sourceUrl = rawSourceUrl.trim();
+
+    console.log('[FACT-CHECK TRACE] Request received:', {
+      hasClaim: Boolean(sanitizedText),
+      claimSnippet: sanitizedText ? sanitizedText.slice(0, 80) : '',
+      hasUrl: Boolean(sourceUrl),
+      urlSnippet: sourceUrl ? sourceUrl.slice(0, 80) : '',
+      requestedModel: requestedModel || 'default'
+    });
+
     if (!sanitizedText && !sourceUrl) {
-      throw new Error('Vui lòng cung cấp nội dung hoặc đường dẫn bài viết cần kiểm chứng.');
+      throw new Error('Vui lòng cung cấp nội dung phát ngôn (claim) hoặc đường dẫn bài viết (url) cần kiểm chứng.');
     }
 
     const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
     if (!apiKey) {
-      throw new Error(
-        'Chưa thiết lập GEMINI_API_KEY trên máy chủ. ' +
-        'Vui lòng thêm GEMINI_API_KEY vào tệp .env (hoặc nhập API Key trong cửa sổ Cấu hình trên giao diện).'
-      );
+      console.error('[FACT-CHECK ERROR] Missing GEMINI_API_KEY on server and client');
+      throw new Error('GEMINI_API_KEY is not configured');
     }
 
     // 1. XỬ LÝ URL NGUỒN CỦA NGƯỜI DÙNG (NẾU CÓ)
@@ -321,8 +349,8 @@ export class FactCheckService {
       error?: string;
     } | null = null;
 
-    if (sourceUrl && sourceUrl.trim().length > 0) {
-      urlContextData = await this.fetchUserUrlContext(sourceUrl.trim());
+    if (sourceUrl && sourceUrl.length > 0) {
+      urlContextData = await this.fetchUserUrlContext(sourceUrl);
     }
 
     // 2. MỐC THỜI GIAN THỰC TẾ
@@ -472,28 +500,25 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
       for await (const m of list) {
         if (m.name) {
           const simpleName = m.name.replace(/^models\//, '');
-          // Ưu tiên các model hỗ trợ generateContent và thuộc dòng flash hoặc pro
           if ((m as any).supportedActions?.includes('generateContent') || !(m as any).supportedActions) {
             liveAvailableModels.push(simpleName);
           }
         }
       }
-      console.log('[FactCheck] Danh sách models khả dụng từ Google AI Studio:', liveAvailableModels);
     } catch (e: any) {
-      console.warn('[FactCheck] Không thể lấy danh sách models tự động:', e?.message || e);
+      console.warn('[FACT-CHECK TRACE] Could not list models automatically:', e?.message || e);
     }
 
-    // Resilient Model Fallback Chain
+    const normalizedRequested = this.normalizeModelName(requestedModel || process.env.GEMINI_MODEL);
+
+    // Resilient Model Fallback Chain (loại bỏ gemini-3.8-flash, ưu tiên gemini-2.5-flash)
     const candidateModels = [
-      requestedModel,
-      process.env.GEMINI_MODEL,
-      // Đưa các model flash phát hiện được từ tài khoản lên đầu
-      ...liveAvailableModels.filter(m => m.includes('flash')),
-      ...liveAvailableModels.filter(m => !m.includes('flash')),
+      normalizedRequested,
       'gemini-2.5-flash',
       'gemini-2.0-flash',
       'gemini-1.5-flash',
-      'gemini-3.8-flash'
+      ...liveAvailableModels.filter(m => m.includes('flash')),
+      ...liveAvailableModels.filter(m => !m.includes('flash'))
     ].filter(Boolean) as string[];
 
     // Loại bỏ model trùng lặp
@@ -501,11 +526,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
     let lastError: any = null;
     let successfulResponse: any = null;
-    let resolvedModel = uniqueModels[0];
+    let resolvedModel = uniqueModels[0] || 'gemini-2.5-flash';
 
     for (const modelName of uniqueModels) {
       try {
-        console.log(`[FactCheck] Đang thử kiểm chứng với model: ${modelName}...`);
+        console.log(`[FACT-CHECK TRACE] Calling Gemini API with model: ${modelName}`);
         const response = await ai.models.generateContent({
           model: modelName,
           contents: systemPrompt,
@@ -522,7 +547,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
         if (response && response.candidates && response.candidates.length > 0) {
           successfulResponse = response;
           resolvedModel = modelName;
-          console.log(`[FactCheck] ✅ Model ${modelName} phản hồi thành công!`);
+          console.log(`[FACT-CHECK TRACE] Gemini response received from model: ${modelName}`);
           break;
         }
       } catch (err: any) {
@@ -535,14 +560,13 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           }
         } catch {}
 
-        console.warn(`[FactCheck] Model ${modelName} gặp lỗi: ${errMsg}`);
+        console.warn(`[FACT-CHECK TRACE] Model ${modelName} encountered error: ${errMsg}`);
 
         // Nếu API Key sai thì dừng ngay để báo cho người dùng
         if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('API key not valid')) {
           throw new Error('Khóa Gemini API Key không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio. Vui lòng kiểm tra lại API Key.');
         }
 
-        // Với mọi lỗi model khác (503 quá tải, 429 quota, 404 not found, deprecated), tiếp tục thử model khác
         continue;
       }
     }
@@ -553,6 +577,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
         const parsed = JSON.parse(finalMsg);
         if (parsed?.error?.message) finalMsg = parsed.error.message;
       } catch {}
+
+      console.error('[FACT-CHECK ERROR] All candidate models failed:', {
+        lastError: finalMsg,
+        modelsTried: uniqueModels
+      });
 
       if (finalMsg.includes('high demand') || finalMsg.includes('503')) {
         throw new Error('Hệ thống máy chủ Google Gemini đang trong thời điểm quá tải cao (503 High Demand). Vui lòng thử lại sau vài giây.');
@@ -566,13 +595,18 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     const candidate = successfulResponse.candidates[0];
     const rawText = candidate?.content?.parts?.map((p: any) => p.text || '').join('') || '';
     if (!rawText.trim()) {
-      throw new Error('Mô hình Gemini không phản hồi nội dung.');
+      throw new Error('Mô hình Gemini không phản hồi nội dung văn bản.');
     }
 
-    // 5. BÓC TÁCH GROUNDING METADATA THỰC TỪ GOOGLE SEARCH
-    const grounding = candidate?.groundingMetadata;
-    const googleSearchQueries: string[] = grounding?.webSearchQueries || [];
-    const groundingChunks = grounding?.groundingChunks || [];
+    // 5. BÓC TÁCH GROUNDING METADATA THỰC TỪ GOOGLE SEARCH AN TOÀN
+    const grounding = candidate?.groundingMetadata ?? null;
+    const googleSearchQueries: string[] = Array.isArray(grounding?.webSearchQueries) ? grounding.webSearchQueries : [];
+    const groundingChunks: any[] = Array.isArray(grounding?.groundingChunks) ? grounding.groundingChunks : [];
+
+    console.log('[FACT-CHECK TRACE] Grounding metadata present:', Boolean(grounding));
+    console.log('[FACT-CHECK TRACE] Grounding chunks count:', groundingChunks.length);
+    console.log('[FACT-CHECK TRACE] Web search queries:', googleSearchQueries);
+
 
     // Trích xuất danh sách nguồn thực từ grounding chunks của Google
     const realGroundingSources: EvaluatedSource[] = groundingChunks

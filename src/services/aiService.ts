@@ -8,7 +8,7 @@ import { AiVerificationResult, CodeInspectionReport } from '../types';
 
 const GEMINI_API_KEY_STORAGE = 'trustnet_gemini_api_key';
 const GEMINI_MODEL_STORAGE = 'trustnet_gemini_model';
-const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 // Danh sách từ khóa báo động giật gân, thao túng cảm xúc (Dành cho Inspector)
 const SENSATIONAL_WORDS = [
@@ -40,6 +40,9 @@ export class AiVerificationService {
     let cleaned = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
     if (cleaned.startsWith('models/')) {
       cleaned = cleaned.replace('models/', '');
+    }
+    if (cleaned === 'gemini-3.8-flash' || cleaned === 'gemini-3.5-flash') {
+      return DEFAULT_GEMINI_MODEL;
     }
     return cleaned || DEFAULT_GEMINI_MODEL;
   }
@@ -111,12 +114,24 @@ export class AiVerificationService {
         body: JSON.stringify({ model: targetModel, apiKey: cleanKey })
       });
 
-      const data = await res.json().catch(() => ({}));
+      let data: any = {};
+      let rawText = '';
+      try {
+        rawText = await res.text();
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        // Không phải JSON
+      }
+
       if (!res.ok || !data.success) {
-        let msg = data.message;
+        let msg = data?.message || data?.error;
         if (!msg) {
-          if (res.status === 404) {
+          if (rawText && rawText.trim().length > 0 && !rawText.trim().startsWith('<')) {
+            msg = rawText.trim().slice(0, 300);
+          } else if (res.status === 404) {
             msg = 'Lỗi 404: Không tìm thấy máy chủ kiểm chứng (/api/v1/fact-check/ping). Vui lòng đảm bảo server đang chạy hoặc đã triển khai Vercel Serverless Function.';
+          } else if (res.status === 500) {
+            msg = 'Lỗi 500: Chưa cấu hình GEMINI_API_KEY hoặc máy chủ gặp sự cố.';
           } else {
             msg = `Lỗi kiểm tra kết nối (${res.status}): ${res.statusText || 'Yêu cầu không thành công'}`;
           }
@@ -174,7 +189,9 @@ export class AiVerificationService {
         method: 'POST',
         headers,
         body: JSON.stringify({
+          claim: text,
           text,
+          url: sourceUrl?.trim() || undefined,
           sourceUrl: sourceUrl?.trim() || undefined,
           model
         })
@@ -184,13 +201,24 @@ export class AiVerificationService {
         onProgress('⚖️ Đang đối chiếu bằng chứng đa nguồn & tính toán độ tin cậy...');
       }
 
-      const data = await response.json().catch(() => ({}));
+      let data: any = {};
+      let rawText = '';
+      try {
+        rawText = await response.text();
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        // Không phải JSON
+      }
 
       if (!response.ok || !data.success) {
-        let errorMsg = data?.error;
+        let errorMsg = data?.error || data?.message;
         if (!errorMsg) {
-          if (response.status === 404) {
+          if (rawText && rawText.trim().length > 0 && !rawText.trim().startsWith('<')) {
+            errorMsg = rawText.trim().slice(0, 300);
+          } else if (response.status === 404) {
             errorMsg = 'Lỗi 404: Không tìm thấy API kiểm chứng (/api/v1/fact-check). Vui lòng kiểm tra Vercel Serverless Function hoặc khởi động server backend.';
+          } else if (response.status === 500) {
+            errorMsg = 'Lỗi máy chủ (500): GEMINI_API_KEY chưa được cấu hình trên máy chủ. Vui lòng thêm GEMINI_API_KEY trên Vercel hoặc nhập API Key trong phần Cấu hình.';
           } else {
             errorMsg = `Lỗi phản hồi máy chủ (${response.status}): ${response.statusText || 'Lỗi không xác định'}`;
           }
