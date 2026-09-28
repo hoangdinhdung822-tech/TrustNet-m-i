@@ -629,45 +629,67 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     const modelErrors: Record<string, string> = {};
 
     for (const modelName of candidateModels) {
-      try {
-        console.log(`[FACT_CHECK] Calling Gemini API with model: ${modelName}`);
+      let modelSucceeded = false;
+      const maxRetriesForModel = 2;
 
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`Timeout 25s khi kết nối tới mô hình ${modelName}`)), 25000)
-        );
+      for (let attempt = 0; attempt <= maxRetriesForModel; attempt++) {
+        if (attempt > 0) {
+          const backoffMs = attempt * 1000 + Math.floor(Math.random() * 500);
+          console.log(`[FACT_CHECK] Retrying model ${modelName} after ${backoffMs}ms (attempt ${attempt + 1}/${maxRetriesForModel + 1})...`);
+          await new Promise(r => setTimeout(r, backoffMs));
+        }
 
-        const apiCallPromise = ai.models.generateContent({
-          model: modelName,
-          contents: systemPrompt,
-          config: {
-            tools: [{ googleSearch: {} }],
-            temperature: 0.1
+        try {
+          console.log(`[FACT_CHECK] Calling Gemini API with model: ${modelName} (attempt ${attempt + 1})`);
+
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout 25s khi kết nối tới mô hình ${modelName}`)), 25000)
+          );
+
+          const apiCallPromise = ai.models.generateContent({
+            model: modelName,
+            contents: systemPrompt,
+            config: {
+              tools: [{ googleSearch: {} }],
+              temperature: 0.1
+            }
+          });
+
+          const response: any = await Promise.race([apiCallPromise, timeoutPromise]);
+
+          if (response && response.candidates && response.candidates.length > 0) {
+            successfulResponse = response;
+            resolvedModel = modelName;
+            modelSucceeded = true;
+            console.log(`[FACT_CHECK] Gemini response received from model: ${modelName}`);
+            break;
           }
-        });
+        } catch (err: any) {
+          lastError = err;
+          let errMsg = err?.message || String(err);
+          try {
+            const parsedErr = JSON.parse(errMsg);
+            if (parsedErr?.error?.message) errMsg = parsedErr.error.message;
+          } catch {}
 
-        const response: any = await Promise.race([apiCallPromise, timeoutPromise]);
+          modelErrors[modelName] = errMsg;
+          console.warn(`[FACT_CHECK] Model ${modelName} attempt ${attempt + 1} encountered error: ${errMsg}`);
 
-        if (response && response.candidates && response.candidates.length > 0) {
-          successfulResponse = response;
-          resolvedModel = modelName;
-          console.log(`[FACT_CHECK] Gemini response received from model: ${modelName}`);
+          if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('API key not valid')) {
+            throw new Error('Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.');
+          }
+
+          // Tiếp tục thử lại nếu gặp lỗi quá tải tạm thời 503 hoặc hạn ngạch 429
+          const isTransient = errMsg.includes('503') || errMsg.includes('high demand') || errMsg.includes('overloaded') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota');
+          if (isTransient && attempt < maxRetriesForModel) {
+            continue;
+          }
           break;
         }
-      } catch (err: any) {
-        lastError = err;
-        let errMsg = err?.message || String(err);
-        try {
-          const parsedErr = JSON.parse(errMsg);
-          if (parsedErr?.error?.message) errMsg = parsedErr.error.message;
-        } catch {}
+      }
 
-        modelErrors[modelName] = errMsg;
-        console.warn(`[FACT_CHECK] Model ${modelName} encountered error: ${errMsg}`);
-
-        if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('API key not valid')) {
-          throw new Error('Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.');
-        }
-        continue;
+      if (modelSucceeded) {
+        break;
       }
     }
 

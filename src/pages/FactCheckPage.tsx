@@ -681,12 +681,23 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                 <span>{errorMessage}</span>
               </div>
             </div>
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-rose-900/60 hover:bg-rose-800/80 text-rose-200 font-bold shrink-0 text-[11px] border border-rose-500/30"
-            >
-              Mở Cấu hình
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleRunCheck}
+                disabled={isAnalyzing}
+                className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-bold text-[11px] shadow-glow-sm transition-all cursor-pointer"
+              >
+                Thử lại ngay
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSettingsOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-rose-900/60 hover:bg-rose-800/80 text-rose-200 font-bold text-[11px] border border-rose-500/30"
+              >
+                Mở Cấu hình
+              </button>
+            </div>
           </div>
         )}
 

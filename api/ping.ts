@@ -194,37 +194,46 @@ export default async function handler(req: any, res?: any) {
     let pingSuccess = false;
 
     for (const m of candidateModels) {
-      try {
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`Timeout 10s khi ping mô hình ${m}`)), 10000)
-        );
-
-        const callPromise = ai.models.generateContent({
-          model: m,
-          contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.'
-        });
-
-        const response: any = await Promise.race([callPromise, timeoutPromise]);
-        reply = response.text || 'Connected';
-        resolvedModel = m;
-        pingSuccess = true;
-        break;
-      } catch (err: any) {
-        lastPingErr = err;
-        let msg = err?.message || String(err);
-        try {
-          const parsedErr = JSON.parse(msg);
-          if (parsedErr?.error?.message) msg = parsedErr.error.message;
-        } catch {}
-
-        if (msg.includes('API_KEY_INVALID') || msg.includes('API key not valid')) {
-          return sendJson(res, 500, {
-            success: false,
-            message: 'Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.'
-          });
+      for (let attempt = 0; attempt <= 1; attempt++) {
+        if (attempt > 0) {
+          await new Promise(r => setTimeout(r, 1000));
         }
-        continue;
+        try {
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout 10s khi ping mô hình ${m}`)), 10000)
+          );
+
+          const callPromise = ai.models.generateContent({
+            model: m,
+            contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.'
+          });
+
+          const response: any = await Promise.race([callPromise, timeoutPromise]);
+          reply = response.text || 'Connected';
+          resolvedModel = m;
+          pingSuccess = true;
+          break;
+        } catch (err: any) {
+          lastPingErr = err;
+          let msg = err?.message || String(err);
+          try {
+            const parsedErr = JSON.parse(msg);
+            if (parsedErr?.error?.message) msg = parsedErr.error.message;
+          } catch {}
+
+          if (msg.includes('API_KEY_INVALID') || msg.includes('API key not valid')) {
+            return sendJson(res, 500, {
+              success: false,
+              message: 'Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.'
+            });
+          }
+          if ((msg.includes('503') || msg.includes('high demand') || msg.includes('overloaded')) && attempt < 1) {
+            continue;
+          }
+          break;
+        }
       }
+      if (pingSuccess) break;
     }
 
     if (!pingSuccess) {
