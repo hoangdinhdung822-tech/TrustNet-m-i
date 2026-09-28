@@ -173,11 +173,14 @@ app.post(['/api/v1/fact-check', '/v1/fact-check', '/fact-check'], async (req: Re
 app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'], async (req: Request, res: Response) => {
   const userApiKey = (req.headers['x-gemini-api-key'] as string) || req.body?.apiKey;
   const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
-  let rawModel = req.body?.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-  if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
-    rawModel = 'gemini-2.5-flash';
+  let rawModel = req.body?.model || process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  let clean = rawModel.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
+  if (clean.includes('pro') && (clean.includes('2.5') || clean.includes('1.5') || clean.includes('2.0'))) {
+    clean = 'gemini-3.1-pro-preview';
+  } else if (clean.includes('1.5') || clean.includes('2.0') || clean.includes('2.5') || !clean.startsWith('gemini-')) {
+    clean = 'gemini-3.5-flash-lite';
   }
-  const model = rawModel;
+  const model = clean;
 
   if (!apiKey) {
     return res.status(400).json({ 
@@ -188,29 +191,15 @@ app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'],
 
   try {
     const { GoogleGenAI } = await import('@google/genai');
-    const ai = new GoogleGenAI({ apiKey });
-
-    let discoveredModels: string[] = [];
-    try {
-      const list = await ai.models.list();
-      for await (const item of list) {
-        if (item.name) {
-          const cleanName = item.name.replace(/^models\//, '');
-          discoveredModels.push(cleanName);
-        }
-      }
-    } catch (e: any) {
-      console.warn('[Server Ping] Could not list models:', e?.message);
-    }
+    const ai = new GoogleGenAI({ 
+      apiKey,
+      httpOptions: { timeout: 6000 }
+    });
 
     const candidateModels = [
       model,
-      ...discoveredModels.filter(m => m.includes('flash')),
-      ...discoveredModels.filter(m => !m.includes('flash')),
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-3.8-flash'
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-pro-preview'
     ].filter(Boolean);
     const uniqueModels = Array.from(new Set(candidateModels));
 
@@ -221,10 +210,19 @@ app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'],
 
     for (const m of uniqueModels) {
       try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 6000);
+
         const response = await ai.models.generateContent({
           model: m,
-          contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.'
+          contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.',
+          config: {
+            abortSignal: controller.signal,
+            httpOptions: { timeout: 6000 }
+          }
         });
+        clearTimeout(timer);
+
         reply = response.text || 'Connected';
         resolvedModel = m;
         pingSuccess = true;
@@ -253,7 +251,7 @@ app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'],
       } catch {}
 
       if (errorMsg.includes('high demand') || errorMsg.includes('503')) {
-        throw new Error('Mô hình Gemini đang trải qua thời điểm quá tải tạm thời (503 High Demand). Vui lòng thử lại sau giây lát hoặc chọn gemini-2.5-flash.');
+        throw new Error('Mô hình Gemini đang trải qua thời điểm quá tải tạm thời (503 High Demand). Vui lòng thử lại sau giây lát hoặc chọn gemini-3.5-flash-lite.');
       } else if (errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota') || errorMsg.includes('429')) {
         throw new Error('Hạn mức truy vấn (Quota) của API Key tạm thời đã hết hoặc bị giới hạn trên AI Studio.');
       } else {

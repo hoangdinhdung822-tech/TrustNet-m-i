@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { GEMINI_CONFIG, normalizeModelName } from './gemini-config';
 
 function sendJson(res: any, statusCode: number, data: any) {
   if (res && typeof res.status === 'function') {
@@ -72,23 +73,7 @@ function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null 
   return { apiKey: '', matchedKeyName: null };
 }
 
-function normalizeModelName(model?: string): string {
-  if (!model) return 'gemini-2.5-flash';
-  let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
-  if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
-  // Google đã đóng (shut down/deprecated) Gemini 1.5, 2.0, 2.5-pro -> tự động ánh xạ lên gemini-2.5-flash
-  if (
-    clean.includes('1.5') || 
-    clean.includes('2.0') || 
-    clean.includes('2.5-pro') ||
-    clean.includes('3.5') || 
-    clean.includes('3.8') ||
-    !clean.startsWith('gemini-')
-  ) {
-    return 'gemini-2.5-flash';
-  }
-  return clean;
-}
+
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -172,11 +157,12 @@ export default async function handler(req: any, res?: any) {
 
     const candidateModels = Array.from(new Set([
       requestedModel,
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite'
-    ])).filter(m => Boolean(m) && m !== 'gemini-2.5-pro');
+      GEMINI_CONFIG.FAST_MODEL,
+      GEMINI_CONFIG.PRIMARY_MODEL,
+      GEMINI_CONFIG.FALLBACK_MODEL
+    ])).filter(Boolean);
 
-    let resolvedModel = candidateModels[0] || 'gemini-2.5-flash';
+    let resolvedModel = candidateModels[0] || GEMINI_CONFIG.FAST_MODEL;
     let reply = 'Connected';
     let lastPingErr: any = null;
     let pingSuccess = false;
@@ -234,10 +220,17 @@ export default async function handler(req: any, res?: any) {
         if (parsedJson?.error?.message) errorMsg = parsedJson.error.message;
       } catch {}
 
-      if (errorMsg.includes('high demand') || errorMsg.includes('503')) {
+      if (errorMsg.includes('no longer available') || errorMsg.includes('not found') || errorMsg.includes('NOT_FOUND') || errorMsg.includes('unsupported model')) {
+        return sendJson(res, 400, {
+          success: false,
+          code: 'GEMINI_MODEL_UNAVAILABLE',
+          message: `Mô hình Gemini [${resolvedModel}] không khả dụng hoặc đã bị Google ngừng cung cấp: ${errorMsg}`
+        });
+      } else if (errorMsg.includes('high demand') || errorMsg.includes('503')) {
         return sendJson(res, 503, {
           success: false,
-          message: 'Mô hình Gemini đang trải qua thời điểm quá tải tạm thời (503 High Demand). Vui lòng thử lại sau giây lát hoặc chọn gemini-2.5-flash.'
+          code: 'GEMINI_TEMPORARILY_UNAVAILABLE',
+          message: `Mô hình Gemini đang trải qua thời điểm quá tải tạm thời (503 High Demand). Vui lòng thử lại sau giây lát hoặc chọn ${GEMINI_CONFIG.FAST_MODEL}.`
         });
       } else if (errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota') || errorMsg.includes('429')) {
         return sendJson(res, 429, {

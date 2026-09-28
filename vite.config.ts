@@ -43,11 +43,14 @@ function trustnetApiPlugin(): Plugin {
           res.setHeader('Access-Control-Allow-Origin', '*');
           const parsed = body ? JSON.parse(body) : {};
           const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
-          let rawModel = parsed?.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-          if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
-            rawModel = 'gemini-2.5-flash';
+          let rawModel = parsed?.model || process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+          let clean = rawModel.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
+          if (clean.includes('pro') && (clean.includes('2.5') || clean.includes('1.5') || clean.includes('2.0'))) {
+            clean = 'gemini-3.1-pro-preview';
+          } else if (clean.includes('1.5') || clean.includes('2.0') || clean.includes('2.5') || !clean.startsWith('gemini-')) {
+            clean = 'gemini-3.5-flash-lite';
           }
-          const model = rawModel;
+          const model = clean;
 
           if (!apiKey) {
             console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
@@ -61,30 +64,17 @@ function trustnetApiPlugin(): Plugin {
           }
 
           const { GoogleGenAI } = await import('@google/genai');
-          const ai = new GoogleGenAI({ apiKey });
-
-          let discoveredModels: string[] = [];
-          try {
-            const list = await ai.models.list();
-            for await (const item of list) {
-              if (item.name) {
-                const cleanName = item.name.replace(/^models\//, '');
-                discoveredModels.push(cleanName);
-              }
-            }
-          } catch (e: any) {
-            console.warn('Could not list models:', e?.message);
-          }
+          const ai = new GoogleGenAI({ 
+            apiKey,
+            httpOptions: { timeout: 6000 }
+          });
 
           const candidateModels = [
             model,
-            'gemini-2.5-flash',
-            'gemini-2.5-flash-lite',
-            'gemini-2.5-pro',
-            ...discoveredModels.filter(m => m.includes('flash')),
-            ...discoveredModels.filter(m => !m.includes('flash'))
-          ].filter(m => m && !m.includes('1.5') && !m.includes('2.0') && !m.includes('3.8'));
-          const uniqueModels = Array.from(new Set(candidateModels));
+            'gemini-3.5-flash-lite',
+            'gemini-3.1-pro-preview'
+          ];
+          const uniqueModels = Array.from(new Set(candidateModels)).filter(Boolean);
 
           let resolvedModel = model;
           let reply = 'Connected';
@@ -93,10 +83,19 @@ function trustnetApiPlugin(): Plugin {
 
           for (const m of uniqueModels) {
             try {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), 6000);
+
               const response = await ai.models.generateContent({
                 model: m,
-                contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.'
+                contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.',
+                config: {
+                  abortSignal: controller.signal,
+                  httpOptions: { timeout: 6000 }
+                }
               });
+              clearTimeout(timer);
+
               reply = response.text || 'Connected';
               resolvedModel = m;
               pingSuccess = true;
@@ -124,7 +123,7 @@ function trustnetApiPlugin(): Plugin {
             } catch {}
 
             if (errorMsg.includes('high demand') || errorMsg.includes('503')) {
-              throw new Error('Mô hình Gemini đang trải qua thời điểm quá tải tạm thời (503 High Demand). Vui lòng thử lại sau giây lát hoặc chọn gemini-2.5-flash.');
+              throw new Error('Mô hình Gemini đang trải qua thời điểm quá tải tạm thời (503 High Demand). Vui lòng thử lại sau giây lát hoặc chọn gemini-3.5-flash-lite.');
             } else if (errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota') || errorMsg.includes('429')) {
               throw new Error('Hạn mức truy vấn (Quota) của API Key tạm thời đã hết hoặc bị giới hạn trên AI Studio.');
             } else {

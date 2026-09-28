@@ -35,22 +35,24 @@ export interface VerifyOptions {
 
 export class FactCheckService {
   /**
-   * Chuẩn hóa tên mô hình Gemini hợp lệ (thay thế gemini-3.8-flash không tồn tại bằng gemini-2.5-flash)
+   * Chuẩn hóa tên mô hình Gemini hợp lệ (chuyển các phiên bản cũ sang gemini-3.5-flash-lite)
    */
   public static normalizeModelName(model?: string): string {
-    if (!model) return 'gemini-2.5-flash';
+    if (!model) return 'gemini-3.5-flash-lite';
     let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
     if (clean.startsWith('models/')) {
       clean = clean.replace(/^models\//, '');
     }
+    if (clean.includes('pro') && (clean.includes('2.5') || clean.includes('1.5') || clean.includes('2.0'))) {
+      return 'gemini-3.1-pro-preview';
+    }
     if (
       clean.includes('1.5') || 
       clean.includes('2.0') || 
-      clean.includes('3.5') || 
-      clean.includes('3.8') ||
+      clean.includes('2.5') ||
       !clean.startsWith('gemini-')
     ) {
-      return 'gemini-2.5-flash';
+      return 'gemini-3.5-flash-lite';
     }
     return clean;
   }
@@ -517,14 +519,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
     const normalizedRequested = this.normalizeModelName(requestedModel || process.env.GEMINI_MODEL);
 
-    // Resilient Model Fallback Chain (loại bỏ phiên bản cũ đã ngưng hoạt động, ưu tiên gemini-2.5-flash)
+    // Resilient Model Fallback Chain (loại bỏ phiên bản cũ đã ngưng hoạt động, ưu tiên gemini-3.5-flash-lite)
     const candidateModels = [
       normalizedRequested,
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
-      'gemini-2.5-pro',
-      ...liveAvailableModels.filter(m => m.includes('flash')),
-      ...liveAvailableModels.filter(m => !m.includes('flash'))
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-pro-preview'
     ].filter(Boolean) as string[];
 
     // Loại bỏ model trùng lặp
@@ -532,7 +531,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
     let lastError: any = null;
     let successfulResponse: any = null;
-    let resolvedModel = uniqueModels[0] || 'gemini-2.5-flash';
+    let resolvedModel = uniqueModels[0] || 'gemini-3.5-flash-lite';
 
     for (const modelName of uniqueModels) {
       try {

@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { GEMINI_CONFIG, normalizeModelName } from './gemini-config';
 
 export type VerificationStatus = 'verified' | 'unverified' | 'suspicious' | 'debunked' | 'analyzing';
 export type FactCheckVerdict = 'TRUE' | 'FALSE' | 'MISLEADING' | 'INSUFFICIENT_EVIDENCE';
@@ -99,23 +100,7 @@ const MAJOR_NEWS_DOMAINS = [
   'apnews.com', 'bbc.com', 'who.int', 'unesco.org'
 ];
 
-function normalizeModelName(model?: string): string {
-  if (!model) return 'gemini-2.5-flash';
-  let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
-  if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
-  // Google đã ngưng hỗ trợ Gemini 1.5, 2.0, 2.5-pro cho new users -> tự động nâng cấp lên 2.5-flash
-  if (
-    clean.includes('1.5') || 
-    clean.includes('2.0') || 
-    clean.includes('2.5-pro') ||
-    clean.includes('3.5') || 
-    clean.includes('3.8') ||
-    !clean.startsWith('gemini-')
-  ) {
-    return 'gemini-2.5-flash';
-  }
-  return clean;
-}
+
 
 function sanitizeInput(input?: string): string {
   if (!input) return '';
@@ -611,8 +596,10 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
       apiKey,
       httpOptions: { timeout: 10000 }
     });
-    const primaryModel = normalizeModelName(requestedModel || process.env.GEMINI_MODEL || 'gemini-2.5-flash');
-    const fallbackModel = 'gemini-2.5-flash-lite';
+    const primaryModel = normalizeModelName(requestedModel || GEMINI_CONFIG.PRIMARY_MODEL);
+    const fallbackModel = primaryModel === GEMINI_CONFIG.FALLBACK_MODEL 
+      ? 'gemini-3.5-flash-lite' 
+      : GEMINI_CONFIG.FALLBACK_MODEL;
 
     let lastError: any = null;
     let successfulResponse: any = null;
@@ -705,6 +692,14 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           success: false,
           code: 'API_KEY_INVALID',
           message: 'Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.'
+        });
+      }
+
+      if (msg1.includes('no longer available') || msg1.includes('not found') || msg1.includes('NOT_FOUND') || msg1.includes('unsupported model')) {
+        return sendJson(res, 400, {
+          success: false,
+          code: 'GEMINI_MODEL_UNAVAILABLE',
+          message: `Mô hình AI [${primaryModel}] không khả dụng hoặc đã bị Google ngừng cung cấp: ${msg1}`
         });
       }
 
@@ -844,6 +839,14 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           success: false,
           code: 'FACT_CHECK_TIMEOUT',
           message: 'Kiểm chứng mất quá nhiều thời gian. Vui lòng thử lại.'
+        });
+      }
+
+      if (finalMsg.includes('no longer available') || finalMsg.includes('not found') || finalMsg.includes('NOT_FOUND') || finalMsg.includes('unsupported model')) {
+        return sendJson(res, 400, {
+          success: false,
+          code: 'GEMINI_MODEL_UNAVAILABLE',
+          message: `Mô hình Gemini không khả dụng hoặc đã bị Google ngừng cung cấp: ${finalMsg}`
         });
       }
 

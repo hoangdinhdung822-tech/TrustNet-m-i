@@ -26,6 +26,7 @@ import { AiVerificationService } from '../services/aiService';
 import { DatabaseService } from '../services/dbMock';
 import { AiVerificationResult, FactCheckRecord, User } from '../types';
 import { AiStatusBadge } from '../components/AiStatusBadge';
+import { FRONTEND_GEMINI_CONFIG } from '../config/geminiConfig';
 
 interface FactCheckResultViewProps {
   result: AiVerificationResult;
@@ -427,7 +428,7 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
   const [simulatedImageName, setSimulatedImageName] = useState<string | null>(null);
 
   // Gemini Settings State
-  const [selectedModel, setSelectedModel] = useState<string>(() => AiVerificationService.getGeminiModel() || 'gemini-2.5-flash');
+  const [selectedModel, setSelectedModel] = useState<string>(() => AiVerificationService.getGeminiModel() || FRONTEND_GEMINI_CONFIG.DEFAULT_MODEL);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [testState, setTestState] = useState<{ testing: boolean; message: string | null; success: boolean | null }>({
     testing: false,
@@ -810,12 +811,12 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedModel('gemini-2.5-flash');
-                    AiVerificationService.setGeminiModel('gemini-2.5-flash');
+                    setSelectedModel(FRONTEND_GEMINI_CONFIG.DEFAULT_MODEL);
+                    AiVerificationService.setGeminiModel(FRONTEND_GEMINI_CONFIG.DEFAULT_MODEL);
                   }}
                   className="text-[11px] text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 font-semibold"
                 >
-                  ⚡ Đặt về gemini-2.5-flash (Chuẩn Google AI Studio)
+                  ⚡ Đặt về {FRONTEND_GEMINI_CONFIG.DEFAULT_MODEL} (Chuẩn Google AI Studio)
                 </button>
               </div>
               <select
@@ -823,9 +824,11 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                 onChange={(e) => setSelectedModel(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
               >
-                <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyến nghị: Chuẩn Google AI Studio, hỗ trợ Search Grounding)</option>
-                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Bản siêu nhanh, tối ưu tài nguyên)</option>
-                <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Mô hình suy luận sâu thế hệ mới)</option>
+                {FRONTEND_GEMINI_CONFIG.AVAILABLE_MODELS.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
               </select>
             </div>
 

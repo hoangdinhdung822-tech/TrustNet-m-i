@@ -1,4 +1,5 @@
 import { AiVerificationResult, CodeInspectionReport } from '../types';
+import { FRONTEND_GEMINI_CONFIG, sanitizeFrontendModel } from '../config/geminiConfig';
 
 /**
  * TrustNet AI Verification Engine (Client Service)
@@ -7,7 +8,7 @@ import { AiVerificationResult, CodeInspectionReport } from '../types';
  */
 
 const GEMINI_MODEL_STORAGE = 'trustnet_gemini_model';
-const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+const DEFAULT_GEMINI_MODEL = FRONTEND_GEMINI_CONFIG.DEFAULT_MODEL;
 
 // Danh sách từ khóa báo động giật gân, thao túng cảm xúc (Dành cho Inspector)
 const SENSATIONAL_WORDS = [
@@ -25,24 +26,10 @@ const PHISHING_SIGNALS = [
 export class AiVerificationService {
   /**
    * Chuẩn hóa tên Model Gemini (xử lý dấu gạch ngang unicode en-dash/em-dash '–', khoảng trắng)
-   * Tự động nâng cấp các phiên bản đã đóng (1.5, 2.0) lên chuẩn 2.5
+   * Tự động nâng cấp các phiên bản đã đóng (1.5, 2.0, 2.5) lên chuẩn mới
    */
   public static sanitizeModel(model?: string): string {
-    if (!model) return DEFAULT_GEMINI_MODEL;
-    let cleaned = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
-    if (cleaned.startsWith('models/')) {
-      cleaned = cleaned.replace(/^models\//, '');
-    }
-    if (
-      cleaned.includes('1.5') || 
-      cleaned.includes('2.0') || 
-      cleaned.includes('3.5') || 
-      cleaned.includes('3.8') ||
-      !cleaned.startsWith('gemini-')
-    ) {
-      return DEFAULT_GEMINI_MODEL;
-    }
-    return cleaned || DEFAULT_GEMINI_MODEL;
+    return sanitizeFrontendModel(model);
   }
 
   /**
