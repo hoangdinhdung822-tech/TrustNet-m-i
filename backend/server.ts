@@ -64,8 +64,8 @@ const verifyJwtToken = (req: AuthRequest, res: Response, next: NextFunction) => 
 
 // 3. API ENDPOINTS
 
-// [POST] /api/v1/auth/register - Đăng ký tài khoản mới (Mã hóa bcrypt)
-app.post('/api/v1/auth/register', async (req: Request, res: Response) => {
+// [POST] /api/v1/auth/register & /v1/auth/register - Đăng ký tài khoản mới (Mã hóa bcrypt)
+app.post(['/api/v1/auth/register', '/v1/auth/register'], async (req: Request, res: Response) => {
   const { username, email, password, name } = req.body;
   if (!username || !email || !password || password.length < 8) {
     return res.status(400).json({ error: 'Thông tin không hợp lệ. Mật khẩu phải có ít nhất 8 ký tự.' });
@@ -74,8 +74,8 @@ app.post('/api/v1/auth/register', async (req: Request, res: Response) => {
   res.status(201).json({ message: 'Tạo tài khoản thành công', user: { username, email, name, points: 100 } });
 });
 
-// [POST] /api/v1/posts/verify-and-create - Đăng bài có AI kiểm chứng trước
-app.post('/api/v1/posts/verify-and-create', verifyJwtToken, async (req: AuthRequest, res: Response) => {
+// [POST] /api/v1/posts/verify-and-create & /v1/posts/verify-and-create - Đăng bài có AI kiểm chứng trước
+app.post(['/api/v1/posts/verify-and-create', '/v1/posts/verify-and-create'], verifyJwtToken, async (req: AuthRequest, res: Response) => {
   const { content, sourceUrl, imageUrl } = req.body;
   if (!content || content.trim().length === 0) {
     return res.status(400).json({ error: 'Nội dung bài viết không được để trống.' });
@@ -106,8 +106,8 @@ app.post('/api/v1/posts/verify-and-create', verifyJwtToken, async (req: AuthRequ
   }
 });
 
-// [POST] /api/v1/fact-check - Kiểm chứng độc lập bằng Google Search Grounding
-app.post('/api/v1/fact-check', async (req: Request, res: Response) => {
+// [POST] /api/v1/fact-check & /v1/fact-check - Kiểm chứng độc lập bằng Google Search Grounding
+app.post(['/api/v1/fact-check', '/v1/fact-check', '/fact-check'], async (req: Request, res: Response) => {
   const { text, sourceUrl, model } = req.body;
   const userApiKey = req.headers['x-gemini-api-key'] as string | undefined;
 
@@ -133,8 +133,8 @@ app.post('/api/v1/fact-check', async (req: Request, res: Response) => {
   }
 });
 
-// [POST] /api/v1/fact-check/ping - Kiểm tra kết nối tới Gemini API
-app.post('/api/v1/fact-check/ping', async (req: Request, res: Response) => {
+// [POST] /api/v1/fact-check/ping & /v1/fact-check/ping - Kiểm tra kết nối tới Gemini API
+app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'], async (req: Request, res: Response) => {
   const userApiKey = (req.headers['x-gemini-api-key'] as string) || req.body?.apiKey;
   const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
   const model = req.body?.model || process.env.GEMINI_MODEL || 'gemini-3.8-flash';
@@ -237,13 +237,13 @@ app.post('/api/v1/fact-check/ping', async (req: Request, res: Response) => {
   }
 });
 
-// [POST] /api/v1/reports - Báo cáo nội dung đáng ngờ
-app.post('/api/v1/reports', verifyJwtToken, (req: AuthRequest, res: Response) => {
+// [POST] /api/v1/reports & /v1/reports - Báo cáo nội dung đáng ngờ
+app.post(['/api/v1/reports', '/v1/reports'], verifyJwtToken, (req: AuthRequest, res: Response) => {
   res.status(201).json({ message: 'Báo cáo đã được ghi nhận. Cảm ơn bạn đã đóng góp cho không gian số.' });
 });
 
-// [GET] /api/v1/health - Kiểm tra tình trạng máy chủ
-app.get('/api/v1/health', (req: Request, res: Response) => {
+// [GET] /api/v1/health & /v1/health - Kiểm tra tình trạng máy chủ
+app.get(['/api/v1/health', '/v1/health'], (req: Request, res: Response) => {
   res.json({
     status: 'online',
     system: 'TrustNet Core Engine',
@@ -253,10 +253,16 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'test') {
+const isDirectRun = !process.env.VERCEL && (
+  process.env.STANDALONE_SERVER === 'true' ||
+  (process.argv[1] && (process.argv[1].endsWith('server.ts') || process.argv[1].endsWith('server.js')))
+);
+
+if (isDirectRun && process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`🚀 TrustNet Backend Server running on port ${PORT}`);
   });
 }
 
 export default app;
+

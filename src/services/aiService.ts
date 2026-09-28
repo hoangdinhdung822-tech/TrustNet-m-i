@@ -113,9 +113,17 @@ export class AiVerificationService {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
+        let msg = data.message;
+        if (!msg) {
+          if (res.status === 404) {
+            msg = 'Lỗi 404: Không tìm thấy máy chủ kiểm chứng (/api/v1/fact-check/ping). Vui lòng đảm bảo server đang chạy hoặc đã triển khai Vercel Serverless Function.';
+          } else {
+            msg = `Lỗi kiểm tra kết nối (${res.status}): ${res.statusText || 'Yêu cầu không thành công'}`;
+          }
+        }
         return {
           success: false,
-          message: data.message || `Lỗi kiểm tra kết nối (${res.status}): ${res.statusText}`
+          message: msg
         };
       }
 
@@ -179,7 +187,14 @@ export class AiVerificationService {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok || !data.success) {
-        const errorMsg = data?.error || `Lỗi phản hồi máy chủ (${response.status}): ${response.statusText}`;
+        let errorMsg = data?.error;
+        if (!errorMsg) {
+          if (response.status === 404) {
+            errorMsg = 'Lỗi 404: Không tìm thấy API kiểm chứng (/api/v1/fact-check). Vui lòng kiểm tra Vercel Serverless Function hoặc khởi động server backend.';
+          } else {
+            errorMsg = `Lỗi phản hồi máy chủ (${response.status}): ${response.statusText || 'Lỗi không xác định'}`;
+          }
+        }
         throw new Error(errorMsg);
       }
 
