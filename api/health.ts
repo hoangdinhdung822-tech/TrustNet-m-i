@@ -89,25 +89,51 @@ export default async function handler(req: any, res?: any) {
     return new Response(null, { status: 204 });
   }
 
-  // Server-side diagnostic an toàn (Chỉ kiểm tra boolean và tên biến, TUYỆT ĐỐI không log key)
+  // Server-side diagnostic an toàn
   const { apiKey, matchedKeyName } = resolveServerApiKey();
   const hasGeminiKey = Boolean(apiKey);
 
+  const rawGemini = process.env.GEMINI_API_KEY;
+  const keyDiagnostics: Record<string, any> = {
+    GEMINI_API_KEY: {
+      existsInProcessEnv: 'GEMINI_API_KEY' in process.env,
+      typeof: typeof rawGemini,
+      length: typeof rawGemini === 'string' ? rawGemini.length : 0,
+      trimmedLength: typeof rawGemini === 'string' ? rawGemini.trim().length : 0,
+      isEmpty: typeof rawGemini !== 'string' || rawGemini.trim().length === 0,
+      diagnosticMessage: (typeof rawGemini === 'string' && rawGemini.trim().length > 0)
+        ? `Hợp lệ (Độ dài: ${rawGemini.trim().length} ký tự)`
+        : 'CẢNH BÁO: Tên biến GEMINI_API_KEY có tồn tại trên Vercel nhưng GIÁ TRỊ ĐANG BỊ RỖNG (0 ký tự)! Vui lòng vào Vercel Settings -> Environment Variables -> Edit GEMINI_API_KEY và dán mã AIza... vào ô Value.'
+    }
+  };
+
+  // Liệt kê chi tiết các biến có liên quan mà không lộ mã bảo mật
   const detectedKeys = Object.keys(process.env).filter(k => {
     const u = k.toUpperCase();
     return u.includes('GEMINI') || u.includes('GOOGLE') || u.includes('KEY') || u.includes('VERCEL');
   });
 
-  console.log('[HEALTH_CHECK]', {
-    hasGeminiKey,
-    matchedKeyName,
-    detectedKeys
-  });
+  for (const k of detectedKeys) {
+    if (k.includes('GEMINI') || k.includes('GOOGLE')) {
+      const v = process.env[k];
+      const str = typeof v === 'string' ? v : '';
+      keyDiagnostics[k] = {
+        existsInProcessEnv: true,
+        typeof: typeof v,
+        length: str.length,
+        trimmedLength: str.trim().length,
+        isEmpty: str.trim().length === 0,
+        startsWithAIza: str.trim().startsWith('AIza'),
+        preview: str.trim().length > 4 ? `${str.trim().slice(0, 4)}...${str.trim().slice(-2)}` : '(rỗng)'
+      };
+    }
+  }
 
   return sendJson(res, 200, {
     status: 'ok',
     hasGeminiKey,
     matchedKeyName: matchedKeyName || null,
+    keyDiagnostics,
     detectedKeys,
     service: 'TrustNet Serverless Health',
     environment: {
@@ -117,3 +143,4 @@ export default async function handler(req: any, res?: any) {
     timestamp: new Date().toISOString()
   });
 }
+
