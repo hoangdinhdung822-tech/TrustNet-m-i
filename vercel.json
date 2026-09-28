@@ -1,21 +1,34 @@
 {
   "version": 2,
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 60
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/v1/fact-check/ping",
-      "destination": "/api/v1/fact-check/ping"
-    },
-    {
-      "source": "/api/v1/fact-check",
-      "destination": "/api/v1/fact-check"
+      "source": "/api/health",
+      "destination": "/api/health"
     },
     {
       "source": "/api/v1/health",
-      "destination": "/api/v1/health"
+      "destination": "/api/health"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index"
+      "source": "/api/ping",
+      "destination": "/api/ping"
+    },
+    {
+      "source": "/api/v1/fact-check/ping",
+      "destination": "/api/ping"
+    },
+    {
+      "source": "/api/fact-check",
+      "destination": "/api/fact-check"
+    },
+    {
+      "source": "/api/v1/fact-check",
+      "destination": "/api/fact-check"
     },
     {
       "source": "/(.*)",

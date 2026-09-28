@@ -20,12 +20,12 @@ function trustnetApiPlugin(): Plugin {
       return;
     }
 
-    // [GET] /api/v1/health & /v1/health
-    if ((urlPath === '/api/v1/health' || urlPath === '/v1/health') && req.method === 'GET') {
+    // [GET] /api/health & /api/v1/health & /v1/health
+    if ((urlPath === '/api/health' || urlPath === '/api/v1/health' || urlPath === '/v1/health') && req.method === 'GET') {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({
-        status: 'online',
+        status: 'ok',
         system: 'TrustNet Integrated Server Engine',
         aiStatus: 'Operational',
         searchGrounding: 'Enabled (@google/genai)',
@@ -34,8 +34,8 @@ function trustnetApiPlugin(): Plugin {
       return;
     }
 
-    // [POST] /api/v1/fact-check/ping & /v1/fact-check/ping
-    if ((urlPath === '/api/v1/fact-check/ping' || urlPath === '/v1/fact-check/ping') && req.method === 'POST') {
+    // [POST] /api/ping & /api/v1/fact-check/ping & /v1/fact-check/ping
+    if ((urlPath === '/api/ping' || urlPath === '/api/v1/fact-check/ping' || urlPath === '/v1/fact-check/ping') && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk: any) => { body += chunk; });
       req.on('end', async () => {
@@ -153,14 +153,36 @@ function trustnetApiPlugin(): Plugin {
       return;
     }
 
-    // [POST] /api/v1/fact-check & /v1/fact-check
-    if ((urlPath === '/api/v1/fact-check' || urlPath === '/v1/fact-check') && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: any) => { body += chunk; });
-      req.on('end', async () => {
-        try {
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          const parsed = body ? JSON.parse(body) : {};
+    // [GET / POST] /api/fact-check & /api/v1/fact-check & /v1/fact-check
+    if (urlPath === '/api/fact-check' || urlPath === '/api/v1/fact-check' || urlPath === '/v1/fact-check') {
+      if (req.method === 'GET') {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          status: 'ok',
+          endpoint: urlPath,
+          message: 'Fact-checking endpoint is operational.'
+        }));
+        return;
+      }
+
+      if (req.method === 'POST') {
+        let body = '';
+        req.on('data', (chunk: any) => { body += chunk; });
+        req.on('end', async () => {
+          try {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            const parsed = body ? JSON.parse(body) : {};
+
+            if (parsed.health === true) {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({
+                status: 'ok',
+                mode: 'test-mode',
+                message: 'Fact-checking test mode verified successfully.'
+              }));
+              return;
+            }
           const claim = (parsed.claim || parsed.text || '').trim();
           const url = (parsed.url || parsed.sourceUrl || '').trim();
           const model = parsed.model;
@@ -235,8 +257,9 @@ function trustnetApiPlugin(): Plugin {
             error: err instanceof Error ? err.message : 'Unknown server error'
           }));
         }
-      });
-      return;
+        });
+        return;
+      }
     }
 
     next();
