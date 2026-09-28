@@ -79,11 +79,11 @@ function trustnetApiPlugin(): Plugin {
           const candidateModels = [
             model,
             'gemini-2.5-flash',
-            'gemini-2.0-flash',
-            'gemini-1.5-flash',
+            'gemini-2.5-flash-lite',
+            'gemini-2.5-pro',
             ...discoveredModels.filter(m => m.includes('flash')),
             ...discoveredModels.filter(m => !m.includes('flash'))
-          ].filter(m => m && m !== 'gemini-3.8-flash');
+          ].filter(m => m && !m.includes('1.5') && !m.includes('2.0') && !m.includes('3.8'));
           const uniqueModels = Array.from(new Set(candidateModels));
 
           let resolvedModel = model;

@@ -72,6 +72,23 @@ function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null 
   return { apiKey: '', matchedKeyName: null };
 }
 
+function normalizeModelName(model?: string): string {
+  if (!model) return 'gemini-2.5-flash';
+  let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
+  if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
+  // Google đã đóng (shut down/deprecated) Gemini 1.5 và Gemini 2.0 trên v1beta -> tự động ánh xạ lên gemini-2.5-flash
+  if (
+    clean.includes('1.5') || 
+    clean.includes('2.0') || 
+    clean.includes('3.5') || 
+    clean.includes('3.8') ||
+    !clean.startsWith('gemini-')
+  ) {
+    return 'gemini-2.5-flash';
+  }
+  return clean;
+}
+
 export default async function handler(req: any, res?: any) {
   if (res && typeof res.setHeader === 'function') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -125,11 +142,7 @@ export default async function handler(req: any, res?: any) {
 
     console.log('[PING_DIAGNOSTIC]', { hasGeminiKey, matchedKeyName });
 
-    let rawModel = body.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-    if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
-      rawModel = 'gemini-2.5-flash';
-    }
-    const model = rawModel;
+    const requestedModel = normalizeModelName(body.model || process.env.GEMINI_MODEL);
 
     if (!apiKey) {
       const detectedKeys = Object.keys(process.env).filter(k => {
@@ -150,12 +163,29 @@ export default async function handler(req: any, res?: any) {
 
     const ai = new GoogleGenAI({ apiKey });
 
+    // Tự động tìm kiếm các model đang hoạt động thực tế trên API key của người dùng
+    let discoveredModels: string[] = [];
+    try {
+      const list = await ai.models.list();
+      for await (const item of list) {
+        if (item.name) {
+          const cleanName = item.name.replace(/^models\//, '');
+          if (cleanName.startsWith('gemini-') && !cleanName.includes('1.5') && !cleanName.includes('2.0')) {
+            discoveredModels.push(cleanName);
+          }
+        }
+      }
+    } catch (e: any) {
+      console.warn('[PING] Could not list models:', e?.message);
+    }
+
     const candidateModels = Array.from(new Set([
-      model,
+      requestedModel,
       'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash'
-    ])).filter(m => m && m !== 'gemini-3.8-flash');
+      'gemini-2.5-flash-lite',
+      'gemini-2.5-pro',
+      ...discoveredModels
+    ])).filter(Boolean);
 
     let resolvedModel = candidateModels[0] || 'gemini-2.5-flash';
     let reply = 'Connected';

@@ -25,14 +25,21 @@ const PHISHING_SIGNALS = [
 export class AiVerificationService {
   /**
    * Chuẩn hóa tên Model Gemini (xử lý dấu gạch ngang unicode en-dash/em-dash '–', khoảng trắng)
+   * Tự động nâng cấp các phiên bản đã đóng (1.5, 2.0) lên chuẩn 2.5
    */
   public static sanitizeModel(model?: string): string {
     if (!model) return DEFAULT_GEMINI_MODEL;
     let cleaned = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
     if (cleaned.startsWith('models/')) {
-      cleaned = cleaned.replace('models/', '');
+      cleaned = cleaned.replace(/^models\//, '');
     }
-    if (cleaned === 'gemini-3.8-flash' || cleaned === 'gemini-3.5-flash') {
+    if (
+      cleaned.includes('1.5') || 
+      cleaned.includes('2.0') || 
+      cleaned.includes('3.5') || 
+      cleaned.includes('3.8') ||
+      !cleaned.startsWith('gemini-')
+    ) {
       return DEFAULT_GEMINI_MODEL;
     }
     return cleaned || DEFAULT_GEMINI_MODEL;
@@ -44,7 +51,13 @@ export class AiVerificationService {
   public static getGeminiModel(): string {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(GEMINI_MODEL_STORAGE);
-      if (stored) return this.sanitizeModel(stored);
+      if (stored) {
+        const sanitized = this.sanitizeModel(stored);
+        if (sanitized !== stored) {
+          localStorage.setItem(GEMINI_MODEL_STORAGE, sanitized);
+        }
+        return sanitized;
+      }
     }
     return DEFAULT_GEMINI_MODEL;
   }

@@ -812,9 +812,9 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                 onChange={(e) => setSelectedModel(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
               >
-                <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyến nghị: Tốc độ cao, hỗ trợ Google Search Grounding)</option>
-                <option value="gemini-2.0-flash">gemini-2.0-flash (Thế hệ Flash 2.0 ổn định)</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash (Bản tương thích mở rộng)</option>
+                <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyến nghị: Chuẩn Google AI Studio, hỗ trợ Search Grounding)</option>
+                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Bản siêu nhanh, tối ưu tài nguyên)</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro (Mô hình suy luận sâu chuyên sâu)</option>
               </select>
             </div>
 

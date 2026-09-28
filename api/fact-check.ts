@@ -102,8 +102,15 @@ const MAJOR_NEWS_DOMAINS = [
 function normalizeModelName(model?: string): string {
   if (!model) return 'gemini-2.5-flash';
   let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
-  if (clean.startsWith('models/')) clean = clean.replace('models/', '');
-  if (clean === 'gemini-3.8-flash' || clean === 'gemini-3.5-flash' || !clean) {
+  if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
+  // Google đã ngưng hỗ trợ hoàn toàn Gemini 1.5 và Gemini 2.0 trên API v1beta -> tự động nâng cấp lên 2.5
+  if (
+    clean.includes('1.5') || 
+    clean.includes('2.0') || 
+    clean.includes('3.5') || 
+    clean.includes('3.8') ||
+    !clean.startsWith('gemini-')
+  ) {
     return 'gemini-2.5-flash';
   }
   return clean;
@@ -588,8 +595,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     const candidateModels = Array.from(new Set([
       normalizedRequested,
       'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash'
+      'gemini-2.5-flash-lite',
+      'gemini-2.5-pro'
     ])).filter(Boolean);
 
     let lastError: any = null;
