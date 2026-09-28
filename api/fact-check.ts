@@ -103,10 +103,11 @@ function normalizeModelName(model?: string): string {
   if (!model) return 'gemini-2.5-flash';
   let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
   if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
-  // Google đã ngưng hỗ trợ hoàn toàn Gemini 1.5 và Gemini 2.0 trên API v1beta -> tự động nâng cấp lên 2.5
+  // Google đã ngưng hỗ trợ Gemini 1.5, 2.0, 2.5-pro cho new users -> tự động nâng cấp lên 2.5-flash
   if (
     clean.includes('1.5') || 
     clean.includes('2.0') || 
+    clean.includes('2.5-pro') ||
     clean.includes('3.5') || 
     clean.includes('3.8') ||
     !clean.startsWith('gemini-')
@@ -594,16 +595,38 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     const ai = new GoogleGenAI({ apiKey });
     const normalizedRequested = normalizeModelName(requestedModel || process.env.GEMINI_MODEL);
 
+    let discoveredModels: string[] = [];
+    try {
+      const list = await ai.models.list();
+      for await (const m of list) {
+        if (m.name) {
+          const cleanName = m.name.replace(/^models\//, '');
+          if (
+            cleanName.startsWith('gemini-') && 
+            !cleanName.includes('1.5') && 
+            !cleanName.includes('2.0') && 
+            !cleanName.includes('2.5-pro')
+          ) {
+            discoveredModels.push(cleanName);
+          }
+        }
+      }
+    } catch (e: any) {
+      console.warn('[FACT_CHECK] Could not list models:', e?.message);
+    }
+
     const candidateModels = Array.from(new Set([
       normalizedRequested,
       'gemini-2.5-flash',
       'gemini-2.5-flash-lite',
-      'gemini-2.5-pro'
-    ])).filter(Boolean);
+      'gemini-3.1-pro-preview',
+      ...discoveredModels
+    ])).filter(m => Boolean(m) && m !== 'gemini-2.5-pro');
 
     let lastError: any = null;
     let successfulResponse: any = null;
     let resolvedModel = candidateModels[0] || 'gemini-2.5-flash';
+    const modelErrors: Record<string, string> = {};
 
     for (const modelName of candidateModels) {
       try {
@@ -638,6 +661,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           if (parsedErr?.error?.message) errMsg = parsedErr.error.message;
         } catch {}
 
+        modelErrors[modelName] = errMsg;
         console.warn(`[FACT_CHECK] Model ${modelName} encountered error: ${errMsg}`);
 
         if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('API key not valid')) {
@@ -648,18 +672,16 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     }
 
     if (!successfulResponse) {
-      let finalMsg = lastError?.message || String(lastError);
-      try {
-        const parsed = JSON.parse(finalMsg);
-        if (parsed?.error?.message) finalMsg = parsed.error.message;
-      } catch {}
+      const summaryErrors = Object.entries(modelErrors)
+        .map(([m, e]) => `${m}: ${e}`)
+        .join(' || ');
 
-      if (finalMsg.includes('high demand') || finalMsg.includes('503')) {
+      if (summaryErrors.includes('high demand') || summaryErrors.includes('503')) {
         throw new Error('Hệ thống máy chủ Google Gemini đang trong thời điểm quá tải cao (503 High Demand). Vui lòng thử lại sau vài giây.');
-      } else if (finalMsg.includes('RESOURCE_EXHAUSTED') || finalMsg.includes('quota')) {
+      } else if (summaryErrors.includes('RESOURCE_EXHAUSTED') || summaryErrors.includes('quota')) {
         throw new Error('Hạn mức truy vấn Gemini API của máy chủ tạm thời đạt giới hạn (Quota Exceeded). Vui lòng thử lại sau giây lát.');
       } else {
-        throw new Error(`Tất cả mô hình Gemini đều không thể phản hồi. Chi tiết: ${finalMsg}`);
+        throw new Error(`Chi tiết phản hồi từ Google AI: ${summaryErrors || lastError?.message || 'Không có phản hồi'}`);
       }
     }
 

@@ -76,10 +76,11 @@ function normalizeModelName(model?: string): string {
   if (!model) return 'gemini-2.5-flash';
   let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
   if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
-  // Google đã đóng (shut down/deprecated) Gemini 1.5 và Gemini 2.0 trên v1beta -> tự động ánh xạ lên gemini-2.5-flash
+  // Google đã đóng (shut down/deprecated) Gemini 1.5, 2.0, 2.5-pro -> tự động ánh xạ lên gemini-2.5-flash
   if (
     clean.includes('1.5') || 
     clean.includes('2.0') || 
+    clean.includes('2.5-pro') ||
     clean.includes('3.5') || 
     clean.includes('3.8') ||
     !clean.startsWith('gemini-')
@@ -183,9 +184,9 @@ export default async function handler(req: any, res?: any) {
       requestedModel,
       'gemini-2.5-flash',
       'gemini-2.5-flash-lite',
-      'gemini-2.5-pro',
+      'gemini-3.1-pro-preview',
       ...discoveredModels
-    ])).filter(Boolean);
+    ])).filter(m => Boolean(m) && m !== 'gemini-2.5-pro');
 
     let resolvedModel = candidateModels[0] || 'gemini-2.5-flash';
     let reply = 'Connected';

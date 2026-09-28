@@ -129,10 +129,29 @@ export default async function handler(req: any, res?: any) {
     }
   }
 
+  let liveAvailableModels: string[] = [];
+  let modelQueryError: string | null = null;
+  if (apiKey) {
+    try {
+      const { GoogleGenAI } = await import('@google/genai');
+      const ai = new GoogleGenAI({ apiKey });
+      const list = await ai.models.list();
+      for await (const m of list) {
+        if (m.name) {
+          liveAvailableModels.push(m.name.replace(/^models\//, ''));
+        }
+      }
+    } catch (e: any) {
+      modelQueryError = e?.message || String(e);
+    }
+  }
+
   return sendJson(res, 200, {
     status: 'ok',
     hasGeminiKey,
     matchedKeyName: matchedKeyName || null,
+    liveAvailableModels,
+    modelQueryError,
     keyDiagnostics,
     detectedKeys,
     service: 'TrustNet Serverless Health',

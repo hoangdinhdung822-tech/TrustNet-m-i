@@ -814,7 +814,7 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
               >
                 <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyến nghị: Chuẩn Google AI Studio, hỗ trợ Search Grounding)</option>
                 <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Bản siêu nhanh, tối ưu tài nguyên)</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro (Mô hình suy luận sâu chuyên sâu)</option>
+                <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Mô hình suy luận sâu thế hệ mới)</option>
               </select>
             </div>
 
