@@ -251,11 +251,11 @@ export default async function handler(req: any, res?: any) {
       }
     }
 
-    const isSwitched = resolvedModel !== model;
+    const isSwitched = resolvedModel !== requestedModel;
     return sendJson(res, 200, {
       success: true,
       message: isSwitched
-        ? `✅ Kết nối thành công với Google ${resolvedModel}! (Lưu ý: ${model} tạm quá tải trên AI Studio, hệ thống đã tự động kết nối qua ${resolvedModel})`
+        ? `✅ Kết nối thành công với Google ${resolvedModel}! (Lưu ý: ${requestedModel} được tự động chuẩn hóa sang ${resolvedModel})`
         : `✅ Kết nối thành công với Google ${resolvedModel}! (${reply.trim()})`,
       resolvedModel,
       matchedKeyName: matchedKeyName || undefined
