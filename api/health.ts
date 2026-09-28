@@ -43,9 +43,23 @@ export default async function handler(req: any, res?: any) {
     return new Response(null, { status: 204 });
   }
 
+  // Server-side diagnostic an toàn (Chỉ kiểm tra boolean, tuyệt đối không log key)
+  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 0);
+  const hasGoogleKey = Boolean(process.env.GOOGLE_API_KEY && process.env.GOOGLE_API_KEY.trim().length > 0);
+
+  console.log('[HEALTH_CHECK]', {
+    hasGeminiKey,
+    hasGoogleKey
+  });
+
   return sendJson(res, 200, {
     status: 'ok',
+    hasGeminiKey,
     service: 'TrustNet Serverless Health',
+    environment: {
+      vercelEnv: process.env.VERCEL_ENV || 'local',
+      vercelRegion: process.env.VERCEL_REGION || 'local'
+    },
     timestamp: new Date().toISOString()
   });
 }

@@ -389,7 +389,12 @@ export default async function handler(req: any, res?: any) {
     }
 
     // 5. Kiểm tra GEMINI_API_KEY ở SERVER-SIDE ONLY (Không bao giờ đọc từ headers / client)
-    const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+    const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+    const apiKey = rawKey.replace(/^["']|["']$/g, '').trim();
+
+    const hasGeminiKey = Boolean(apiKey);
+    console.log('[FACT_CHECK_DIAGNOSTIC]', { hasGeminiKey });
+
     if (!apiKey) {
       console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
       return sendJson(res, 500, {

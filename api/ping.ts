@@ -74,7 +74,11 @@ export default async function handler(req: any, res?: any) {
     }
 
     // SERVER-SIDE ONLY: Đọc duy nhất từ biến môi trường server
-    const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+    const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+    const apiKey = rawKey.replace(/^["']|["']$/g, '').trim();
+
+    const hasGeminiKey = Boolean(apiKey);
+    console.log('[PING_DIAGNOSTIC]', { hasGeminiKey });
 
     let rawModel = body.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
