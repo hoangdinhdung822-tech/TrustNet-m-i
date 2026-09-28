@@ -176,9 +176,15 @@ export class AiVerificationService {
       }
 
       if (!response.ok || !data.success) {
-        let errorMsg = data?.error || data?.message;
+        let errorMsg = data?.message || data?.error;
         if (!errorMsg) {
-          if (rawText && rawText.trim().length > 0 && !rawText.trim().startsWith('<')) {
+          if (rawText && rawText.includes('FUNCTION_INVOCATION_TIMEOUT')) {
+            errorMsg = 'Quá thời gian thực thi máy chủ (FUNCTION_INVOCATION_TIMEOUT). Vui lòng bấm Thử lại.';
+          } else if (response.status === 504 || data?.code === 'FACT_CHECK_TIMEOUT' || data?.code === 'GEMINI_TIMEOUT') {
+            errorMsg = 'Kiểm chứng mất quá nhiều thời gian (Timeout). Vui lòng bấm Thử lại để hệ thống kiểm tra lại.';
+          } else if (response.status === 503 || data?.code === 'GEMINI_TEMPORARILY_UNAVAILABLE') {
+            errorMsg = 'Dịch vụ AI đang tạm thời quá tải (503 High Demand). Vui lòng thử lại sau giây lát.';
+          } else if (rawText && rawText.trim().length > 0 && !rawText.trim().startsWith('<')) {
             errorMsg = rawText.trim().slice(0, 300);
           } else if (response.status === 404) {
             errorMsg = 'Lỗi 404: Không tìm thấy API kiểm chứng (/api/fact-check). Vui lòng kiểm tra Vercel Serverless Function hoặc khởi động server backend.';

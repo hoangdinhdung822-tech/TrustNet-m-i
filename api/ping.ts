@@ -90,6 +90,9 @@ function normalizeModelName(model?: string): string {
   return clean;
 }
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
 export default async function handler(req: any, res?: any) {
   if (res && typeof res.setHeader === 'function') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -162,30 +165,15 @@ export default async function handler(req: any, res?: any) {
       });
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-
-    // Tự động tìm kiếm các model đang hoạt động thực tế trên API key của người dùng
-    let discoveredModels: string[] = [];
-    try {
-      const list = await ai.models.list();
-      for await (const item of list) {
-        if (item.name) {
-          const cleanName = item.name.replace(/^models\//, '');
-          if (cleanName.startsWith('gemini-') && !cleanName.includes('1.5') && !cleanName.includes('2.0')) {
-            discoveredModels.push(cleanName);
-          }
-        }
-      }
-    } catch (e: any) {
-      console.warn('[PING] Could not list models:', e?.message);
-    }
+    const ai = new GoogleGenAI({ 
+      apiKey,
+      httpOptions: { timeout: 6000 }
+    });
 
     const candidateModels = Array.from(new Set([
       requestedModel,
       'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
-      'gemini-3.1-pro-preview',
-      ...discoveredModels
+      'gemini-2.5-flash-lite'
     ])).filter(m => Boolean(m) && m !== 'gemini-2.5-pro');
 
     let resolvedModel = candidateModels[0] || 'gemini-2.5-flash';
@@ -199,16 +187,19 @@ export default async function handler(req: any, res?: any) {
           await new Promise(r => setTimeout(r, 1000));
         }
         try {
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error(`Timeout 10s khi ping mô hình ${m}`)), 10000)
-          );
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 6000);
 
-          const callPromise = ai.models.generateContent({
+          const response: any = await ai.models.generateContent({
             model: m,
-            contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.'
+            contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.',
+            config: {
+              abortSignal: controller.signal,
+              httpOptions: { timeout: 6000 }
+            }
           });
+          clearTimeout(timer);
 
-          const response: any = await Promise.race([callPromise, timeoutPromise]);
           reply = response.text || 'Connected';
           resolvedModel = m;
           pingSuccess = true;

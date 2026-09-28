@@ -354,7 +354,15 @@ function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null 
   return { apiKey: '', matchedKeyName: null };
 }
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
 export default async function handler(req: any, res?: any) {
+  const requestStartTime = Date.now();
+  const MAX_TOTAL_TIME_MS = 25000;
+  const getElapsedMs = () => Date.now() - requestStartTime;
+  const getRemainingMs = () => Math.max(0, MAX_TOTAL_TIME_MS - getElapsedMs());
+
   // 1. CORS Preflight
   if (res && typeof res.setHeader === 'function') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -416,6 +424,13 @@ export default async function handler(req: any, res?: any) {
     const claim = (body.claim || body.text || '').trim();
     const url = (body.url || body.sourceUrl || '').trim();
     const requestedModel = body.model;
+
+    console.log('[FACT_CHECK_START]', {
+      elapsedMs: getElapsedMs(),
+      hasClaim: Boolean(claim),
+      hasUrl: Boolean(url),
+      requestedModel: requestedModel || 'default'
+    });
 
     // 4. Validation: Claim & URL
     if (!claim && !url) {
@@ -591,121 +606,269 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 }
 `;
 
-    // 7. Khởi tạo Google GenAI bằng Server-Side API Key duy nhất
-    const ai = new GoogleGenAI({ apiKey });
-    const normalizedRequested = normalizeModelName(requestedModel || process.env.GEMINI_MODEL);
-
-    let discoveredModels: string[] = [];
-    try {
-      const list = await ai.models.list();
-      for await (const m of list) {
-        if (m.name) {
-          const cleanName = m.name.replace(/^models\//, '');
-          if (
-            cleanName.startsWith('gemini-') && 
-            !cleanName.includes('1.5') && 
-            !cleanName.includes('2.0') && 
-            !cleanName.includes('2.5-pro')
-          ) {
-            discoveredModels.push(cleanName);
-          }
-        }
-      }
-    } catch (e: any) {
-      console.warn('[FACT_CHECK] Could not list models:', e?.message);
-    }
-
-    const candidateModels = Array.from(new Set([
-      normalizedRequested,
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
-      'gemini-3.1-pro-preview',
-      ...discoveredModels
-    ])).filter(m => Boolean(m) && m !== 'gemini-2.5-pro');
+    // 7. Khởi tạo Google GenAI bằng Server-Side API Key duy nhất và cấu hình httpOptions
+    const ai = new GoogleGenAI({ 
+      apiKey,
+      httpOptions: { timeout: 10000 }
+    });
+    const primaryModel = normalizeModelName(requestedModel || process.env.GEMINI_MODEL || 'gemini-2.5-flash');
+    const fallbackModel = 'gemini-2.5-flash-lite';
 
     let lastError: any = null;
     let successfulResponse: any = null;
-    let resolvedModel = candidateModels[0] || 'gemini-2.5-flash';
-    const modelErrors: Record<string, string> = {};
+    let resolvedModel = primaryModel;
+    let retryCount = 0;
+    let fallbackCount = 0;
+    let totalGeminiTimeMs = 0;
+    let lastGeminiDurationMs = 0;
 
-    for (const modelName of candidateModels) {
-      let modelSucceeded = false;
-      const maxRetriesForModel = 2;
+    // Helper gọi Gemini với timeout nghiêm ngặt qua AbortSignal và httpOptions SDK
+    async function executeGeminiCall(modelToUse: string, timeoutMs: number) {
+      const callStart = Date.now();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-      for (let attempt = 0; attempt <= maxRetriesForModel; attempt++) {
-        if (attempt > 0) {
-          const backoffMs = attempt * 1000 + Math.floor(Math.random() * 500);
-          console.log(`[FACT_CHECK] Retrying model ${modelName} after ${backoffMs}ms (attempt ${attempt + 1}/${maxRetriesForModel + 1})...`);
-          await new Promise(r => setTimeout(r, backoffMs));
-        }
-
-        try {
-          console.log(`[FACT_CHECK] Calling Gemini API with model: ${modelName} (attempt ${attempt + 1})`);
-
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error(`Timeout 25s khi kết nối tới mô hình ${modelName}`)), 25000)
-          );
-
-          const apiCallPromise = ai.models.generateContent({
-            model: modelName,
-            contents: systemPrompt,
-            config: {
-              tools: [{ googleSearch: {} }],
-              temperature: 0.1
+      try {
+        const response: any = await ai.models.generateContent({
+          model: modelToUse,
+          contents: systemPrompt,
+          config: {
+            tools: [{ googleSearch: {} }],
+            temperature: 0.1,
+            abortSignal: controller.signal,
+            httpOptions: {
+              timeout: timeoutMs
             }
-          });
-
-          const response: any = await Promise.race([apiCallPromise, timeoutPromise]);
-
-          if (response && response.candidates && response.candidates.length > 0) {
-            successfulResponse = response;
-            resolvedModel = modelName;
-            modelSucceeded = true;
-            console.log(`[FACT_CHECK] Gemini response received from model: ${modelName}`);
-            break;
           }
-        } catch (err: any) {
-          lastError = err;
-          let errMsg = err?.message || String(err);
+        });
+        clearTimeout(timer);
+        const duration = Date.now() - callStart;
+        totalGeminiTimeMs += duration;
+        lastGeminiDurationMs = duration;
+        return { response, durationMs: duration };
+      } catch (err: any) {
+        clearTimeout(timer);
+        const duration = Date.now() - callStart;
+        totalGeminiTimeMs += duration;
+        lastGeminiDurationMs = duration;
+        throw err;
+      }
+    }
+
+    // --- PHASE 1: Primary Model (Tối đa 2 attempts: Attempt 1 + Attempt 2 nếu gặp 503) ---
+    if (getRemainingMs() < 3500) {
+      console.warn('[FACT_CHECK_TIMEOUT] Time budget exhausted before calling Gemini');
+      return sendJson(res, 504, {
+        success: false,
+        code: 'FACT_CHECK_TIMEOUT',
+        message: 'Kiểm chứng mất quá nhiều thời gian. Vui lòng thử lại.'
+      });
+    }
+
+    console.log('[FACT_CHECK_GEMINI_START]', {
+      elapsedMs: getElapsedMs(),
+      attempt: 1,
+      model: primaryModel
+    });
+
+    const call1Timeout = Math.min(10000, Math.max(3000, getRemainingMs() - 2000));
+    try {
+      const res1 = await executeGeminiCall(primaryModel, call1Timeout);
+      if (res1.response?.candidates?.length > 0) {
+        successfulResponse = res1.response;
+        resolvedModel = primaryModel;
+        console.log('[FACT_CHECK_GEMINI_END]', {
+          elapsedMs: getElapsedMs(),
+          attempt: 1,
+          model: primaryModel,
+          durationMs: res1.durationMs
+        });
+      }
+    } catch (err1: any) {
+      lastError = err1;
+      let msg1 = err1?.message || String(err1);
+      try {
+        const parsed1 = JSON.parse(msg1);
+        if (parsed1?.error?.message) msg1 = parsed1.error.message;
+      } catch {}
+
+      console.log('[FACT_CHECK_GEMINI_END]', {
+        elapsedMs: getElapsedMs(),
+        attempt: 1,
+        model: primaryModel,
+        durationMs: lastGeminiDurationMs,
+        error: msg1
+      });
+
+      if (msg1.includes('API_KEY_INVALID') || msg1.includes('API key not valid')) {
+        return sendJson(res, 500, {
+          success: false,
+          code: 'API_KEY_INVALID',
+          message: 'Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.'
+        });
+      }
+
+      // 504 / Deadline Exceeded: không retry nhiều lần
+      const isTimeout1 = msg1.includes('deadline') || msg1.includes('TIMEOUT') || msg1.includes('abort') || err1?.name === 'AbortError';
+      if (isTimeout1) {
+        return sendJson(res, 504, {
+          success: false,
+          code: 'GEMINI_TIMEOUT',
+          message: 'Gemini mất quá nhiều thời gian để phản hồi.'
+        });
+      }
+
+      // Xử lý 503 (High Demand / Overloaded): Retry attempt 2 sau 1s nếu còn budget
+      const is503_1 = msg1.includes('503') || msg1.includes('high demand') || msg1.includes('overloaded') || msg1.includes('RESOURCE_EXHAUSTED');
+      if (is503_1 && getRemainingMs() > 6000) {
+        retryCount = 1;
+        console.log('[FACT_CHECK_RETRY]', {
+          elapsedMs: getElapsedMs(),
+          attempt: 1,
+          model: primaryModel,
+          delayMs: 1000
+        });
+        await new Promise(r => setTimeout(r, 1000));
+
+        console.log('[FACT_CHECK_GEMINI_START]', {
+          elapsedMs: getElapsedMs(),
+          attempt: 2,
+          model: primaryModel
+        });
+
+        const call2Timeout = Math.min(10000, Math.max(3000, getRemainingMs() - 2000));
+        try {
+          const res2 = await executeGeminiCall(primaryModel, call2Timeout);
+          if (res2.response?.candidates?.length > 0) {
+            successfulResponse = res2.response;
+            resolvedModel = primaryModel;
+            console.log('[FACT_CHECK_GEMINI_END]', {
+              elapsedMs: getElapsedMs(),
+              attempt: 2,
+              model: primaryModel,
+              durationMs: res2.durationMs
+            });
+          }
+        } catch (err2: any) {
+          lastError = err2;
+          let msg2 = err2?.message || String(err2);
           try {
-            const parsedErr = JSON.parse(errMsg);
-            if (parsedErr?.error?.message) errMsg = parsedErr.error.message;
+            const parsed2 = JSON.parse(msg2);
+            if (parsed2?.error?.message) msg2 = parsed2.error.message;
           } catch {}
 
-          modelErrors[modelName] = errMsg;
-          console.warn(`[FACT_CHECK] Model ${modelName} attempt ${attempt + 1} encountered error: ${errMsg}`);
+          console.log('[FACT_CHECK_GEMINI_END]', {
+            elapsedMs: getElapsedMs(),
+            attempt: 2,
+            model: primaryModel,
+            durationMs: lastGeminiDurationMs,
+            error: msg2
+          });
 
-          if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('API key not valid')) {
-            throw new Error('Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.');
+          if (msg2.includes('deadline') || msg2.includes('TIMEOUT') || msg2.includes('abort') || err2?.name === 'AbortError') {
+            return sendJson(res, 504, {
+              success: false,
+              code: 'GEMINI_TIMEOUT',
+              message: 'Gemini mất quá nhiều thời gian để phản hồi.'
+            });
           }
-
-          // Tiếp tục thử lại nếu gặp lỗi quá tải tạm thời 503 hoặc hạn ngạch 429
-          const isTransient = errMsg.includes('503') || errMsg.includes('high demand') || errMsg.includes('overloaded') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota');
-          if (isTransient && attempt < maxRetriesForModel) {
-            continue;
-          }
-          break;
         }
       }
+    }
 
-      if (modelSucceeded) {
-        break;
+    // --- PHASE 2: Fallback Model (Thử duy nhất 1 lần nếu Model chính chưa thành công & còn budget) ---
+    if (!successfulResponse && primaryModel !== fallbackModel && getRemainingMs() > 4500) {
+      fallbackCount = 1;
+      console.log('[FACT_CHECK_FALLBACK]', {
+        elapsedMs: getElapsedMs(),
+        fromModel: primaryModel,
+        toModel: fallbackModel
+      });
+
+      console.log('[FACT_CHECK_GEMINI_START]', {
+        elapsedMs: getElapsedMs(),
+        attempt: 1,
+        model: fallbackModel
+      });
+
+      const fallbackTimeout = Math.min(8000, Math.max(3000, getRemainingMs() - 1500));
+      try {
+        const resFb = await executeGeminiCall(fallbackModel, fallbackTimeout);
+        if (resFb.response?.candidates?.length > 0) {
+          successfulResponse = resFb.response;
+          resolvedModel = fallbackModel;
+          console.log('[FACT_CHECK_GEMINI_END]', {
+            elapsedMs: getElapsedMs(),
+            attempt: 1,
+            model: fallbackModel,
+            durationMs: resFb.durationMs
+          });
+        }
+      } catch (errFb: any) {
+        lastError = errFb;
+        let msgFb = errFb?.message || String(errFb);
+        try {
+          const parsedFb = JSON.parse(msgFb);
+          if (parsedFb?.error?.message) msgFb = parsedFb.error.message;
+        } catch {}
+
+        console.log('[FACT_CHECK_GEMINI_END]', {
+          elapsedMs: getElapsedMs(),
+          attempt: 1,
+          model: fallbackModel,
+          durationMs: lastGeminiDurationMs,
+          error: msgFb
+        });
       }
     }
 
+    // --- PHASE 3: Kết quả hoặc Trả lỗi có kiểm soát ---
     if (!successfulResponse) {
-      const summaryErrors = Object.entries(modelErrors)
-        .map(([m, e]) => `${m}: ${e}`)
-        .join(' || ');
+      const totalElapsedMs = getElapsedMs();
+      console.log('[FACT_CHECK_END]', {
+        totalElapsedMs,
+        success: false,
+        modelUsed: null,
+        retryCount,
+        fallbackCount
+      });
 
-      if (summaryErrors.includes('high demand') || summaryErrors.includes('503')) {
-        throw new Error('Hệ thống máy chủ Google Gemini đang trong thời điểm quá tải cao (503 High Demand). Vui lòng thử lại sau vài giây.');
-      } else if (summaryErrors.includes('RESOURCE_EXHAUSTED') || summaryErrors.includes('quota')) {
-        throw new Error('Hạn mức truy vấn Gemini API của máy chủ tạm thời đạt giới hạn (Quota Exceeded). Vui lòng thử lại sau giây lát.');
-      } else {
-        throw new Error(`Chi tiết phản hồi từ Google AI: ${summaryErrors || lastError?.message || 'Không có phản hồi'}`);
+      let finalMsg = lastError?.message || String(lastError || '');
+      try {
+        const parsed = JSON.parse(finalMsg);
+        if (parsed?.error?.message) finalMsg = parsed.error.message;
+      } catch {}
+
+      if (getRemainingMs() <= 2000 || finalMsg.includes('TIMEOUT') || finalMsg.includes('abort') || lastError?.name === 'AbortError') {
+        return sendJson(res, 504, {
+          success: false,
+          code: 'FACT_CHECK_TIMEOUT',
+          message: 'Kiểm chứng mất quá nhiều thời gian. Vui lòng thử lại.'
+        });
       }
+
+      if (finalMsg.includes('503') || finalMsg.includes('high demand') || finalMsg.includes('overloaded') || finalMsg.includes('RESOURCE_EXHAUSTED')) {
+        return sendJson(res, 503, {
+          success: false,
+          code: 'GEMINI_TEMPORARILY_UNAVAILABLE',
+          message: 'Dịch vụ AI đang tạm thời quá tải (503 High Demand). Vui lòng thử lại sau.'
+        });
+      }
+
+      return sendJson(res, 500, {
+        success: false,
+        code: 'FACT_CHECK_ERROR',
+        message: `Không thể kết nối tới Google AI: ${finalMsg.slice(0, 200)}`
+      });
     }
+
+    console.log('[FACT_CHECK_END]', {
+      totalElapsedMs: getElapsedMs(),
+      success: true,
+      modelUsed: resolvedModel,
+      retryCount,
+      fallbackCount
+    });
 
     // 8. Bóc tách response và candidates an toàn (Null-safe)
     const candidate = successfulResponse.candidates?.[0];
