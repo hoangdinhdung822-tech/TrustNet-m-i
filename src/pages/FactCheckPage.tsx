@@ -14,9 +14,7 @@ import {
   Loader2, 
   Settings,
   Zap,
-  Key,
-  Eye,
-  EyeOff,
+  Shield,
   X,
   Globe,
   AlertTriangle,
@@ -429,17 +427,13 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
   const [simulatedImageName, setSimulatedImageName] = useState<string | null>(null);
 
   // Gemini Settings State
-  const [apiKey, setApiKey] = useState<string>(() => AiVerificationService.getGeminiApiKey() || '');
-  const [selectedModel, setSelectedModel] = useState<string>(() => AiVerificationService.getGeminiModel() || 'gemini-3.8-flash');
+  const [selectedModel, setSelectedModel] = useState<string>(() => AiVerificationService.getGeminiModel() || 'gemini-2.5-flash');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [showKeyText, setShowKeyText] = useState(false);
   const [testState, setTestState] = useState<{ testing: boolean; message: string | null; success: boolean | null }>({
     testing: false,
     message: null,
     success: null
   });
-
-  const hasGeminiKey = Boolean(apiKey && apiKey.trim().length > 0);
 
   // Sample Presets for Gen Z and Students to test immediately
   const samplePresets = [
@@ -510,9 +504,6 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
       console.error('Fact-check failure:', err);
       const msg = err?.message || 'Có lỗi xảy ra trong quá trình kiểm chứng thông tin.';
       setErrorMessage(msg);
-      if (msg.includes('API_KEY') || msg.includes('GEMINI_API_KEY')) {
-        setIsSettingsOpen(true);
-      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -531,8 +522,8 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
   };
 
   const handleTestConnection = async () => {
-    setTestState({ testing: true, message: 'Đang gửi kiểm tra tới Google Gemini qua máy chủ...', success: null });
-    const res = await AiVerificationService.testGeminiConnection(apiKey, selectedModel);
+    setTestState({ testing: true, message: 'Đang kiểm tra kết nối tới Google Gemini qua Serverless Backend...', success: null });
+    const res = await AiVerificationService.testGeminiConnection(undefined, selectedModel);
     if (res.resolvedModel && res.resolvedModel !== selectedModel) {
       setSelectedModel(res.resolvedModel);
       AiVerificationService.setGeminiModel(res.resolvedModel);
@@ -541,15 +532,8 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
   };
 
   const handleSaveSettings = () => {
-    AiVerificationService.setGeminiApiKey(apiKey);
     AiVerificationService.setGeminiModel(selectedModel);
     setIsSettingsOpen(false);
-  };
-
-  const handleClearKey = () => {
-    AiVerificationService.setGeminiApiKey('');
-    setApiKey('');
-    setTestState({ testing: false, message: null, success: null });
   };
 
   const scrollToSource = (index: number) => {
@@ -590,11 +574,11 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 shadow-glow-emerald hover:bg-emerald-900/40 transition-all"
-              title="Google Search Grounding đang kích hoạt. Nhấn để xem cấu hình hoặc thêm API Key."
+              title="Google Search Grounding kích hoạt trên máy chủ. Nhấn để xem trạng thái kết nối."
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Google Gemini ({selectedModel}) • {hasGeminiKey ? 'Khóa riêng' : 'Server Default'}</span>
+              <span>Google Gemini ({selectedModel}) • Server Grounding</span>
               <Settings className="w-3.5 h-3.5 text-slate-400 ml-1" />
             </button>
           </div>
@@ -795,43 +779,14 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
               </div>
             </div>
 
-            {/* API Key Input */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
-                <span>Google Gemini API Key:</span>
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-cyan-400 hover:underline flex items-center gap-1 font-normal text-[11px]"
-                >
-                  <span>Lấy key miễn phí tại AI Studio</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </label>
-
-              <div className="relative">
-                <Key className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type={showKeyText ? 'text' : 'password'}
-                  value={apiKey}
-                  onChange={(e) => {
-                    setApiKey(e.target.value);
-                    setTestState({ testing: false, message: null, success: null });
-                  }}
-                  placeholder="AIzaSy... (hoặc để trống nếu server đã có .env)"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowKeyText(!showKeyText)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                >
-                  {showKeyText ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+            {/* Server-Side Security Note */}
+            <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-1.5">
+              <div className="font-bold text-slate-200 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-emerald-400" />
+                <span>Kiến trúc Xác thực Server-Side (Bảo mật 100%)</span>
               </div>
-              <p className="text-[11px] text-slate-500">
-                * Khóa API được gửi an toàn tới endpoint máy chủ để thực hiện truy vấn và không bao giờ xuất hiện trong mã nguồn client.
+              <p className="text-slate-400 leading-relaxed text-[11px]">
+                Khóa <code className="text-cyan-300 bg-slate-950 px-1 py-0.5 rounded font-mono">GEMINI_API_KEY</code> được bảo vệ trực tiếp trên môi trường máy chủ Vercel. Người dùng không cần và không thể nhập API key từ trình duyệt, đảm bảo an toàn tuyệt đối cho hệ thống.
               </p>
             </div>
 
@@ -839,17 +794,17 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-300 block">
-                  Chọn phiên bản mô hình Gemini:
+                  Phiên bản mô hình Google Gemini trên máy chủ:
                 </label>
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedModel('gemini-3.8-flash');
-                    AiVerificationService.setGeminiModel('gemini-3.8-flash');
+                    setSelectedModel('gemini-2.5-flash');
+                    AiVerificationService.setGeminiModel('gemini-2.5-flash');
                   }}
                   className="text-[11px] text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 font-semibold"
                 >
-                  ⚡ Đặt về gemini-3.8-flash (Chuẩn Google)
+                  ⚡ Đặt về gemini-2.5-flash (Chuẩn Google AI Studio)
                 </button>
               </div>
               <select
@@ -857,10 +812,9 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                 onChange={(e) => setSelectedModel(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
               >
-                <option value="gemini-3.8-flash">gemini-3.8-flash (Chính thức được Google AI Studio khuyến nghị)</option>
-                <option value="gemini-3.5-flash">gemini-3.5-flash (Thế hệ 3.5 tốc độ cao)</option>
-                <option value="gemini-flash-latest">gemini-flash-latest (Bản Flash mới nhất tự động)</option>
-                <option value="gemini-3-flash-preview">gemini-3-flash-preview (Bản xem trước thế hệ 3)</option>
+                <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyến nghị: Tốc độ cao, hỗ trợ Google Search Grounding)</option>
+                <option value="gemini-2.0-flash">gemini-2.0-flash (Thế hệ Flash 2.0 ổn định)</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash (Bản tương thích mở rộng)</option>
               </select>
             </div>
 
@@ -882,32 +836,20 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
               <button
                 type="button"
                 onClick={handleTestConnection}
-                disabled={testState.testing || !apiKey.trim()}
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                disabled={testState.testing}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
               >
                 {testState.testing && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>Kiểm tra kết nối</span>
+                <span>Kiểm tra kết nối máy chủ</span>
               </button>
 
-              <div className="flex items-center gap-2">
-                {hasGeminiKey && (
-                  <button
-                    type="button"
-                    onClick={handleClearKey}
-                    className="px-3 py-2 rounded-xl text-rose-400 hover:bg-rose-950/30 text-xs font-semibold"
-                  >
-                    Ngắt kết nối
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleSaveSettings}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-glow-sm"
-                >
-                  Lưu & Áp dụng
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleSaveSettings}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-glow-sm"
+              >
+                Lưu & Đóng
+              </button>
             </div>
 
           </div>

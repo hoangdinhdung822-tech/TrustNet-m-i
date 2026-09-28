@@ -1,37 +1,25 @@
 {
   "version": 2,
   "functions": {
-    "api/**/*.ts": {
+    "api/*.ts": {
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
-      "source": "/api/health",
-      "destination": "/api/health"
-    },
-    {
       "source": "/api/v1/health",
       "destination": "/api/health"
-    },
-    {
-      "source": "/api/ping",
-      "destination": "/api/ping"
     },
     {
       "source": "/api/v1/fact-check/ping",
       "destination": "/api/ping"
     },
     {
-      "source": "/api/fact-check",
-      "destination": "/api/fact-check"
-    },
-    {
       "source": "/api/v1/fact-check",
       "destination": "/api/fact-check"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|assets/|favicon.ico).*)",
       "destination": "/index.html"
     }
   ]

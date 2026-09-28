@@ -14,7 +14,7 @@ function trustnetApiPlugin(): Plugin {
     if (req.method === 'OPTIONS' && (urlPath.startsWith('/api') || urlPath.startsWith('/v1'))) {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-gemini-api-key, Authorization');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.statusCode = 204;
       res.end();
       return;
@@ -42,8 +42,7 @@ function trustnetApiPlugin(): Plugin {
         try {
           res.setHeader('Access-Control-Allow-Origin', '*');
           const parsed = body ? JSON.parse(body) : {};
-          const userApiKey = (req.headers['x-gemini-api-key'] as string) || parsed?.apiKey;
-          const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+          const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
           let rawModel = parsed?.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
           if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
             rawModel = 'gemini-2.5-flash';
@@ -51,11 +50,12 @@ function trustnetApiPlugin(): Plugin {
           const model = rawModel;
 
           if (!apiKey) {
-            res.statusCode = 400;
+            console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
+            res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({
               success: false,
-              message: 'Chưa cấu hình API Key. Vui lòng thêm GEMINI_API_KEY vào .env hoặc nhập trong Cấu hình.'
+              message: 'Gemini API is not configured on the server.'
             }));
             return;
           }
@@ -186,7 +186,6 @@ function trustnetApiPlugin(): Plugin {
           const claim = (parsed.claim || parsed.text || '').trim();
           const url = (parsed.url || parsed.sourceUrl || '').trim();
           const model = parsed.model;
-          const userApiKey = req.headers['x-gemini-api-key'] as string | undefined;
 
           if (!claim && !url) {
             res.statusCode = 400;
@@ -198,37 +197,14 @@ function trustnetApiPlugin(): Plugin {
             return;
           }
 
-          if (url) {
-            try {
-              const parsedUrl = new URL(url);
-              if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-                res.statusCode = 400;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({
-                  success: false,
-                  error: 'Địa chỉ URL không hợp lệ. Chỉ chấp nhận giao thức http:// hoặc https://.'
-                }));
-                return;
-              }
-            } catch {
-              res.statusCode = 400;
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({
-                success: false,
-                error: 'Địa chỉ URL không đúng định dạng.'
-              }));
-              return;
-            }
-          }
-
-          const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+          const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
           if (!apiKey) {
-            console.error('[FACT-CHECK ERROR] GEMINI_API_KEY is not configured');
+            console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
             res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({
               success: false,
-              error: 'GEMINI_API_KEY is not configured'
+              error: 'Gemini API is not configured on the server.'
             }));
             return;
           }
@@ -239,7 +215,6 @@ function trustnetApiPlugin(): Plugin {
             text: claim || undefined,
             url: url || undefined,
             sourceUrl: url || undefined,
-            userApiKey: userApiKey || undefined,
             requestedModel: model || undefined
           });
 

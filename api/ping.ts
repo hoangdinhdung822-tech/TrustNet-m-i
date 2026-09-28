@@ -9,7 +9,7 @@ function sendJson(res: any, statusCode: number, data: any) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, x-gemini-api-key, Authorization'
+      'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end(JSON.stringify(data));
     return;
@@ -20,7 +20,7 @@ function sendJson(res: any, statusCode: number, data: any) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, x-gemini-api-key, Authorization'
+        'Access-Control-Allow-Headers': 'Content-Type'
       }
     });
   }
@@ -30,7 +30,7 @@ export default async function handler(req: any, res?: any) {
   if (res && typeof res.setHeader === 'function') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-gemini-api-key, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   }
 
   const method = req?.method || (req instanceof Request ? req.method : 'POST');
@@ -73,16 +73,8 @@ export default async function handler(req: any, res?: any) {
       body = req.body;
     }
 
-    const getHeader = (name: string): string | undefined => {
-      if (req?.headers) {
-        if (typeof req.headers.get === 'function') return req.headers.get(name) || undefined;
-        return (req.headers[name] as string) || (req.headers[name.toLowerCase()] as string);
-      }
-      return undefined;
-    };
-
-    const userApiKey = getHeader('x-gemini-api-key') || body.apiKey;
-    const apiKey = (userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+    // SERVER-SIDE ONLY: Đọc duy nhất từ biến môi trường server
+    const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
 
     let rawModel = body.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     if (rawModel === 'gemini-3.8-flash' || rawModel === 'gemini-3.5-flash') {
@@ -91,9 +83,10 @@ export default async function handler(req: any, res?: any) {
     const model = rawModel;
 
     if (!apiKey) {
-      return sendJson(res, 400, {
+      console.error('[FACT_CHECK] GEMINI_API_KEY is missing');
+      return sendJson(res, 500, {
         success: false,
-        message: 'Chưa cấu hình API Key. Vui lòng thêm GEMINI_API_KEY vào biến môi trường Vercel hoặc nhập trong ô Cấu hình API Key.'
+        message: 'Gemini API chưa được cấu hình trên máy chủ (Thiếu GEMINI_API_KEY trong Vercel Environment Variables).'
       });
     }
 
@@ -136,9 +129,9 @@ export default async function handler(req: any, res?: any) {
         } catch {}
 
         if (msg.includes('API_KEY_INVALID') || msg.includes('API key not valid')) {
-          return sendJson(res, 400, {
+          return sendJson(res, 500, {
             success: false,
-            message: 'Khóa Gemini API Key không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.'
+            message: 'Khóa Gemini API Key trên máy chủ không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio.'
           });
         }
         continue;
@@ -160,10 +153,10 @@ export default async function handler(req: any, res?: any) {
       } else if (errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota') || errorMsg.includes('429')) {
         return sendJson(res, 429, {
           success: false,
-          message: 'Hạn mức truy vấn (Quota) của API Key tạm thời đã hết hoặc bị giới hạn trên AI Studio.'
+          message: 'Hạn mức truy vấn (Quota) của API Key trên máy chủ tạm thời đã hết hoặc bị giới hạn trên AI Studio.'
         });
       } else {
-        return sendJson(res, 400, {
+        return sendJson(res, 500, {
           success: false,
           message: errorMsg
         });
@@ -179,7 +172,7 @@ export default async function handler(req: any, res?: any) {
       resolvedModel
     });
   } catch (err: any) {
-    return sendJson(res, 400, {
+    return sendJson(res, 500, {
       success: false,
       message: `Kết nối thất bại: ${err?.message || err}`
     });

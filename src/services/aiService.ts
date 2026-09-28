@@ -6,7 +6,6 @@ import { AiVerificationResult, CodeInspectionReport } from '../types';
  * Bảo mật: API Key không bị lộ trong client bundle.
  */
 
-const GEMINI_API_KEY_STORAGE = 'trustnet_gemini_api_key';
 const GEMINI_MODEL_STORAGE = 'trustnet_gemini_model';
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
@@ -25,14 +24,6 @@ const PHISHING_SIGNALS = [
 
 export class AiVerificationService {
   /**
-   * Chuẩn hóa API Key (loại bỏ dấu ngoặc kép, khoảng trắng thừa)
-   */
-  public static sanitizeApiKey(key: string): string {
-    if (!key) return '';
-    return key.trim().replace(/^["']|["']$/g, '');
-  }
-
-  /**
    * Chuẩn hóa tên Model Gemini (xử lý dấu gạch ngang unicode en-dash/em-dash '–', khoảng trắng)
    */
   public static sanitizeModel(model?: string): string {
@@ -45,31 +36,6 @@ export class AiVerificationService {
       return DEFAULT_GEMINI_MODEL;
     }
     return cleaned || DEFAULT_GEMINI_MODEL;
-  }
-
-  /**
-   * Lấy Gemini API Key tùy chọn từ localStorage (nếu người dùng muốn dùng key riêng)
-   */
-  public static getGeminiApiKey(): string | null {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(GEMINI_API_KEY_STORAGE);
-      if (stored && stored.trim().length > 0) return this.sanitizeApiKey(stored);
-    }
-    return null;
-  }
-
-  /**
-   * Lưu Gemini API Key vào localStorage
-   */
-  public static setGeminiApiKey(key: string): void {
-    if (typeof window !== 'undefined') {
-      const clean = this.sanitizeApiKey(key);
-      if (!clean) {
-        localStorage.removeItem(GEMINI_API_KEY_STORAGE);
-      } else {
-        localStorage.setItem(GEMINI_API_KEY_STORAGE, clean);
-      }
-    }
   }
 
   /**
@@ -93,25 +59,19 @@ export class AiVerificationService {
   }
 
   /**
-   * Kiểm tra kết nối tới Google Gemini API qua server-side ping endpoint
+   * Kiểm tra kết nối tới Google Gemini API qua server-side ping endpoint (Server-Side Only)
    */
   public static async testGeminiConnection(
-    key?: string, 
+    _unusedKey?: string, 
     model?: string
   ): Promise<{ success: boolean; message: string; resolvedModel?: string }> {
-    const cleanKey = this.sanitizeApiKey(key || this.getGeminiApiKey() || '');
     const targetModel = this.sanitizeModel(model || this.getGeminiModel());
 
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (cleanKey) {
-        headers['x-gemini-api-key'] = cleanKey;
-      }
-
-      const res = await fetch('/api/v1/fact-check/ping', {
+      const res = await fetch('/api/ping', {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ model: targetModel, apiKey: cleanKey })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: targetModel })
       });
 
       let data: any = {};
@@ -129,9 +89,9 @@ export class AiVerificationService {
           if (rawText && rawText.trim().length > 0 && !rawText.trim().startsWith('<')) {
             msg = rawText.trim().slice(0, 300);
           } else if (res.status === 404) {
-            msg = 'Lỗi 404: Không tìm thấy máy chủ kiểm chứng (/api/v1/fact-check/ping). Vui lòng đảm bảo server đang chạy hoặc đã triển khai Vercel Serverless Function.';
+            msg = 'Lỗi 404: Không tìm thấy máy chủ kiểm chứng (/api/ping). Vui lòng đảm bảo server đang chạy hoặc đã triển khai Vercel Serverless Function.';
           } else if (res.status === 500) {
-            msg = 'Lỗi 500: Chưa cấu hình GEMINI_API_KEY hoặc máy chủ gặp sự cố.';
+            msg = 'Lỗi 500: Gemini API chưa được cấu hình trên máy chủ (Thiếu GEMINI_API_KEY).';
           } else {
             msg = `Lỗi kiểm tra kết nối (${res.status}): ${res.statusText || 'Yêu cầu không thành công'}`;
           }
@@ -164,7 +124,6 @@ export class AiVerificationService {
     sourceUrl?: string,
     onProgress?: (step: string) => void
   ): Promise<AiVerificationResult> {
-    const cleanKey = this.getGeminiApiKey();
     const model = this.getGeminiModel();
 
     if (onProgress) {
@@ -177,22 +136,15 @@ export class AiVerificationService {
     }
     await new Promise(r => setTimeout(r, 400));
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-    if (cleanKey) {
-      headers['x-gemini-api-key'] = cleanKey;
-    }
-
     try {
-      const response = await fetch('/api/v1/fact-check', {
+      const response = await fetch('/api/fact-check', {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           claim: text,
-          text,
           url: sourceUrl?.trim() || undefined,
-          sourceUrl: sourceUrl?.trim() || undefined,
           model
         })
       });
@@ -216,9 +168,9 @@ export class AiVerificationService {
           if (rawText && rawText.trim().length > 0 && !rawText.trim().startsWith('<')) {
             errorMsg = rawText.trim().slice(0, 300);
           } else if (response.status === 404) {
-            errorMsg = 'Lỗi 404: Không tìm thấy API kiểm chứng (/api/v1/fact-check). Vui lòng kiểm tra Vercel Serverless Function hoặc khởi động server backend.';
+            errorMsg = 'Lỗi 404: Không tìm thấy API kiểm chứng (/api/fact-check). Vui lòng kiểm tra Vercel Serverless Function hoặc khởi động server backend.';
           } else if (response.status === 500) {
-            errorMsg = 'Lỗi máy chủ (500): GEMINI_API_KEY chưa được cấu hình trên máy chủ. Vui lòng thêm GEMINI_API_KEY trên Vercel hoặc nhập API Key trong phần Cấu hình.';
+            errorMsg = 'Lỗi máy chủ (500): Gemini API chưa được cấu hình trên máy chủ (Thiếu GEMINI_API_KEY).';
           } else {
             errorMsg = `Lỗi phản hồi máy chủ (${response.status}): ${response.statusText || 'Lỗi không xác định'}`;
           }
