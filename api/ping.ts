@@ -1,5 +1,4 @@
 import { GoogleGenAI } from '@google/genai';
-import { GEMINI_CONFIG, normalizeModelName } from './gemini-config';
 
 function sendJson(res: any, statusCode: number, data: any) {
   if (res && typeof res.status === 'function') {
@@ -73,7 +72,30 @@ function resolveServerApiKey(): { apiKey: string; matchedKeyName: string | null 
   return { apiKey: '', matchedKeyName: null };
 }
 
+function normalizeModelName(model?: string): string {
+  if (!model) return 'gemini-3.5-flash-lite';
+  let clean = model.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-').trim();
+  if (clean.startsWith('models/')) clean = clean.replace(/^models\//, '');
+  
+  if (clean.includes('pro') && (clean.includes('2.5') || clean.includes('1.5') || clean.includes('2.0'))) {
+    return 'gemini-3.1-pro-preview';
+  }
+  if (
+    clean.includes('1.5') || 
+    clean.includes('2.0') || 
+    clean.includes('2.5') ||
+    !clean.startsWith('gemini-')
+  ) {
+    return 'gemini-3.5-flash-lite';
+  }
+  return clean;
+}
 
+const GEMINI_CONFIG = {
+  PRIMARY_MODEL: normalizeModelName(process.env.GEMINI_FACT_CHECK_MODEL || process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'),
+  FAST_MODEL: normalizeModelName(process.env.GEMINI_FAST_MODEL || 'gemini-3.5-flash-lite'),
+  FALLBACK_MODEL: normalizeModelName(process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.1-pro-preview')
+} as const;
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
