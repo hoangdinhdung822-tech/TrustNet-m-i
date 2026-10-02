@@ -368,7 +368,7 @@ export const maxDuration = 60;
 
 export default async function handler(req: any, res?: any) {
   const requestStartTime = Date.now();
-  const MAX_TOTAL_TIME_MS = 25000;
+  const MAX_TOTAL_TIME_MS = 45000;
   const getElapsedMs = () => Date.now() - requestStartTime;
   const getRemainingMs = () => Math.max(0, MAX_TOTAL_TIME_MS - getElapsedMs());
 
@@ -633,11 +633,12 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     let totalGeminiTimeMs = 0;
     let lastGeminiDurationMs = 0;
 
-    // Helper gọi Gemini với timeout nghiêm ngặt qua AbortSignal và httpOptions SDK
+    // Helper gọi Gemini với timeout nghiêm ngặt qua AbortSignal và httpOptions SDK (Tối thiểu 10s theo quy định của Google)
     async function executeGeminiCall(modelToUse: string, timeoutMs: number) {
+      const safeTimeoutMs = Math.max(10000, timeoutMs);
       const callStart = Date.now();
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const timer = setTimeout(() => controller.abort(), safeTimeoutMs);
 
       try {
         const response: any = await ai.models.generateContent({
@@ -648,7 +649,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
             temperature: 0.1,
             abortSignal: controller.signal,
             httpOptions: {
-              timeout: timeoutMs
+              timeout: safeTimeoutMs
             }
           }
         });
@@ -667,7 +668,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     }
 
     // --- PHASE 1: Primary Model (Tối đa 2 attempts: Attempt 1 + Attempt 2 nếu gặp 503) ---
-    if (getRemainingMs() < 3500) {
+    if (getRemainingMs() < 12000) {
       console.warn('[FACT_CHECK_TIMEOUT] Time budget exhausted before calling Gemini');
       return sendJson(res, 504, {
         success: false,
@@ -682,7 +683,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
       model: primaryModel
     });
 
-    const call1Timeout = Math.min(10000, Math.max(3000, getRemainingMs() - 2000));
+    const call1Timeout = 12000;
     try {
       const res1 = await executeGeminiCall(primaryModel, call1Timeout);
       if (res1.response?.candidates?.length > 0) {
@@ -739,7 +740,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
       // Xử lý 503 (High Demand / Overloaded): Retry attempt 2 sau 1s nếu còn budget
       const is503_1 = msg1.includes('503') || msg1.includes('high demand') || msg1.includes('overloaded') || msg1.includes('RESOURCE_EXHAUSTED');
-      if (is503_1 && getRemainingMs() > 6000) {
+      if (is503_1 && getRemainingMs() > 14000) {
         retryCount = 1;
         console.log('[FACT_CHECK_RETRY]', {
           elapsedMs: getElapsedMs(),
@@ -755,7 +756,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           model: primaryModel
         });
 
-        const call2Timeout = Math.min(10000, Math.max(3000, getRemainingMs() - 2000));
+        const call2Timeout = 12000;
         try {
           const res2 = await executeGeminiCall(primaryModel, call2Timeout);
           if (res2.response?.candidates?.length > 0) {
@@ -796,7 +797,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     }
 
     // --- PHASE 2: Fallback Model (Thử duy nhất 1 lần nếu Model chính chưa thành công & còn budget) ---
-    if (!successfulResponse && primaryModel !== fallbackModel && getRemainingMs() > 4500) {
+    if (!successfulResponse && primaryModel !== fallbackModel && getRemainingMs() > 13000) {
       fallbackCount = 1;
       console.log('[FACT_CHECK_FALLBACK]', {
         elapsedMs: getElapsedMs(),
@@ -810,7 +811,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
         model: fallbackModel
       });
 
-      const fallbackTimeout = Math.min(8000, Math.max(3000, getRemainingMs() - 1500));
+      const fallbackTimeout = 12000;
       try {
         const resFb = await executeGeminiCall(fallbackModel, fallbackTimeout);
         if (resFb.response?.candidates?.length > 0) {

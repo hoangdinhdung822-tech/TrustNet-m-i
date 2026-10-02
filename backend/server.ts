@@ -193,7 +193,7 @@ app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'],
     const { GoogleGenAI } = await import('@google/genai');
     const ai = new GoogleGenAI({ 
       apiKey,
-      httpOptions: { timeout: 6000 }
+      httpOptions: { timeout: 10000 }
     });
 
     const candidateModels = [
@@ -211,14 +211,14 @@ app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'],
     for (const m of uniqueModels) {
       try {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 6000);
+        const timer = setTimeout(() => controller.abort(), 10000);
 
         const response = await ai.models.generateContent({
           model: m,
           contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.',
           config: {
             abortSignal: controller.signal,
-            httpOptions: { timeout: 6000 }
+            httpOptions: { timeout: 10000 }
           }
         });
         clearTimeout(timer);

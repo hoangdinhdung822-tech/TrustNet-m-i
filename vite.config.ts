@@ -66,7 +66,7 @@ function trustnetApiPlugin(): Plugin {
           const { GoogleGenAI } = await import('@google/genai');
           const ai = new GoogleGenAI({ 
             apiKey,
-            httpOptions: { timeout: 6000 }
+            httpOptions: { timeout: 10000 }
           });
 
           const candidateModels = [
@@ -84,14 +84,14 @@ function trustnetApiPlugin(): Plugin {
           for (const m of uniqueModels) {
             try {
               const controller = new AbortController();
-              const timer = setTimeout(() => controller.abort(), 6000);
+              const timer = setTimeout(() => controller.abort(), 10000);
 
               const response = await ai.models.generateContent({
                 model: m,
                 contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.',
                 config: {
                   abortSignal: controller.signal,
-                  httpOptions: { timeout: 6000 }
+                  httpOptions: { timeout: 10000 }
                 }
               });
               clearTimeout(timer);

@@ -174,7 +174,7 @@ export default async function handler(req: any, res?: any) {
 
     const ai = new GoogleGenAI({ 
       apiKey,
-      httpOptions: { timeout: 6000 }
+      httpOptions: { timeout: 10000 }
     });
 
     const candidateModels = Array.from(new Set([
@@ -196,14 +196,14 @@ export default async function handler(req: any, res?: any) {
         }
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 6000);
+          const timer = setTimeout(() => controller.abort(), 10000);
 
           const response: any = await ai.models.generateContent({
             model: m,
             contents: 'Ping test: Hãy trả lời "TrustNet AI Connected" trong 3 từ.',
             config: {
               abortSignal: controller.signal,
-              httpOptions: { timeout: 6000 }
+              httpOptions: { timeout: 10000 }
             }
           });
           clearTimeout(timer);
