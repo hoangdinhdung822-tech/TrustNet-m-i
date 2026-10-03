@@ -8,6 +8,7 @@ import {
   getNextLessonUnlockInfo 
 } from '../data/lessonsData';
 import { MASTER_SCENARIOS_CATALOG } from '../data/scenariosData';
+import { MASTER_SEARCH_CATALOG } from '../data/searchData';
 
 const STORAGE_KEYS = {
   USER: 'trustnet_current_user',
@@ -357,69 +358,8 @@ const INITIAL_LESSONS: Lesson[] = MASTER_LESSONS_CATALOG;
 const INITIAL_SCENARIOS: Scenario[] = MASTER_SCENARIOS_CATALOG;
 
 
-// Initial Search Index
-const INITIAL_SEARCH_RESULTS: SearchResultItem[] = [
-  {
-    id: 's-1',
-    title: 'Cổng Thông tin Điện tử Chính phủ: Thông cáo báo chí về chính sách mới',
-    summary: 'Cập nhật nhanh chóng, chính xác toàn bộ nghị định, quyết định của Thủ tướng Chính phủ và các bộ ngành liên quan đến đời sống xã hội.',
-    source: 'Cổng TTĐT Chính phủ',
-    sourceType: 'Cơ quan Nhà nước',
-    date: '27/09/2026',
-    url: 'https://chinhphu.vn',
-    credibilityScore: 99,
-    reliability: 'Rất cao',
-    category: 'official'
-  },
-  {
-    id: 's-2',
-    title: 'Bộ Y tế khuyến cáo về phòng chống dịch bệnh theo mùa và tiêm chủng',
-    summary: 'Cung cấp hướng dẫn điều trị chuẩn y khoa, phác đồ dinh dưỡng và đính chính các thông tin thuốc nam không rõ nguồn gốc trên mạng xã hội.',
-    source: 'Bộ Y tế Việt Nam',
-    sourceType: 'Cơ quan Nhà nước',
-    date: '26/09/2026',
-    url: 'https://moh.gov.vn',
-    credibilityScore: 98,
-    reliability: 'Rất cao',
-    category: 'official'
-  },
-  {
-    id: 's-3',
-    title: 'Trung tâm Xử lý Tin giả Việt Nam (VAFC): Danh sách các website lừa đảo mới bị chặn',
-    summary: 'Công bố hơn 150 tên miền giả mạo ngân hàng, sàn giao dịch tiền ảo bất hợp pháp và cảnh báo các chiến dịch tin giả có tổ chức.',
-    source: 'VAFC (Bộ TT&TT)',
-    sourceType: 'Chuyên trang Công nghệ',
-    date: '25/09/2026',
-    url: 'http://tingia.gov.vn',
-    credibilityScore: 96,
-    reliability: 'Rất cao',
-    category: 'tech'
-  },
-  {
-    id: 's-4',
-    title: 'Tuổi Trẻ Online: Kiểm chứng thông tin - Mục Nói Lại Cho Rõ',
-    summary: 'Chuyên mục điều tra độc lập của báo Tuổi Trẻ, xác minh các tin đồn chấn động trên mạng xã hội và đưa ra bằng chứng thực tế.',
-    source: 'Báo Tuổi Trẻ',
-    sourceType: 'Báo chính thống',
-    date: '24/09/2026',
-    url: 'https://tuoitre.vn/noi-lai-cho-ro.htm',
-    credibilityScore: 92,
-    reliability: 'Đáng tin cậy',
-    category: 'news'
-  },
-  {
-    id: 's-5',
-    title: 'Tạp chí Khoa học Phổ thông: Thực hư công nghệ pin thể rắn và xe điện thế hệ mới',
-    summary: 'Phân tích các bài báo nghiên cứu của Viện Công nghệ MIT và đánh giá khả năng thương mại hóa thực tế của pin sạc nhanh.',
-    source: 'Tạp chí KHPT',
-    sourceType: 'Tổ chức Giáo dục',
-    date: '20/09/2026',
-    url: 'https://khoahocphothong.vn',
-    credibilityScore: 88,
-    reliability: 'Đáng tin cậy',
-    category: 'edu'
-  }
-];
+// Cơ sở dữ liệu tra cứu chính thống kết nối chinhphu.vn, tuoitre.vn, moh.gov.vn
+const INITIAL_SEARCH_RESULTS: SearchResultItem[] = MASTER_SEARCH_CATALOG;
 
 // Initial Admin Reports
 const INITIAL_REPORTS: ReportItem[] = [
@@ -926,8 +866,11 @@ export class DatabaseService {
   }
 
   // Lấy Search data
-  public static getSearchResults(keyword?: string, category?: string): SearchResultItem[] {
+  public static getSearchResults(keyword?: string, category?: string, portal?: string): SearchResultItem[] {
     let results = INITIAL_SEARCH_RESULTS;
+    if (portal && portal !== 'all') {
+      results = results.filter(r => r.connectedPortal === portal || r.url.toLowerCase().includes(portal.toLowerCase()));
+    }
     if (category && category !== 'all') {
       results = results.filter(r => r.category === category);
     }

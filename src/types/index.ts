@@ -314,4 +314,5 @@ export interface SearchResultItem {
   credibilityScore: number; // 0-100
   reliability: 'Rất cao' | 'Đáng tin cậy' | 'Cần kiểm chứng' | 'Cảnh báo';
   category: 'news' | 'official' | 'edu' | 'tech' | 'social';
+  connectedPortal?: 'chinhphu.vn' | 'tuoitre.vn' | 'moh.gov.vn' | 'other';
 }
