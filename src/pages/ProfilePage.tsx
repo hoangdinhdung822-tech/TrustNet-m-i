@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   UserCircle2, 
   Award, 
@@ -24,11 +24,14 @@ import {
   Key,
   ShieldAlert,
   Eye,
-  EyeOff
+  EyeOff,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import { DatabaseService } from '../services/dbMock';
 import { User } from '../types';
 import { AiStatusBadge } from '../components/AiStatusBadge';
+import { processDeviceImage } from '../utils/imageUpload';
 
 interface Props {
   user: User;
@@ -137,6 +140,65 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
   const [editClass, setEditClass] = useState(user.className || 'Khối 11 - Đoàn Trường');
   const [editBio, setEditBio] = useState(user.bio || '');
   const [editAvatar, setEditAvatar] = useState(user.avatar);
+
+  // File upload refs & state cho ảnh từ thiết bị cá nhân
+  const headerAvatarFileInputRef = useRef<HTMLInputElement>(null);
+  const editAvatarFileInputRef = useRef<HTMLInputElement>(null);
+  const regAvatarFileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarUploadError, setAvatarUploadError] = useState<string | null>(null);
+
+  // Tải ảnh trực tiếp trên Header Profile
+  const handleHeaderAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    try {
+      const dataUrl = await processDeviceImage(file);
+      const updated = DatabaseService.updateUserProfile({ avatar: dataUrl });
+      if (onUserUpdate) onUserUpdate(updated);
+      setEditAvatar(dataUrl);
+      showToast('🎉 Đã cập nhật ảnh đại diện mới từ thiết bị thành công!');
+    } catch (err: any) {
+      showToast('❌ ' + (err.message || 'Lỗi khi tải ảnh từ thiết bị'));
+    } finally {
+      setIsUploadingAvatar(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  // Tải ảnh trong modal chỉnh sửa thông tin cá nhân
+  const handleEditAvatarFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    setAvatarUploadError(null);
+    try {
+      const dataUrl = await processDeviceImage(file);
+      setEditAvatar(dataUrl);
+      showToast('📸 Đã nén và tải ảnh từ thiết bị lên form thành công!');
+    } catch (err: any) {
+      setAvatarUploadError(err.message || 'Lỗi khi tải ảnh từ thiết bị');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  // Tải ảnh trong modal đăng ký tài khoản nhanh
+  const handleRegAvatarFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await processDeviceImage(file);
+      setRegAvatar(dataUrl);
+      showToast('📸 Đã tải ảnh từ thiết bị cho tài khoản mới!');
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi tải ảnh');
+    } finally {
+      if (e.target) e.target.value = '';
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -376,13 +438,29 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               <span className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-4 border-slate-950 rounded-full flex items-center justify-center shadow-lg" title="Trạng thái: Trực tuyến">
                 <CheckCircle className="w-3.5 h-3.5 text-white" />
               </span>
+              {/* Tải ảnh đại diện trực tiếp từ thiết bị */}
+              <input
+                type="file"
+                ref={headerAvatarFileInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={handleHeaderAvatarUpload}
+              />
               <button
-                onClick={() => requestAccessPersonalSecurity('profile')}
-                className="absolute inset-0 bg-slate-950/60 rounded-3xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-xs font-semibold text-white transition-opacity gap-1"
-                title="Thay đổi ảnh đại diện (Yêu cầu mật khẩu)"
+                type="button"
+                onClick={() => headerAvatarFileInputRef.current?.click()}
+                disabled={isUploadingAvatar}
+                className="absolute inset-0 bg-slate-950/75 rounded-3xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-xs font-semibold text-white transition-opacity gap-1 cursor-pointer p-1 text-center"
+                title="Tải ảnh đại diện mới từ thiết bị cá nhân (Điện thoại / Máy tính)"
               >
-                <Camera className="w-5 h-5 text-cyan-300" />
-                <span>Đổi ảnh</span>
+                {isUploadingAvatar ? (
+                  <RefreshCw className="w-5 h-5 text-cyan-300 animate-spin" />
+                ) : (
+                  <>
+                    <Upload className="w-5 h-5 text-cyan-300" />
+                    <span className="text-[10px] font-bold leading-tight">Tải ảnh từ máy</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -859,50 +937,111 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
             {profileModalTab === 'profile' && (
               <form onSubmit={handleSaveProfile} className="space-y-5">
                 
-                {/* Avatar Selector */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                    Chọn ảnh đại diện phong cách TrustNet
-                  </label>
-                  <div className="flex items-center gap-4 p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <img
-                      src={editAvatar}
-                      alt="Preview"
-                      className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-500"
-                    />
-                    <div className="flex-1 space-y-1">
-                      <span className="text-xs font-bold text-white">Ảnh hiện tại</span>
-                      <input
-                        type="text"
-                        value={editAvatar}
-                        onChange={(e) => setEditAvatar(e.target.value)}
-                        placeholder="Hoặc dán URL ảnh trực tiếp..."
-                        className="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-900 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500"
-                      />
+                {/* Avatar Selector with Device Upload */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                      Ảnh đại diện cá nhân
+                    </label>
+                    <span className="text-[11px] text-cyan-400 font-medium">Hỗ trợ JPG, PNG, WEBP từ thiết bị</span>
+                  </div>
+
+                  {/* Device Upload Bar */}
+                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="relative shrink-0">
+                        <img
+                          src={editAvatar}
+                          alt="Preview"
+                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-500 shadow-md"
+                        />
+                        {editAvatar.startsWith('data:image') && (
+                          <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500 text-[9px] font-bold text-white shadow">
+                            Từ máy
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 w-full space-y-2">
+                        <input
+                          type="file"
+                          ref={editAvatarFileInputRef}
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleEditAvatarFileUpload}
+                        />
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => editAvatarFileInputRef.current?.click()}
+                            disabled={isUploadingAvatar}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-glow-sm transition-all cursor-pointer"
+                          >
+                            {isUploadingAvatar ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                <span>Đang xử lý ảnh...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-3.5 h-3.5" />
+                                <span>Tải ảnh từ thiết bị cá nhân</span>
+                              </>
+                            )}
+                          </button>
+
+                          <span className="text-[11px] text-slate-400">
+                            (Điện thoại, máy tính, thư viện ảnh)
+                          </span>
+                        </div>
+
+                        {avatarUploadError && (
+                          <p className="text-xs text-rose-400 font-medium">
+                            ⚠️ {avatarUploadError}
+                          </p>
+                        )}
+
+                        <div className="flex items-center gap-2 pt-1">
+                          <input
+                            type="text"
+                            value={editAvatar}
+                            onChange={(e) => setEditAvatar(e.target.value)}
+                            placeholder="Hoặc dán URL ảnh trực tuyến..."
+                            className="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-900 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 pt-2">
-                    {AVATAR_PRESETS.map((preset, idx) => (
-                      <button
-                        type="button"
-                        key={idx}
-                        onClick={() => setEditAvatar(preset.url)}
-                        className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${
-                          editAvatar === preset.url
-                            ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
-                            : 'border-slate-800 hover:border-slate-600 opacity-70 hover:opacity-100'
-                        }`}
-                        title={preset.label}
-                      >
-                        <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
-                        {editAvatar === preset.url && (
-                          <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center">
-                            <Check className="w-4 h-4 text-cyan-300 drop-shadow" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
+                  {/* Ready-to-use Presets */}
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-slate-400 block">
+                      Hoặc chọn nhanh từ các mẫu avatar an toàn số chọn lọc:
+                    </span>
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                      {AVATAR_PRESETS.map((preset, idx) => (
+                        <button
+                          type="button"
+                          key={idx}
+                          onClick={() => setEditAvatar(preset.url)}
+                          className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
+                            editAvatar === preset.url
+                              ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
+                              : 'border-slate-800 hover:border-slate-600 opacity-70 hover:opacity-100'
+                          }`}
+                          title={preset.label}
+                        >
+                          <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
+                          {editAvatar === preset.url && (
+                            <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-cyan-300 drop-shadow" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -1403,16 +1542,48 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                   </div>
                 </div>
 
-                {/* Avatar Selection */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">Chọn Ảnh đại diện</label>
+                {/* Avatar Selection with Device Upload */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300">Ảnh đại diện</label>
+                    
+                    <input
+                      type="file"
+                      ref={regAvatarFileInputRef}
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleRegAvatarFileUpload}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => regAvatarFileInputRef.current?.click()}
+                      className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Tải ảnh từ máy</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <img
+                      src={regAvatar}
+                      alt="Preview"
+                      className="w-12 h-12 rounded-xl object-cover ring-2 ring-indigo-500 shrink-0"
+                    />
+                    <span className="text-[11px] text-slate-400 flex-1">
+                      {regAvatar.startsWith('data:image') 
+                        ? '🟢 Đã chọn ảnh từ thiết bị cá nhân' 
+                        : 'Mẫu avatar an toàn số chọn lọc bên dưới'}
+                    </span>
+                  </div>
+
                   <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                     {AVATAR_PRESETS.map((preset, idx) => (
                       <button
                         type="button"
                         key={idx}
                         onClick={() => setRegAvatar(preset.url)}
-                        className={`rounded-xl overflow-hidden aspect-square border-2 transition-all ${
+                        className={`rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
                           regAvatar === preset.url
                             ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
                             : 'border-slate-800 opacity-60 hover:opacity-100'

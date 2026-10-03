@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   ShieldCheck, 
   Sparkles, 
@@ -16,10 +16,13 @@ import {
   Moon,
   Flame,
   Check,
-  ShieldAlert
+  ShieldAlert,
+  Upload,
+  RefreshCw
 } from 'lucide-react';
 import { DatabaseService } from '../services/dbMock';
 import { User as UserType } from '../types';
+import { processDeviceImage } from '../utils/imageUpload';
 
 interface Props {
   onLoginSuccess: (user: UserType) => void;
@@ -82,6 +85,26 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
   const [regAvatar, setRegAvatar] = useState(AVATAR_PRESETS[0].url);
   const [regAgreed, setRegAgreed] = useState(true);
   const [regError, setRegError] = useState<string | null>(null);
+
+  // File upload ref và handler cho ảnh từ thiết bị
+  const regAvatarFileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingRegAvatar, setIsUploadingRegAvatar] = useState(false);
+
+  const handleRegAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingRegAvatar(true);
+    try {
+      const dataUrl = await processDeviceImage(file);
+      setRegAvatar(dataUrl);
+      setRegError(null);
+    } catch (err: any) {
+      setRegError(err.message || 'Lỗi khi tải ảnh từ thiết bị');
+    } finally {
+      setIsUploadingRegAvatar(false);
+      if (e.target) e.target.value = '';
+    }
+  };
 
   const initialAccounts = DatabaseService.getAllAccounts();
   const sampleAccounts = initialAccounts.filter(acc => acc.role !== 'admin');
@@ -537,33 +560,88 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
                   </div>
                 </div>
 
-                {/* Avatar Presets Selection */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
-                    <span>Chọn Avatar đại sứ an toàn số</span>
-                    <span className="text-[10px] text-cyan-400">8 mẫu chọn lọc</span>
-                  </label>
-                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-                    {AVATAR_PRESETS.map((preset, idx) => (
+                {/* Avatar Selection with Device Upload */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300">
+                      Ảnh đại diện tài khoản
+                    </label>
+                    <span className="text-[10px] text-cyan-400 font-medium">Hỗ trợ tải từ thiết bị</span>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800">
+                    <div className="relative shrink-0">
+                      <img
+                        src={regAvatar}
+                        alt="Preview"
+                        className="w-14 h-14 rounded-2xl object-cover ring-2 ring-cyan-400 shadow-md"
+                      />
+                      {regAvatar.startsWith('data:image') && (
+                        <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500 text-[8px] font-bold text-white shadow">
+                          Từ máy
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-1">
+                      <input
+                        type="file"
+                        ref={regAvatarFileInputRef}
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleRegAvatarUpload}
+                      />
                       <button
                         type="button"
-                        key={idx}
-                        onClick={() => setRegAvatar(preset.url)}
-                        className={`rounded-xl overflow-hidden aspect-square border-2 transition-all relative ${
-                          regAvatar === preset.url
-                            ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
-                            : 'border-slate-800 opacity-60 hover:opacity-100'
-                        }`}
-                        title={preset.label}
+                        onClick={() => regAvatarFileInputRef.current?.click()}
+                        disabled={isUploadingRegAvatar}
+                        className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                       >
-                        <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
-                        {regAvatar === preset.url && (
-                          <div className="absolute inset-0 bg-cyan-500/25 flex items-center justify-center">
-                            <Check className="w-3.5 h-3.5 text-white drop-shadow" />
-                          </div>
+                        {isUploadingRegAvatar ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Đang xử lý ảnh...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Tải ảnh từ thiết bị cá nhân</span>
+                          </>
                         )}
                       </button>
-                    ))}
+                      <span className="text-[10px] text-slate-400 block text-center">
+                        Điện thoại, máy tính hoặc thư viện ảnh
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Ready-to-use Presets */}
+                  <div className="space-y-1">
+                    <span className="text-[11px] text-slate-400 block">
+                      Hoặc chọn nhanh từ các mẫu avatar an toàn số:
+                    </span>
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                      {AVATAR_PRESETS.map((preset, idx) => (
+                        <button
+                          type="button"
+                          key={idx}
+                          onClick={() => setRegAvatar(preset.url)}
+                          className={`rounded-xl overflow-hidden aspect-square border-2 transition-all relative cursor-pointer ${
+                            regAvatar === preset.url
+                              ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
+                              : 'border-slate-800 opacity-60 hover:opacity-100'
+                          }`}
+                          title={preset.label}
+                        >
+                          <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
+                          {regAvatar === preset.url && (
+                            <div className="absolute inset-0 bg-cyan-500/25 flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white drop-shadow" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

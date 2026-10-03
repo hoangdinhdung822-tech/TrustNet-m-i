@@ -636,6 +636,52 @@ export class DatabaseService {
     const updatedAccounts = accounts.map(a => a.id === updated.id ? updated : a);
     localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(updatedAccounts));
 
+    // Đồng bộ avatar mới vào các bài viết của người dùng
+    if (updatedFields.avatar || updatedFields.name) {
+      const rawPosts = localStorage.getItem(STORAGE_KEYS.POSTS);
+      if (rawPosts) {
+        try {
+          const posts = JSON.parse(rawPosts);
+          const syncedPosts = posts.map((p: any) => {
+            if (p.author?.username === current.username || p.author?.name === current.name) {
+              return {
+                ...p,
+                author: {
+                  ...p.author,
+                  name: updated.name,
+                  avatar: updated.avatar
+                }
+              };
+            }
+            return p;
+          });
+          localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(syncedPosts));
+        } catch {}
+      }
+
+      // Đồng bộ avatar mới vào các bình luận của người dùng
+      const rawComments = localStorage.getItem(STORAGE_KEYS.COMMENTS);
+      if (rawComments) {
+        try {
+          const comments = JSON.parse(rawComments);
+          const syncedComments = comments.map((c: any) => {
+            if (c.author?.username === current.username || c.author?.name === current.name || c.userId === current.id) {
+              return {
+                ...c,
+                author: {
+                  ...c.author,
+                  name: updated.name,
+                  avatar: updated.avatar
+                }
+              };
+            }
+            return c;
+          });
+          localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(syncedComments));
+        } catch {}
+      }
+    }
+
     return updated;
   }
 
