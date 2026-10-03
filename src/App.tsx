@@ -4,7 +4,6 @@ import { Sidebar } from './components/Sidebar';
 import { MobileNav } from './components/MobileNav';
 import { HomeFeed } from './pages/HomeFeed';
 import { FactCheckPage } from './pages/FactCheckPage';
-import { InspectorPage } from './pages/InspectorPage';
 import { SearchPage } from './pages/SearchPage';
 import { AcademyPage } from './pages/AcademyPage';
 import { ScenariosPage } from './pages/ScenariosPage';
@@ -111,10 +110,6 @@ export function App() {
               user={currentUser}
               onUserUpdate={handleUserUpdate}
             />
-          )}
-
-          {activeTab === 'inspector' && (
-            <InspectorPage />
           )}
 
           {activeTab === 'search' && (
