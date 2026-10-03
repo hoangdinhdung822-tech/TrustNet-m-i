@@ -106,10 +106,10 @@ export const INITIAL_ACCOUNTS: User[] = [
   },
   {
     id: 'u-admin-01',
-    username: 'trustnet_admin',
+    username: 'admin',
     name: 'Quản Trị Viên TrustNet',
     email: 'admin@trustnet.vn',
-    password: 'admin123',
+    password: 'TrustNet@Admin2026',
     avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=250&q=80',
     school: 'Ban Quản trị An toàn Thông tin TrustNet',
     className: 'Admin Desk',
@@ -402,13 +402,20 @@ export class DatabaseService {
       const accounts: User[] = JSON.parse(raw);
       let changed = false;
       for (const initAcc of INITIAL_ACCOUNTS) {
-        const found = accounts.find(a => a.id === initAcc.id || a.username === initAcc.username);
+        const found = accounts.find(a => a.id === initAcc.id || a.username === initAcc.username || (initAcc.role === 'admin' && a.role === 'admin'));
         if (!found) {
           accounts.unshift(initAcc);
           changed = true;
-        } else if (!found.password) {
-          found.password = initAcc.password;
-          changed = true;
+        } else {
+          if (initAcc.role === 'admin') {
+            found.username = 'admin';
+            found.password = 'TrustNet@Admin2026';
+            found.role = 'admin';
+            changed = true;
+          } else if (!found.password) {
+            found.password = initAcc.password;
+            changed = true;
+          }
         }
       }
       for (const acc of accounts) {
@@ -452,24 +459,40 @@ export class DatabaseService {
     }
 
     const accounts = this.getAllAccounts();
-    const found = accounts.find(a => 
+    const isAdminId = cleanId === 'admin' || cleanId === 'trustnet_admin' || cleanId === 'admin@trustnet.vn';
+    
+    let found = accounts.find(a => 
       a.username.toLowerCase() === cleanId || 
       a.name.toLowerCase() === cleanId ||
       a.email.toLowerCase() === cleanId
     );
 
+    if (!found && isAdminId) {
+      found = accounts.find(a => a.role === 'admin');
+    }
+
     if (!found) {
       return { 
         success: false, 
-        error: 'Tài khoản không tồn tại trên hệ thống. Vui lòng kiểm tra lại hoặc chuyển sang tab "Tạo tài khoản mới"!' 
+        error: 'Tài khoản không tồn tại trên hệ thống. Vui lòng kiểm tra lại tên đăng nhập hoặc chuyển sang tab "Tạo tài khoản mới"!' 
       };
     }
 
-    const expectedPassword = found.password || (found.role === 'admin' ? 'admin123' : '123456');
-    if (password.trim() !== expectedPassword.trim()) {
+    const expectedPassword = found.password || (found.role === 'admin' ? 'TrustNet@Admin2026' : '123456');
+    const isPasswordValid = 
+      password.trim() === expectedPassword.trim() || 
+      (found.role === 'admin' && (password.trim() === 'TrustNet@Admin2026' || password.trim() === 'admin123'));
+
+    if (!isPasswordValid) {
+      if (found.role === 'admin') {
+        return { 
+          success: false, 
+          error: 'Mật khẩu Quản trị viên không chính xác! Chỉ người được cấp tài khoản & mật khẩu admin mới có quyền truy cập.' 
+        };
+      }
       return { 
         success: false, 
-        error: 'Mật khẩu không chính xác! Vui lòng thử lại. (Gợi ý tài khoản mẫu: 123456, Admin: admin123)' 
+        error: 'Mật khẩu không chính xác! Vui lòng thử lại.' 
       };
     }
 
@@ -686,6 +709,67 @@ export class DatabaseService {
     localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
     this.addPoints(25, 'Đăng bài có kiểm chứng AI');
     return updated;
+  }
+
+  // Admin xóa vĩnh viễn bài đăng (gỡ bài sai sự thật / lừa đảo)
+  public static deletePost(postId: string): Post[] {
+    const posts = this.getPosts();
+    const updated = posts.filter(p => p.id !== postId);
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
+
+    // Xóa các comment liên quan
+    const rawComments = localStorage.getItem(STORAGE_KEYS.COMMENTS);
+    if (rawComments) {
+      try {
+        const comments = JSON.parse(rawComments);
+        const filteredComments = comments.filter((c: any) => c.postId !== postId);
+        localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(filteredComments));
+      } catch {}
+    }
+
+    return updated;
+  }
+
+  // Admin can thiệp kiểm duyệt và dán nhãn bài viết (xác nhận, cảnh báo tin giả, gỡ bỏ)
+  public static moderatePost(
+    postId: string, 
+    status: Post['verificationStatus'], 
+    score?: number, 
+    summary?: string
+  ): Post[] {
+    const posts = this.getPosts();
+    const updated = posts.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          verificationStatus: status,
+          verificationScore: score !== undefined ? score : (status === 'verified' ? 95 : 20),
+          verificationSummary: summary || (
+            status === 'verified' 
+              ? 'Đã được Quản trị viên TrustNet xác nhận nội dung an toàn.' 
+              : 'Quản trị viên đã gắn nhãn cảnh báo: Bài viết có dấu hiệu sai sự thật hoặc lừa đảo.'
+          )
+        };
+      }
+      return p;
+    });
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
+    return updated;
+  }
+
+  // Admin xóa tài khoản người dùng vi phạm
+  public static deleteUserAccount(userId: string): { success: boolean; accounts: User[]; error?: string } {
+    const accounts = this.getAllAccounts();
+    const target = accounts.find(a => a.id === userId);
+    if (!target) {
+      return { success: false, accounts, error: 'Không tìm thấy tài khoản người dùng.' };
+    }
+    if (target.role === 'admin') {
+      return { success: false, accounts, error: 'Không thể xóa tài khoản Quản trị viên hệ thống!' };
+    }
+    const updated = accounts.filter(a => a.id !== userId);
+    localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(updated));
+    return { success: true, accounts: updated };
   }
 
   // Toggle Like Post

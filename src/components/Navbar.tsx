@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Sparkles, Bell, Sun, Moon, Search, Award, CheckCircle, LogOut } from 'lucide-react';
+import { ShieldCheck, Sparkles, Bell, Sun, Moon, Search, Award, CheckCircle, LogOut, ShieldAlert } from 'lucide-react';
 import { User } from '../types';
 
 interface Props {
@@ -83,22 +83,17 @@ export const Navbar: React.FC<Props> = ({
         {/* Right Action Icons & User Stats */}
         <div className="flex items-center gap-2.5 sm:gap-4">
           
-          {/* Admin Switcher Pill */}
-          <button
-            onClick={() => {
-              setIsAdminMode(!isAdminMode);
-              if (!isAdminMode) setActiveTab('admin');
-            }}
-            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-              isAdminMode 
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm' 
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'
-            }`}
-            title="Chuyển chế độ Quản trị viên / Kiểm duyệt"
-          >
-            <span className={`w-2 h-2 rounded-full ${isAdminMode ? 'bg-rose-400 animate-pulse' : 'bg-slate-500'}`} />
-            {isAdminMode ? 'Chế độ Admin' : 'Admin Demo'}
-          </button>
+          {/* Admin Indicator - CHỈ HIỂN THỊ KHI ĐĂNG NHẬP VỚI TÀI KHOẢN ADMIN */}
+          {user.role === 'admin' && (
+            <button
+              onClick={() => setActiveTab('admin')}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition-all cursor-pointer shadow-sm"
+              title="Mở Bảng Quản Trị & Kiểm Duyệt"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+              <span>Quản Trị Viên</span>
+            </button>
+          )}
 
           {/* XP & Level Badge */}
           <div 

@@ -13,6 +13,7 @@ import { SchoolIntroPage } from './pages/SchoolIntroPage';
 import { AuthPage } from './pages/AuthPage';
 import { DatabaseService } from './services/dbMock';
 import { User } from './types';
+import { ShieldAlert } from 'lucide-react';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<User>(DatabaseService.getCurrentUser());
@@ -87,6 +88,7 @@ export function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isAdminMode={isAdminMode}
+          user={currentUser}
         />
 
         {/* Dynamic Main Page Content */}
@@ -139,7 +141,25 @@ export function App() {
           )}
 
           {activeTab === 'admin' && (
-            <AdminDashboard />
+            currentUser.role === 'admin' ? (
+              <AdminDashboard />
+            ) : (
+              <div className="glass-panel rounded-3xl p-8 text-center space-y-4 max-w-lg mx-auto mt-8 border border-rose-500/30">
+                <div className="w-14 h-14 rounded-2xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
+                  <ShieldAlert className="w-8 h-8" />
+                </div>
+                <h2 className="text-xl font-bold text-white">Yêu cầu quyền Quản trị viên (Admin)</h2>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Thanh tác vụ và khu vực kiểm duyệt này chỉ dành riêng cho tài khoản Quản trị viên của TrustNet. Vui lòng đăng nhập bằng tài khoản admin được cấp để truy cập.
+                </p>
+                <button
+                  onClick={() => setActiveTab('feed')}
+                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-sm transition-all"
+                >
+                  Quay lại Trang chủ
+                </button>
+              </div>
+            )
           )}
         </main>
 

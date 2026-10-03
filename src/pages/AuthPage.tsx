@@ -84,11 +84,12 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
   const [regError, setRegError] = useState<string | null>(null);
 
   const initialAccounts = DatabaseService.getAllAccounts();
+  const sampleAccounts = initialAccounts.filter(acc => acc.role !== 'admin');
 
   // Điền nhanh tài khoản mẫu để người dùng kiểm tra đăng nhập
   const handleQuickLogin = (acc: UserType) => {
     setLoginIdentifier(acc.username);
-    const pwd = acc.password || (acc.role === 'admin' ? 'admin123' : '123456');
+    const pwd = acc.password || '123456';
     setLoginPassword(pwd);
     setLoginError(null);
   };
@@ -139,6 +140,10 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
     }
 
     const cleanUsername = regUsername.trim() || `user_${Date.now().toString().slice(-4)}`;
+    if (cleanUsername.toLowerCase() === 'admin' || cleanUsername.toLowerCase() === 'trustnet_admin' || cleanUsername.toLowerCase().includes('admin')) {
+      setRegError('Tên người dùng "admin" được bảo lưu riêng cho Quản trị viên hệ thống!');
+      return;
+    }
     const user = DatabaseService.registerUser({
       name: regName.trim(),
       username: cleanUsername,
@@ -302,8 +307,8 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
                   </div>
                   
                   <div className="space-y-2">
-                    {initialAccounts.slice(0, 3).map((acc) => {
-                      const pwd = acc.password || (acc.role === 'admin' ? 'admin123' : '123456');
+                    {sampleAccounts.slice(0, 2).map((acc) => {
+                      const pwd = acc.password || '123456';
                       return (
                         <button
                           key={acc.id}
@@ -322,11 +327,6 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
                                 <span className="text-xs font-bold text-white group-hover:text-cyan-300 truncate">
                                   {acc.name}
                                 </span>
-                                {acc.role === 'admin' && (
-                                  <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold">
-                                    Admin
-                                  </span>
-                                )}
                                 <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono font-bold">
                                   MK: {pwd}
                                 </span>
@@ -343,6 +343,16 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
                         </button>
                       );
                     })}
+
+                    <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-slate-300 font-semibold">
+                        <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Cổng Quản trị viên:</span>
+                      </span>
+                      <span className="text-slate-400 italic">
+                        Đăng nhập thủ công bằng tài khoản admin được cấp
+                      </span>
+                    </div>
                   </div>
                 </div>
 

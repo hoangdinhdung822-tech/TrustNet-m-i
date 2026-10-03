@@ -12,13 +12,17 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { DatabaseService } from '../services/dbMock';
+import { User } from '../types';
+
 interface Props {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  isAdminMode: boolean;
+  isAdminMode?: boolean;
+  user?: User;
 }
 
-export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, isAdminMode }) => {
+export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, user }) => {
   const navItems = [
     { id: 'feed', label: 'Trang chủ', icon: Home, badge: 'Feed' },
     { id: 'school', label: 'THPT Số 1 Phan Đình Phùng', icon: School, badge: 'Đắk Lắk' },
@@ -71,23 +75,25 @@ export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, isAdminMode 
           );
         })}
 
-        {/* Admin Dashboard Nav Item */}
-        <button
-          onClick={() => setActiveTab('admin')}
-          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all group ${
-            activeTab === 'admin'
-              ? 'bg-rose-600 text-white shadow-md font-semibold'
-              : 'text-slate-400 hover:text-rose-300 hover:bg-rose-950/20'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <ShieldAlert className={`w-5 h-5 ${activeTab === 'admin' ? 'text-white' : 'text-rose-400'}`} />
-            <span>Admin & Kiểm duyệt</span>
-          </div>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold">
-            Live
-          </span>
-        </button>
+        {/* Admin Dashboard Nav Item - CHỈ HIỂN THỊ KHI TÀI KHOẢN ĐĂNG NHẬP LÀ ADMIN */}
+        {user?.role === 'admin' && (
+          <button
+            onClick={() => setActiveTab('admin')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all group ${
+              activeTab === 'admin'
+                ? 'bg-rose-600 text-white shadow-md font-semibold'
+                : 'text-slate-400 hover:text-rose-300 hover:bg-rose-950/20'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <ShieldAlert className={`w-5 h-5 ${activeTab === 'admin' ? 'text-white' : 'text-rose-400'}`} />
+              <span>Admin & Kiểm duyệt</span>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold">
+              Admin
+            </span>
+          </button>
+        )}
       </nav>
 
       {/* Safety Daily Motivation Card */}
