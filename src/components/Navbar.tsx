@@ -58,9 +58,17 @@ export const Navbar: React.FC<Props> = ({
                 AI Fact Check
               </span>
             </div>
-            <p className="hidden md:block text-[11px] font-medium text-slate-400">
-              Đừng chỉ tin. Hãy kiểm chứng!
-            </p>
+            <div className="hidden md:flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+              <span>Đừng chỉ tin. Hãy kiểm chứng!</span>
+              <span className="text-slate-600">•</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setActiveTab('school'); }}
+                className="text-cyan-400 hover:text-cyan-300 font-bold hover:underline transition-colors cursor-pointer"
+                title="Xem giới thiệu Trường THPT Số 1 Phan Đình Phùng"
+              >
+                Giới thiệu trường
+              </button>
+            </div>
           </div>
         </div>
 

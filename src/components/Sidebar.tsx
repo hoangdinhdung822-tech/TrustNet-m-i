@@ -25,7 +25,7 @@ interface Props {
 export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, user }) => {
   const navItems = [
     { id: 'feed', label: 'Trang chủ', icon: Home, badge: 'Feed' },
-    { id: 'school', label: 'THPT Số 1 Phan Đình Phùng', icon: School, badge: 'Đắk Lắk' },
+    { id: 'school', label: 'Giới thiệu trường', icon: School, badge: 'THPT Số 1' },
     { id: 'search', label: 'Tìm kiếm', icon: Search },
     { id: 'factcheck', label: 'AI Kiểm chứng', icon: Bot, highlight: true },
     { id: 'academy', label: 'Học an toàn số', icon: GraduationCap, badge: 'Mỗi tuần' },

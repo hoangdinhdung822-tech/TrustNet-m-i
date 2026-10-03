@@ -10,7 +10,7 @@ export const MobileNav: React.FC<Props> = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'feed', label: 'Trang chủ', icon: Home },
     { id: 'factcheck', label: 'Kiểm chứng', icon: Bot },
-    { id: 'school', label: 'THPT Số 1', icon: School },
+    { id: 'school', label: 'Giới thiệu trường', icon: School },
     { id: 'scenarios', label: 'Tình huống', icon: Gamepad2 },
     { id: 'profile', label: 'Hồ sơ', icon: UserCircle2 },
   ];
