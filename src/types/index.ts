@@ -218,6 +218,43 @@ export interface Lesson {
   isNewThisWeek?: boolean;
 }
 
+export type ScenarioQuestionType = 
+  | 'single_choice'           // Trắc nghiệm 1 đáp án
+  | 'fill_in_the_blank'       // Điền từ vào ô trống
+  | 'multi_select'            // Chọn nhiều hành động đúng
+  | 'quick_reflex_judgment';  // Phán đoán nhanh: Độc hại hay An toàn
+
+export interface FillInTheBlankData {
+  prefixText: string;
+  blankPlaceholder?: string;
+  suffixText: string;
+  acceptableAnswers: string[];
+  hint?: string;
+  explanation: string;
+}
+
+export interface MultiSelectItem {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+  feedback?: string;
+}
+
+export interface MultiSelectData {
+  instruction: string;
+  items: MultiSelectItem[];
+  minCorrectRequired?: number;
+  explanation: string;
+}
+
+export interface QuickReflexData {
+  targetSnippet: string;
+  correctVerdict: 'MALICIOUS' | 'SAFE';
+  maliciousLabel?: string;
+  safeLabel?: string;
+  explanation: string;
+}
+
 export interface ScenarioOption {
   id: string;
   text: string;
@@ -228,7 +265,7 @@ export interface ScenarioOption {
 export interface Scenario {
   id: string;
   title: string;
-  category: 'breaking_news' | 'prize_scam' | 'imposter' | 'deepfake' | 'emotional_bait';
+  category: 'breaking_news' | 'prize_scam' | 'imposter' | 'deepfake' | 'emotional_bait' | 'ransomware' | 'task_fraud' | 'wifi_eavesdropping' | 'qr_tampering' | 'account_takeover';
   categoryLabel: string;
   urgencyLevel: 'Khẩn cấp' | 'Cảnh báo đỏ' | 'Đánh lừa' | 'Nguy hiểm';
   description: string;
@@ -237,14 +274,18 @@ export interface Scenario {
     senderHandle: string;
     senderAvatar: string;
     timeAgo: string;
-    platform: 'Facebook' | 'Zalo' | 'Telegram' | 'SMS' | 'TikTok';
+    platform: 'Facebook' | 'Zalo' | 'Telegram' | 'SMS' | 'TikTok' | 'Email' | 'Discord';
     messageText: string;
     mediaUrl?: string;
     mediaType?: 'image' | 'video' | 'link_card';
     metadataTag?: string;
   };
+  questionType?: ScenarioQuestionType;
   question: string;
-  options: ScenarioOption[];
+  options?: ScenarioOption[];
+  fillBlankData?: FillInTheBlankData;
+  multiSelectData?: MultiSelectData;
+  quickReflexData?: QuickReflexData;
   expertTip: string;
   pointsReward: number;
   isCompleted?: boolean;

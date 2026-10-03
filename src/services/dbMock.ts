@@ -7,6 +7,7 @@ import {
   getCurrentAcademicWeek, 
   getNextLessonUnlockInfo 
 } from '../data/lessonsData';
+import { MASTER_SCENARIOS_CATALOG } from '../data/scenariosData';
 
 const STORAGE_KEYS = {
   USER: 'trustnet_current_user',
@@ -352,249 +353,9 @@ const INITIAL_COMMENTS: Comment[] = [
 const INITIAL_LESSONS: Lesson[] = MASTER_LESSONS_CATALOG;
 
 
-// 5 Cyber Scenarios as specified in prompt
-const INITIAL_SCENARIOS: Scenario[] = [
-  {
-    id: 'scen-1',
-    title: 'Tình huống 1: Tin Nóng Khẩn Cấp Về Dịch Bệnh',
-    category: 'breaking_news',
-    categoryLabel: 'Tin nóng khẩn cấp',
-    urgencyLevel: 'Khẩn cấp',
-    description: 'Bạn đang lướt mạng xã hội vào đêm muộn thì bắt gặp một bài đăng giật gân có hàng ngàn lượt chia sẻ trong ít phút.',
-    simulatedMessage: {
-      senderName: 'Nhóm Thông Tin Đô Thị 24/7',
-      senderHandle: '@tinnhanh_dothi',
-      senderAvatar: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=200&q=80',
-      timeAgo: '12 phút trước',
-      platform: 'Facebook',
-      messageText: '🚨 KHẨN CẤP! Vừa phát hiện một loại virus lạ cực độc lây qua đường hô hấp đang lan rộng ở các quận trung tâm, các bệnh viện đang quá tải. Mọi người phải chia sẻ bài viết này ngay cho gia đình để kịp tích trữ lương thực trước khi phong tỏa ngày mai!!',
-      mediaType: 'image',
-      mediaUrl: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&w=600&q=80',
-      metadataTag: '🔥 8.4k Lượt chia sẻ'
-    },
-    question: 'Trong tình huống này, phản xạ đúng đắn nhất của một công dân số thông minh là gì?',
-    options: [
-      {
-        id: 'opt-a',
-        text: 'A. Chia sẻ ngay vào nhóm gia đình để mọi người đi siêu thị mua đồ tích trữ kịp thời.',
-        isCorrect: false,
-        feedback: 'Sai lầm nguy hiểm: Chia sẻ tin tức chưa kiểm chứng gây hoang mang dư luận xã hội và có thể kích động tình trạng khan hiếm hàng hóa giả tạo.'
-      },
-      {
-        id: 'opt-b',
-        text: 'B. Bình luận hỏi thêm chủ bài viết xem có nguồn tin từ đâu không.',
-        isCorrect: false,
-        feedback: 'Chưa tối ưu: Việc bình luận trên các bài đăng tin rác vô tình giúp thuật toán đẩy bài viết đó tiếp cận nhiều người hơn.'
-      },
-      {
-        id: 'opt-c',
-        text: 'C. Kiểm tra nguồn chính thức (Bộ Y tế, Cổng thông tin Chính phủ) và kiểm tra ngày đăng cũng như đối soát chéo trên TrustNet.',
-        isCorrect: true,
-        feedback: 'Tuyệt vời! Lựa chọn C chuẩn xác vì trước khi chia sẻ thông tin khẩn cấp, bạn bắt buộc phải kiểm tra thông báo từ các cơ quan có thẩm quyền và báo chí chính ngạch.'
-      },
-      {
-        id: 'opt-d',
-        text: 'D. Chụp màn hình gửi cho tất cả bạn bè thân thiết hỏi "cái này thật không mày?".',
-        isCorrect: false,
-        feedback: 'Chưa đúng: Việc lan truyền ảnh chụp màn hình cũng tương đương với việc phát tán tin đồn khi bạn bè bạn tiếp tục chia sẻ tiếp.'
-      }
-    ],
-    expertTip: 'Ghi nhớ nguyên tắc: "Tin càng giật gân, càng phải bình tĩnh kiểm tra nguồn chính thống".',
-    pointsReward: 50,
-    isCompleted: true
-  },
-  {
-    id: 'scen-2',
-    title: 'Tình huống 2: Tin Nhắn Trúng Thưởng 50.000.000 VNĐ',
-    category: 'prize_scam',
-    categoryLabel: 'Lừa đảo trúng thưởng',
-    urgencyLevel: 'Cảnh báo đỏ',
-    description: 'Bạn nhận được một tin nhắn SMS hoặc thông báo ứng dụng với nội dung nhận phần thưởng giá trị cao bất ngờ.',
-    simulatedMessage: {
-      senderName: 'Hệ Thống Quay Thưởng May Mắn 2026',
-      senderHandle: 'SMS Brandname: TRI-AN-VIP',
-      senderAvatar: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=200&q=80',
-      timeAgo: 'Vừa xong',
-      platform: 'SMS',
-      messageText: 'Chúc mừng số thuê bao 090xxxxxxx! Bạn đã may mắn trúng giải Đặc biệt trị giá 50.000.000 VNĐ trong sự kiện tri ân. Nhấn vào liên kết: http://nhanthuong-50trieu.gift-claim.xyz để điền thông tin tài khoản nhận tiền trong vòng 2 giờ!',
-      mediaType: 'link_card',
-      metadataTag: '⚠️ Tên miền không chứng thực'
-    },
-    question: 'Hành động bảo vệ bản thân an toàn và chính xác nhất là gì?',
-    options: [
-      {
-        id: 'opt-2a',
-        text: 'A. Bấm vào link ngay vì sợ hết hạn 2 giờ, sau đó chỉ điền số tài khoản chứ không nhập mật khẩu.',
-        isCorrect: false,
-        feedback: 'Rất rủi ro: Chỉ cần click vào link lạ, thiết bị của bạn có thể bị dính mã độc đánh cắp cookie hoặc theo dõi bàn phím.'
-      },
-      {
-        id: 'opt-2b',
-        text: 'B. Nhận diện dấu hiệu lừa đảo: không tham gia quay số thì không bao giờ trúng thưởng; không bấm link lạ và chặn/báo cáo số điện thoại.',
-        isCorrect: true,
-        feedback: 'Chính xác 100%! Không có bữa trưa nào miễn phí. Đây là chiêu trò Phishing đánh cắp tiền trong tài khoản bằng cách yêu cầu phí nhận thưởng hoặc lấy mã OTP.'
-      },
-      {
-        id: 'opt-2c',
-        text: 'C. Nhập thông tin của một người bạn ghét vào link để thử xem có được nhận tiền thật không.',
-        isCorrect: false,
-        feedback: 'Hành vi này vi phạm đạo đức và quy định pháp luật về bảo vệ dữ liệu cá nhân của người khác.'
-      },
-      {
-        id: 'opt-2d',
-        text: 'D. Nhắn tin lại hỏi ban tổ chức xem có thể nhận bằng tiền mặt được không.',
-        isCorrect: false,
-        feedback: 'Kẻ lừa đảo sẽ tiếp tục đưa bạn vào kịch bản đóng tiền cọc hoặc nộp thuế trúng thưởng trước khi biến mất.'
-      }
-    ],
-    expertTip: 'Không bao giờ có chuyện trúng thưởng tiền tỷ từ một chương trình bạn chưa từng đăng ký tham gia.',
-    pointsReward: 50,
-    isCompleted: false
-  },
-  {
-    id: 'scen-3',
-    title: 'Tình huống 3: Mạo Danh Người Nổi Tiếng Mượn Tiền Gấp',
-    category: 'imposter',
-    categoryLabel: 'Tài khoản mạo danh',
-    urgencyLevel: 'Đánh lừa',
-    description: 'Một tài khoản có ảnh đại diện và tên giống hệt một ca sĩ hoặc streamer bạn yêu thích nhắn tin trực tiếp.',
-    simulatedMessage: {
-      senderName: 'Sơn Tùng M-TP (Tài Khoản Phụ)',
-      senderHandle: '@sontung_private_official',
-      senderAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80',
-      timeAgo: '15 phút trước',
-      platform: 'TikTok',
-      messageText: 'Chào em, anh là Tùng đây. Tài khoản chính của anh đang bị kiểm toán tạm khóa một ngày. Anh đang cần chuyển khoản gấp 5 triệu cho quản lý tổ chức concert nhưng thẻ anh bị lỗi. Em giúp anh ứng trước được không, tối nay anh chuyển trả lại em 10 triệu và tặng vé VIP concert?',
-      metadataTag: '💬 Tin nhắn chờ từ người lạ'
-    },
-    question: 'Những dấu hiệu đáng ngờ nào tố cáo đây là kẻ mạo danh?',
-    options: [
-      {
-        id: 'opt-3a',
-        text: 'A. Tài khoản không có tích xanh chính chủ, tạo cớ kịch tính, hứa hẹn trả lãi cao và yêu cầu chuyển tiền vào tài khoản cá nhân.',
-        isCorrect: true,
-        feedback: 'Hoàn toàn chính xác! Người nổi tiếng có ekip và nguồn tài chính riêng, không bao giờ nhắn tin mượn tiền người hâm mộ qua mạng.'
-      },
-      {
-        id: 'opt-3b',
-        text: 'B. Tài khoản này thật vì có ảnh đại diện giống hệt và biết tên ca sĩ.',
-        isCorrect: false,
-        feedback: 'Bất kỳ ai cũng có thể tải ảnh trên Google về làm avatar trong vòng 3 giây.'
-      },
-      {
-        id: 'opt-3c',
-        text: 'C. Chuyển trước 1 triệu thôi để thử lòng idol.',
-        isCorrect: false,
-        feedback: 'Dù chỉ 100k thì bạn cũng đã bị lừa và tiếp tay cho tội phạm lừa đảo trực tuyến.'
-      },
-      {
-        id: 'opt-3d',
-        text: 'D. Xin chụp ảnh căn cước công dân của họ rồi mới chuyển.',
-        isCorrect: false,
-        feedback: 'Kẻ gian thường sử dụng CCCD giả hoặc CCCD nhặt được để lừa nạn nhân tin tưởng.'
-      }
-    ],
-    expertTip: 'Quy tắc vàng: Bất kỳ tin nhắn nào nhắc đến việc chuyển tiền gấp từ người lạ đều là lừa đảo.',
-    pointsReward: 50,
-    isCompleted: false
-  },
-  {
-    id: 'scen-4',
-    title: 'Tình huống 4: Bẫy Deepfake - Bạn Có Tin Không?',
-    category: 'deepfake',
-    categoryLabel: 'Video Deepfake AI',
-    urgencyLevel: 'Nguy hiểm',
-    description: 'Một đoạn video lan truyền trên mạng quay cảnh một hiệu trưởng trường học nổi tiếng có phát ngôn gây phẫn nộ với học sinh.',
-    simulatedMessage: {
-      senderName: 'Hội Học Sinh Bức Xúc',
-      senderHandle: '@bocphot_hocduong',
-      senderAvatar: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=200&q=80',
-      timeAgo: '1 giờ trước',
-      platform: 'TikTok',
-      messageText: 'Clip nóng: Thầy hiệu trưởng phát biểu xúc phạm học sinh trong cuộc họp kín! Các bạn share mạnh để bộ ngành vào cuộc đòi công bằng nào!!',
-      mediaType: 'video',
-      mediaUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=600&q=80',
-      metadataTag: '👁️ 500k Views • Âm thanh bị làm méo'
-    },
-    question: 'Khi quan sát video này để xác định có phải Deepfake hay không, bạn nên chú ý điều gì?',
-    options: [
-      {
-        id: 'opt-4a',
-        text: 'A. Xem khẩu hình miệng có khớp tự nhiên với âm thanh không, kiểm tra viền khuôn mặt, bóng đổ ánh sáng và tìm văn bản phát ngôn chính thức từ nhà trường.',
-        isCorrect: true,
-        feedback: 'Xuất sắc! Video Deepfake thường để lại tì vết ở chuyển động bờ môi không tự nhiên, răng bị mờ nhòe và viền da xung quanh cổ bị giật rung.'
-      },
-      {
-        id: 'opt-4b',
-        text: 'B. Vì có hình ảnh và giọng nói rõ ràng nên chắc chắn là thật 100%.',
-        isCorrect: false,
-        feedback: 'Với công nghệ Voice Cloning và Face Swap năm 2026, AI có thể mô phỏng bất kỳ giọng nói nào chỉ với 3 giây mẫu âm thanh.'
-      },
-      {
-        id: 'opt-4c',
-        text: 'C. Đăng video lên trang cá nhân và kêu gọi bạn bè vào ném đá tẩy chay ngôi trường.',
-        isCorrect: false,
-        feedback: 'Hành vi phát tán thông tin vu khống sai lệch do AI tạo ra có thể bị xử lý hình sự về tội xúc phạm danh dự nhân phẩm.'
-      },
-      {
-        id: 'opt-4d',
-        text: 'D. Nếu có nhiều người like thì video đó phải là thật.',
-        isCorrect: false,
-        feedback: 'Số lượng view và like có thể dễ dàng bị can thiệp bởi mạng lưới bot ảo (farm click).'
-      }
-    ],
-    expertTip: 'Hãy quan sát chớp mắt và vùng tiếp giáp giữa mặt và tai: AI thường gặp khó khăn trong việc render độ phản xạ ánh sáng tự nhiên.',
-    pointsReward: 50,
-    isCompleted: false
-  },
-  {
-    id: 'scen-5',
-    title: 'Tình huống 5: Thao Túng Cảm Xúc & Kích Động Thù Hằn',
-    category: 'emotional_bait',
-    categoryLabel: 'Nội dung kích động',
-    urgencyLevel: 'Cảnh báo đỏ',
-    description: 'Một bài viết dùng từ ngữ nặng nề, xúc phạm một nhóm người hoặc vùng miền nhằm khơi dậy sự phẫn nộ trong cộng đồng mạng.',
-    simulatedMessage: {
-      senderName: 'Góc Nhìn Cực Đoan',
-      senderHandle: '@gocnhin_gocngoai',
-      senderAvatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=200&q=80',
-      timeAgo: '45 phút trước',
-      platform: 'Facebook',
-      messageText: 'Lại là người ở khu vực đó! Đúng là bản tính xấu xí không bao giờ thay đổi, đi đến đâu làm nhục quốc thể đến đó. Tất cả những ai quê ở đấy đều không đáng tin, mọi người tẩy chay ngay!',
-      metadataTag: '🔥 1.2k Bình luận tranh cãi nảy lửa'
-    },
-    question: 'Trước nội dung thao túng cảm xúc này, quy trình tư duy đúng đắn là gì?',
-    options: [
-      {
-        id: 'opt-5a',
-        text: 'A. Nhận diện mình đang bị kích thích cảm xúc tức giận, không tham gia chửi bới, phân tích bằng chứng khách quan và bấm Báo cáo (Report) nội dung thù ghét.',
-        isCorrect: true,
-        feedback: 'Rất chín chắn! Kẻ tạo nội dung câu view thường dùng chiến thuật "Outrage Baiting" (bẫy phẫn nộ) để kiếm tương tác. Bình tĩnh và report là vũ khí sắc bén nhất.'
-      },
-      {
-        id: 'opt-5b',
-        text: 'B. Vào bình luận chửi lại bằng ngôn từ cay độc hơn để bảo vệ quan điểm của mình.',
-        isCorrect: false,
-        feedback: 'Điều này chỉ làm môi trường mạng độc hại hơn và giúp bài viết tăng lượng tương tác thuật toán.'
-      },
-      {
-        id: 'opt-5c',
-        text: 'C. Chia sẻ bài viết với dòng trạng thái bức xúc để bạn bè cùng ghét chung.',
-        isCorrect: false,
-        feedback: 'Bạn đã rơi vào bẫy khuếch đại sự thù ghét của những kẻ thao túng thuật toán.'
-      },
-      {
-        id: 'opt-5d',
-        text: 'D. Thu thập thông tin cá nhân của chủ bài viết để công khai dọa dẫm (Doxxing).',
-        isCorrect: false,
-        feedback: 'Hành vi Doxxing là bất hợp pháp và gây nguy hiểm đến an ninh cá nhân.'
-      }
-    ],
-    expertTip: 'Khái niệm "Outrage Economy": Các trang tin rác kiếm tiền từ chính sự tức giận của bạn. Đừng để cảm xúc của mình bị khai thác.',
-    pointsReward: 50,
-    isCompleted: false
-  }
-];
+// Danh mục 12 kịch bản an toàn số tương tác cao
+const INITIAL_SCENARIOS: Scenario[] = MASTER_SCENARIOS_CATALOG;
+
 
 // Initial Search Index
 const INITIAL_SEARCH_RESULTS: SearchResultItem[] = [
@@ -1040,14 +801,33 @@ export class DatabaseService {
     return newComment;
   }
 
-  // Lấy danh sách Scenarios
+  // Lấy danh sách Scenarios (Tự động nâng cấp danh mục 12+ kịch bản đa tương tác)
   public static getScenarios(): Scenario[] {
     const raw = localStorage.getItem(STORAGE_KEYS.SCENARIOS);
     if (!raw) {
       localStorage.setItem(STORAGE_KEYS.SCENARIOS, JSON.stringify(INITIAL_SCENARIOS));
       return INITIAL_SCENARIOS;
     }
-    return JSON.parse(raw);
+    try {
+      const parsed: Scenario[] = JSON.parse(raw);
+      // Nếu số lượng tình huống cũ ít hơn danh mục mới hoặc thiếu questionType, nâng cấp danh mục và bảo lưu tiến độ hoàn thành
+      if (parsed.length < INITIAL_SCENARIOS.length) {
+        const completedMap = new Map<string, boolean>();
+        for (const s of parsed) {
+          if (s.isCompleted) completedMap.set(s.id, true);
+        }
+        const upgraded = INITIAL_SCENARIOS.map(s => ({
+          ...s,
+          isCompleted: completedMap.get(s.id) || s.isCompleted || false
+        }));
+        localStorage.setItem(STORAGE_KEYS.SCENARIOS, JSON.stringify(upgraded));
+        return upgraded;
+      }
+      return parsed;
+    } catch {
+      localStorage.setItem(STORAGE_KEYS.SCENARIOS, JSON.stringify(INITIAL_SCENARIOS));
+      return INITIAL_SCENARIOS;
+    }
   }
 
   // Hoàn thành scenario
