@@ -633,41 +633,69 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     let totalGeminiTimeMs = 0;
     let lastGeminiDurationMs = 0;
 
+    // Helper kiểm tra lỗi Quota / Rate Limit từ Google Gemini
+    function isQuotaError(err: any): boolean {
+      const msg = (err?.message || String(err || '')).toLowerCase();
+      const status = err?.status || err?.statusCode || 0;
+      return (
+        status === 429 ||
+        msg.includes('quota') ||
+        msg.includes('exceeded your current quota') ||
+        msg.includes('resource_exhausted') ||
+        msg.includes('rate-limit') ||
+        msg.includes('rate limit') ||
+        msg.includes('429')
+      );
+    }
+
     // Helper gọi Gemini với timeout nghiêm ngặt qua AbortSignal và httpOptions SDK (Tối thiểu 10s theo quy định của Google)
-    async function executeGeminiCall(modelToUse: string, timeoutMs: number) {
+    // Tự động fallback chạy không kèm Search Grounding nếu tài khoản là Free Tier hoặc hết hạn mức tìm kiếm
+    async function executeGeminiCall(modelToUse: string, timeoutMs: number, enableSearch: boolean = true) {
       const safeTimeoutMs = Math.max(10000, timeoutMs);
       const callStart = Date.now();
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), safeTimeoutMs);
 
+      const callConfig: any = {
+        temperature: 0.1,
+        abortSignal: controller.signal,
+        httpOptions: {
+          timeout: safeTimeoutMs
+        }
+      };
+
+      if (enableSearch) {
+        callConfig.tools = [{ googleSearch: {} }];
+      }
+
       try {
         const response: any = await ai.models.generateContent({
           model: modelToUse,
           contents: systemPrompt,
-          config: {
-            tools: [{ googleSearch: {} }],
-            temperature: 0.1,
-            abortSignal: controller.signal,
-            httpOptions: {
-              timeout: safeTimeoutMs
-            }
-          }
+          config: callConfig
         });
         clearTimeout(timer);
         const duration = Date.now() - callStart;
         totalGeminiTimeMs += duration;
         lastGeminiDurationMs = duration;
-        return { response, durationMs: duration };
+        return { response, durationMs: duration, searchUsed: enableSearch };
       } catch (err: any) {
         clearTimeout(timer);
         const duration = Date.now() - callStart;
         totalGeminiTimeMs += duration;
         lastGeminiDurationMs = duration;
+
+        // Nếu lỗi Quota do Search Grounding (Free tier hoặc hết quota Search), tự động thử lại trực tiếp với Gemini knowledge base (không kèm Search Grounding)
+        if (enableSearch && isQuotaError(err) && getRemainingMs() >= 10000) {
+          console.warn('[FACT_CHECK_SEARCH_QUOTA] Search Grounding quota reached or restricted on current key. Falling back to Gemini native reasoning without search tool...');
+          return await executeGeminiCall(modelToUse, timeoutMs, false);
+        }
+
         throw err;
       }
     }
 
-    // --- PHASE 1: Primary Model (Tối đa 2 attempts: Attempt 1 + Attempt 2 nếu gặp 503) ---
+    // --- PHASE 1: Primary Model (Tối đa 2 attempts: Attempt 1 + Attempt 2 nếu gặp 503 / 429) ---
     if (getRemainingMs() < 12000) {
       console.warn('[FACT_CHECK_TIMEOUT] Time budget exhausted before calling Gemini');
       return sendJson(res, 504, {
@@ -685,7 +713,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
     const call1Timeout = 12000;
     try {
-      const res1 = await executeGeminiCall(primaryModel, call1Timeout);
+      const res1 = await executeGeminiCall(primaryModel, call1Timeout, true);
       if (res1.response?.candidates?.length > 0) {
         successfulResponse = res1.response;
         resolvedModel = primaryModel;
@@ -693,7 +721,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           elapsedMs: getElapsedMs(),
           attempt: 1,
           model: primaryModel,
-          durationMs: res1.durationMs
+          durationMs: res1.durationMs,
+          searchUsed: res1.searchUsed
         });
       }
     } catch (err1: any) {
@@ -738,17 +767,19 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
         });
       }
 
-      // Xử lý 503 (High Demand / Overloaded): Retry attempt 2 sau 1s nếu còn budget
-      const is503_1 = msg1.includes('503') || msg1.includes('high demand') || msg1.includes('overloaded') || msg1.includes('RESOURCE_EXHAUSTED');
-      if (is503_1 && getRemainingMs() > 14000) {
+      // Xử lý 503 (High Demand) hoặc 429 (Rate Limit): Retry attempt 2 sau 1.5s nếu còn budget
+      const isQuota1 = isQuotaError(err1);
+      const is503_1 = msg1.includes('503') || msg1.includes('high demand') || msg1.includes('overloaded');
+      if ((is503_1 || isQuota1) && getRemainingMs() > 14000) {
         retryCount = 1;
         console.log('[FACT_CHECK_RETRY]', {
           elapsedMs: getElapsedMs(),
           attempt: 1,
           model: primaryModel,
-          delayMs: 1000
+          reason: isQuota1 ? 'QUOTA_RATE_LIMIT' : 'OVERLOAD_503',
+          delayMs: 1500
         });
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 1500));
 
         console.log('[FACT_CHECK_GEMINI_START]', {
           elapsedMs: getElapsedMs(),
@@ -758,7 +789,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
         const call2Timeout = 12000;
         try {
-          const res2 = await executeGeminiCall(primaryModel, call2Timeout);
+          const res2 = await executeGeminiCall(primaryModel, call2Timeout, false);
           if (res2.response?.candidates?.length > 0) {
             successfulResponse = res2.response;
             resolvedModel = primaryModel;
@@ -766,7 +797,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
               elapsedMs: getElapsedMs(),
               attempt: 2,
               model: primaryModel,
-              durationMs: res2.durationMs
+              durationMs: res2.durationMs,
+              searchUsed: res2.searchUsed
             });
           }
         } catch (err2: any) {
@@ -813,7 +845,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
       const fallbackTimeout = 12000;
       try {
-        const resFb = await executeGeminiCall(fallbackModel, fallbackTimeout);
+        const useSearchForFallback = !isQuotaError(lastError);
+        const resFb = await executeGeminiCall(fallbackModel, fallbackTimeout, useSearchForFallback);
         if (resFb.response?.candidates?.length > 0) {
           successfulResponse = resFb.response;
           resolvedModel = fallbackModel;
@@ -821,7 +854,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
             elapsedMs: getElapsedMs(),
             attempt: 1,
             model: fallbackModel,
-            durationMs: resFb.durationMs
+            durationMs: resFb.durationMs,
+            searchUsed: resFb.searchUsed
           });
         }
       } catch (errFb: any) {
@@ -875,7 +909,15 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
         });
       }
 
-      if (finalMsg.includes('503') || finalMsg.includes('high demand') || finalMsg.includes('overloaded') || finalMsg.includes('RESOURCE_EXHAUSTED')) {
+      if (isQuotaError(lastError) || finalMsg.includes('quota') || finalMsg.includes('exceeded your current quota') || finalMsg.includes('RESOURCE_EXHAUSTED')) {
+        return sendJson(res, 429, {
+          success: false,
+          code: 'GEMINI_QUOTA_EXCEEDED',
+          message: 'Tài khoản Google Gemini đã chạm giới hạn hạn mức (Quota Exceeded / Rate Limit). Vui lòng đợi 1–2 phút rồi bấm "Thử lại ngay" hoặc kiểm tra lại hạn mức trên Google AI Studio.'
+        });
+      }
+
+      if (finalMsg.includes('503') || finalMsg.includes('high demand') || finalMsg.includes('overloaded')) {
         return sendJson(res, 503, {
           success: false,
           code: 'GEMINI_TEMPORARILY_UNAVAILABLE',

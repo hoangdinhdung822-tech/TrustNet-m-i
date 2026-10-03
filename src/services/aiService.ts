@@ -96,6 +96,20 @@ export class AiVerificationService {
             msg = `Lỗi kiểm tra kết nối (${res.status}): ${res.statusText || 'Yêu cầu không thành công'}`;
           }
         }
+
+        const lowerMsg = (msg || '').toLowerCase();
+        if (
+          res.status === 429 ||
+          data?.code === 'GEMINI_QUOTA_EXCEEDED' ||
+          lowerMsg.includes('quota') ||
+          lowerMsg.includes('exceeded your current quota') ||
+          lowerMsg.includes('rate-limit') ||
+          lowerMsg.includes('rate limit') ||
+          lowerMsg.includes('resource_exhausted')
+        ) {
+          msg = 'Hạn mức truy vấn (Quota) của API Key tạm thời đã hết hoặc bị giới hạn trên Google AI Studio. Vui lòng thử lại sau 1–2 phút.';
+        }
+
         return {
           success: false,
           message: msg
@@ -167,6 +181,8 @@ export class AiVerificationService {
         if (!errorMsg) {
           if (rawText && rawText.includes('FUNCTION_INVOCATION_TIMEOUT')) {
             errorMsg = 'Quá thời gian thực thi máy chủ (FUNCTION_INVOCATION_TIMEOUT). Vui lòng bấm Thử lại.';
+          } else if (response.status === 429 || data?.code === 'GEMINI_QUOTA_EXCEEDED') {
+            errorMsg = 'Tài khoản Google Gemini đã chạm giới hạn hạn mức (Quota Exceeded / Rate Limit). Vui lòng đợi 1–2 phút rồi bấm "Thử lại ngay".';
           } else if (response.status === 504 || data?.code === 'FACT_CHECK_TIMEOUT' || data?.code === 'GEMINI_TIMEOUT') {
             errorMsg = 'Kiểm chứng mất quá nhiều thời gian (Timeout). Vui lòng bấm Thử lại để hệ thống kiểm tra lại.';
           } else if (response.status === 503 || data?.code === 'GEMINI_TEMPORARILY_UNAVAILABLE') {
@@ -181,6 +197,21 @@ export class AiVerificationService {
             errorMsg = `Lỗi phản hồi máy chủ (${response.status}): ${response.statusText || 'Lỗi không xác định'}`;
           }
         }
+
+        // Chuyển đổi các thông báo lỗi kỹ thuật tiếng Anh về Quota / Rate Limit thành tiếng Việt dễ hiểu
+        const lowerMsg = (errorMsg || '').toLowerCase();
+        if (
+          response.status === 429 ||
+          data?.code === 'GEMINI_QUOTA_EXCEEDED' ||
+          lowerMsg.includes('quota') ||
+          lowerMsg.includes('exceeded your current quota') ||
+          lowerMsg.includes('rate-limit') ||
+          lowerMsg.includes('rate limit') ||
+          lowerMsg.includes('resource_exhausted')
+        ) {
+          errorMsg = 'Tài khoản Google Gemini đã chạm giới hạn hạn mức (Quota Exceeded / Rate Limit). Vui lòng đợi 1–2 phút rồi bấm "Thử lại ngay" hoặc kiểm tra lại hạn mức trên Google AI Studio.';
+        }
+
         throw new Error(errorMsg);
       }
 

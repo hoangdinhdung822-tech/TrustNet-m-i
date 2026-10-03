@@ -533,9 +533,23 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     let successfulResponse: any = null;
     let resolvedModel = uniqueModels[0] || 'gemini-3.5-flash-lite';
 
+    function isQuotaError(err: any): boolean {
+      const msg = (err?.message || String(err || '')).toLowerCase();
+      const status = err?.status || err?.statusCode || 0;
+      return (
+        status === 429 ||
+        msg.includes('quota') ||
+        msg.includes('exceeded your current quota') ||
+        msg.includes('resource_exhausted') ||
+        msg.includes('rate-limit') ||
+        msg.includes('rate limit') ||
+        msg.includes('429')
+      );
+    }
+
     for (const modelName of uniqueModels) {
       try {
-        console.log(`[FACT-CHECK TRACE] Calling Gemini API with model: ${modelName}`);
+        console.log(`[FACT-CHECK TRACE] Calling Gemini API with model: ${modelName} (with Search Grounding)`);
         const response = await ai.models.generateContent({
           model: modelName,
           contents: systemPrompt,
@@ -572,6 +586,28 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
           throw new Error('Khóa Gemini API Key không hợp lệ hoặc đã bị vô hiệu hóa trên Google AI Studio. Vui lòng kiểm tra lại API Key.');
         }
 
+        // Nếu lỗi Quota (do Search Grounding yêu cầu billing / pay-as-you-go), thử lại ngay với mô hình thuần không có tools
+        if (isQuotaError(err)) {
+          console.warn(`[FACT-CHECK TRACE] Search Grounding quota hit for ${modelName}. Retrying with native Gemini knowledge (no search tool)...`);
+          try {
+            const fallbackResponse = await ai.models.generateContent({
+              model: modelName,
+              contents: systemPrompt,
+              config: {
+                temperature: 0.1
+              }
+            });
+            if (fallbackResponse && fallbackResponse.candidates && fallbackResponse.candidates.length > 0) {
+              successfulResponse = fallbackResponse;
+              resolvedModel = modelName;
+              console.log(`[FACT-CHECK TRACE] Native Gemini response received from model: ${modelName}`);
+              break;
+            }
+          } catch (retryErr: any) {
+            lastError = retryErr;
+          }
+        }
+
         continue;
       }
     }
@@ -590,8 +626,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
 
       if (finalMsg.includes('high demand') || finalMsg.includes('503')) {
         throw new Error('Hệ thống máy chủ Google Gemini đang trong thời điểm quá tải cao (503 High Demand). Vui lòng thử lại sau vài giây.');
-      } else if (finalMsg.includes('RESOURCE_EXHAUSTED') || finalMsg.includes('quota')) {
-        throw new Error('Hạn mức truy vấn Gemini API tạm thời đạt giới hạn (Quota Exceeded). Vui lòng thử lại sau giây lát.');
+      } else if (isQuotaError(lastError) || finalMsg.includes('RESOURCE_EXHAUSTED') || finalMsg.includes('quota') || finalMsg.includes('exceeded your current quota')) {
+        throw new Error('Hạn mức truy vấn Gemini API tạm thời đạt giới hạn (Quota Exceeded / Rate Limit). Vui lòng đợi 1–2 phút rồi thử lại hoặc kiểm tra tại Google AI Studio.');
       } else {
         throw new Error(`Tất cả mô hình Gemini đều không thể phản hồi. Chi tiết: ${finalMsg}`);
       }

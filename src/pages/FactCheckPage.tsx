@@ -680,6 +680,11 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
               <div>
                 <span className="font-bold block mb-0.5">Không thể hoàn tất kiểm chứng:</span>
                 <span>{errorMessage}</span>
+                {(errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('hạn mức') || errorMessage.toLowerCase().includes('giới hạn')) && (
+                  <p className="mt-1.5 text-[11px] text-amber-300/90 bg-amber-950/30 p-2 rounded-lg border border-amber-500/20">
+                    💡 <strong>Mẹo:</strong> Gói miễn phí Google AI Studio giới hạn tần suất yêu cầu trong 1 phút (RPM limit). Bạn chỉ cần đợi khoảng 1 phút rồi bấm <strong>"Thử lại ngay"</strong>.
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
