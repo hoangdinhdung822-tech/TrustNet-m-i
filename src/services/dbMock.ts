@@ -1,6 +1,12 @@
 import { 
   User, Post, Comment, FactCheckRecord, Lesson, Scenario, ReportItem, SearchResultItem 
 } from '../types';
+import { 
+  MASTER_LESSONS_CATALOG, 
+  buildWeeklyLessonsSchedule, 
+  getCurrentAcademicWeek, 
+  getNextLessonUnlockInfo 
+} from '../data/lessonsData';
 
 const STORAGE_KEYS = {
   USER: 'trustnet_current_user',
@@ -342,183 +348,9 @@ const INITIAL_COMMENTS: Comment[] = [
 ];
 
 // 5 Digital Safety Academy Lessons
-const INITIAL_LESSONS: Lesson[] = [
-  {
-    id: 'lesson-1',
-    title: 'Nghệ Thuật Bóc Mẽ Tin Giả (Fake News Detection)',
-    topic: 'Kỹ năng xác minh nguồn',
-    icon: '🕵️‍♂️',
-    description: 'Nắm vững quy tắc vàng 5 ngón tay: Kiểm tra tác giả, tên miền, ngày đăng, so sánh chéo và đọc kỹ trước khi bấm share.',
-    readTime: '3 phút',
-    difficulty: 'Dễ',
-    points: 100,
-    content: [
-      {
-        heading: '1. Không bao giờ chỉ dừng lại ở tiêu đề (Clickbait)',
-        body: 'Hơn 60% người dùng mạng xã hội chia sẻ bài viết chỉ sau khi đọc tít giật gân. Các trang tin rác thường đặt tiêu đề cường điệu để câu tương tác, trong khi nội dung bên trong lại hoàn toàn khác hoặc trích dẫn sai sự thật.',
-        tip: 'Mẹo: Luôn click vào đọc ít nhất 3 đoạn đầu và kiểm tra xem tiêu đề có bằng chứng cụ thể bên dưới hay không.'
-      },
-      {
-        heading: '2. Kỹ thuật đảo ngược hình ảnh (Reverse Image Search)',
-        body: 'Nhiều kẻ tạo tin giả lấy ảnh từ một vụ hỏa hoạn ở nước ngoài từ 5 năm trước rồi gán ghép thành sự việc xảy ra sáng nay tại Hà Nội.',
-        example: 'Sử dụng Google Images hoặc Google Lens để tìm ảnh gốc và ngày xuất bản đầu tiên của tấm hình.'
-      },
-      {
-        heading: '3. Kiểm tra tên miền và ngày xuất bản',
-        body: 'Chú ý các tên miền nhái tinh vi như vnexpress-24h.com, tuoitre-news.cc thay vì các trang chính thống có đuôi .vn chuẩn xác.',
-        warning: 'Cảnh báo: Luôn nhìn thanh địa chỉ URL của trình duyệt trước khi tin nội dung.'
-      }
-    ],
-    quiz: {
-      question: 'Bạn thấy một bài đăng với tiêu đề "Khẩn cấp: Uống giấm táo trị khỏi hoàn toàn bệnh ung thư sau 3 ngày!". Hành động nào thể hiện tư duy an toàn số đúng đắn nhất?',
-      options: [
-        'A. Chia sẻ ngay vào nhóm gia đình để cảnh báo người thân',
-        'B. Bấm nút thích và để lại bình luận xin công thức chi tiết',
-        'C. Đọc kỹ nội dung, kiểm tra nguồn y khoa chính thống (Bộ Y tế/WHO) và đối chiếu với AI Fact Check',
-        'D. Chụp màn hình gửi cho tất cả bạn bè trong danh bạ'
-      ],
-      answerIndex: 2,
-      explanation: 'Chính xác! Các khẳng định y khoa thần kỳ không có căn cứ từ Bộ Y tế hoặc WHO thường là tin giả nguy hiểm. Cần kiểm tra chéo và đối soát trước khi có bất kỳ hành động nào.'
-    },
-    isCompleted: true
-  },
-  {
-    id: 'lesson-2',
-    title: 'Giải Mã Cạm Bẫy Phishing & Lừa Đảo Trực Tuyến',
-    topic: 'An toàn phòng ngừa lừa đảo',
-    icon: '🎣',
-    description: 'Cách nhận diện email mạo danh ngân hàng, tin nhắn trúng thưởng giả mạo và các link độc chiếm đoạt tài khoản.',
-    readTime: '4 phút',
-    difficulty: 'Trung bình',
-    points: 120,
-    content: [
-      {
-        heading: '1. Bản chất của tấn công Phishing (Lừa câu cá)',
-        body: 'Kẻ xấu giả dạng làm người có thẩm quyền (ngân hàng, công an, thầy cô giáo, sàn thương mại điện tử) để tạo cảm xúc cấp bách hoặc lòng tham, ép nạn nhân hành động ngay lập tức.',
-        tip: 'Quy tắc: Ngân hàng và công an KHÔNG BAO GIỜ yêu cầu bạn đọc mã OTP hoặc chuyển tiền vào tài khoản cá nhân để "phục vụ điều tra".'
-      },
-      {
-        heading: '2. Phân tích đường link đáng ngờ',
-        body: 'Kẻ lừa đảo sử dụng các ký tự gần giống (homograph attack) như thay chữ "o" bằng số "0", hoặc dùng tên miền phụ: vietcombank.login-security.xyz (bản chất tên miền là login-security.xyz).',
-        example: 'Đường link thật: https://www.vietcombank.com.vn | Đường link giả: http://vietcombank.portal-security.com'
-      }
-    ],
-    quiz: {
-      question: 'Một tin nhắn SMS có brandname giống ngân hàng của bạn gửi đến: "Tài khoản của bạn sẽ bị đóng băng sau 30 phút nếu không bấm vào link http://msb.xacthuc-247.com". Bạn nên làm gì?',
-      options: [
-        'A. Vội vàng ấn vào link và nhập mật khẩu Internet Banking để không bị khóa',
-        'B. Bỏ qua tin nhắn, tuyệt đối không ấn vào link và gọi thẳng tới hotline tổng đài in trên thẻ ATM để xác minh',
-        'C. Nhập mã OTP vào trang web để lấy lại tài khoản',
-        'D. Gửi link này cho bạn bè hỏi xem họ có bị khóa giống mình không'
-      ],
-      answerIndex: 1,
-      explanation: 'Xuất sắc! Đây là hình thức giả mạo SMS Brandname bằng trạm BTS giả. Hotline in trực tiếp sau thẻ ATM là kênh liên lạc duy nhất đáng tin cậy.'
-    },
-    isCompleted: false
-  },
-  {
-    id: 'lesson-3',
-    title: 'Pháo Đài Mật Khẩu & Xác Thực Hai Lớp (2FA)',
-    topic: 'Bảo mật tài khoản',
-    icon: '🔐',
-    description: 'Xây dựng mật khẩu không thể phá vỡ và thiết lập ứng dụng Authenticator bảo vệ tuyệt đối mạng xã hội.',
-    readTime: '3 phút',
-    difficulty: 'Dễ',
-    points: 100,
-    content: [
-      {
-        heading: '1. Tại sao mật khẩu "123456" hay ngày sinh vẫn bị hack trong 1 giây?',
-        body: 'Kẻ tấn công sử dụng kỹ thuật Brute-force và danh sách từ điển hàng tỷ mật khẩu bị rò rỉ. Nếu bạn dùng một mật khẩu cho cả Facebook, TikTok, email trường học, khi một trang bị lộ thì bạn mất tất cả.',
-        tip: 'Nên dùng cụm mật khẩu (Passphrase) gồm 4 từ ngẫu nhiên có dấu hoặc ký tự đặc biệt, ví dụ: "BanhMi-KemTrung-2026@SieuNgon".'
-      },
-      {
-        heading: '2. Bật 2FA bằng App thay vì SMS',
-        body: 'Mã OTP qua tin nhắn SMS có thể bị đánh cắp bằng thủ đoạn tráo SIM (SIM swap). Hãy ưu tiên dùng Google Authenticator hoặc Microsoft Authenticator.',
-        example: 'Ứng dụng sinh mã TOTP 6 số tự động đổi mỗi 30 giây ngay cả khi không có mạng.'
-      }
-    ],
-    quiz: {
-      question: 'Phương thức xác thực 2 yếu tố (2FA) nào sau đây an toàn và khó bị can thiệp nhất đối với tài khoản cá nhân?',
-      options: [
-        'A. Gửi mã OTP qua cuộc gọi điện thoại thông thường',
-        'B. Gửi mã qua tin nhắn SMS',
-        'C. Sử dụng ứng dụng xác thực chuyên dụng (Google/Microsoft Authenticator) hoặc khóa bảo mật phần cứng',
-        'D. Ghi nhớ mã bí mật ra một tờ giấy dán trên màn hình'
-      ],
-      answerIndex: 2,
-      explanation: 'Chính xác! Ứng dụng Authenticator tạo mã cục bộ theo chuẩn thuật toán mã hóa TOTP, không bị ảnh hưởng bởi sóng điện thoại hay tấn công tráo SIM.'
-    },
-    isCompleted: false
-  },
-  {
-    id: 'lesson-4',
-    title: 'Dấu Chân Kỹ Thuật Số & Bảo Vệ Dữ Liệu Cá Nhân',
-    topic: 'Quyền riêng tư trực tuyến',
-    icon: '🛡️',
-    description: 'Kiểm soát những gì bạn đăng: Tại sao bức ảnh vé máy bay hay góc học tập có thể trở thành vũ khí chống lại bạn.',
-    readTime: '4 phút',
-    difficulty: 'Trung bình',
-    points: 120,
-    content: [
-      {
-        heading: '1. Nguy hiểm từ việc "Check-in" quá chi tiết',
-        body: 'Chụp hình căn cước công dân, thẻ sinh viên, hoặc vé máy bay có mã vạch barcode có thể làm lộ họ tên, số hộ chiếu, ngày sinh và hành trình đi lại cho kẻ xấu lợi dụng lừa đảo người thân ở nhà.',
-        warning: 'Tuyệt đối không khoe mã vạch, mã QR trên vé sự kiện hoặc CCCD lên mạng xã hội.'
-      },
-      {
-        heading: '2. Dọn dẹp quyền ứng dụng (App Permissions)',
-        body: 'Một ứng dụng đèn pin hay chỉnh sửa ảnh selfie không có lý do gì để đòi quyền đọc danh bạ điện thoại, đọc tin nhắn SMS hay định vị vị trí 24/7.',
-        tip: 'Hãy vào Cài đặt điện thoại và thu hồi các quyền truy cập vô lý ngay lập tức.'
-      }
-    ],
-    quiz: {
-      question: 'Bạn vừa đỗ kỳ thi quan trọng và muốn đăng ảnh lên mạng xã hội để ăn mừng. Bạn nên xử lý tấm ảnh phiếu điểm/CCCD như thế nào?',
-      options: [
-        'A. Đăng nguyên bản không che để mọi người thấy tính xác thực',
-        'B. Che toàn bộ số định danh cá nhân, mã QR/Barcode, ngày sinh, địa chỉ nhà trước khi chia sẻ',
-        'C. Gửi ảnh gốc vào các nhóm công khai để xin lời khuyên',
-        'D. Đổi ảnh đại diện bằng hình chụp mặt trước và mặt sau CCCD'
-      ],
-      answerIndex: 1,
-      explanation: 'Rất chuẩn! Việc che giấu (redact) các dữ liệu định danh như số CCCD, mã QR và địa chỉ nhà ngăn chặn triệt để hành vi đánh cắp danh tính để mở thẻ tín dụng ảo hoặc lừa đảo mạo danh.'
-    },
-    isCompleted: false
-  },
-  {
-    id: 'lesson-5',
-    title: 'Vén Màn Deepfake & Trí Tuệ Nhân Tạo Giả Mạo',
-    topic: 'Công nghệ AI & Nhận thức thế hệ mới',
-    icon: '🤖',
-    description: 'Cách phát hiện hình ảnh do AI vẽ, video hoán đổi khuôn mặt và giọng nói nhái của người thân gọi video call.',
-    readTime: '5 phút',
-    difficulty: 'Nâng cao',
-    points: 150,
-    content: [
-      {
-        heading: '1. Dấu hiệu nhận biết video Deepfake gọi video lừa tiền',
-        body: 'Kẻ lừa đảo thường thực hiện cuộc gọi video rất ngắn (vài giây), viện cớ "sóng yếu, mạng chập chờn" rồi cúp máy để nhắn tin xin chuyển tiền gấp.',
-        tip: 'Khi có người thân gọi video xin tiền khẩn cấp: Hãy yêu cầu họ quay nghiêng mặt sang hai bên hoặc đưa bàn tay qua mặt. Deepfake AI sẽ bị lỗi biến dạng (glitch) ở phần viền khuôn mặt.'
-      },
-      {
-        heading: '2. Nhận biết ảnh do AI tạo ra (AI-generated)',
-        body: 'Soi kỹ các chi tiết phức tạp: Khớp ngón tay (thường bị 6 ngón hoặc biến dạng), bóng đổ không nhất quán với nguồn sáng, văn bản nền bị méo mó vô nghĩa, và vành tai không tự nhiên.',
-        example: 'Chú ý tròng mắt: Kính mắt của người do AI tạo thường có gọng hai bên không đối xứng hoặc ánh phản chiếu trong mắt kỳ lạ.'
-      }
-    ],
-    quiz: {
-      question: 'Khi nhận được video call từ tài khoản mẹ bạn nói đang gặp tai nạn cần chuyển tiền gấp, nhưng hình ảnh giật cục và chỉ nói 5 giây rồi tắt. Bạn nên làm gì?',
-      options: [
-        'A. Chuyển tiền ngay lập tức vì sợ mẹ gặp nguy hiểm',
-        'B. Đăng lên Facebook hỏi ý kiến mọi người',
-        'C. Giữ bình tĩnh, KHÔNG chuyển tiền. Gọi trực tiếp số điện thoại viễn thông thông thường (SIM) của mẹ hoặc người thân khác để kiểm tra',
-        'D. Nhắn tin vào tài khoản đó xin số tài khoản lạ để chuyển'
-      ],
-      answerIndex: 2,
-      explanation: 'Xuất sắc! Cuộc gọi video call ngắn vài giây kèm lý do khẩn cấp là chiêu bài Deepfake kinh điển. Luôn dùng kênh liên lạc thứ hai độc lập (gọi điện thoại trực tiếp qua mạng viễn thông) để xác minh.'
-    },
-    isCompleted: false
-  }
-];
+// Danh mục bài học an toàn số (15 tuần và tự động mở rộng theo chu kỳ hàng tuần)
+const INITIAL_LESSONS: Lesson[] = MASTER_LESSONS_CATALOG;
+
 
 // 5 Cyber Scenarios as specified in prompt
 const INITIAL_SCENARIOS: Scenario[] = [
@@ -1235,19 +1067,25 @@ export class DatabaseService {
     return updated;
   }
 
-  // Lấy danh sách Lessons
-  public static getLessons(): Lesson[] {
+  // Lấy danh sách Lessons được đồng bộ tự động theo chu kỳ mỗi tuần 1 bài học
+  public static getLessons(previewAll: boolean = false): Lesson[] {
+    let parsedStored: Lesson[] = [];
     const raw = localStorage.getItem(STORAGE_KEYS.LESSONS);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.LESSONS, JSON.stringify(INITIAL_LESSONS));
-      return INITIAL_LESSONS;
+    if (raw) {
+      try {
+        parsedStored = JSON.parse(raw);
+      } catch {}
     }
-    return JSON.parse(raw);
+
+    // Tự động xây dựng và cập nhật lịch trình bài học theo tuần
+    const scheduledLessons = buildWeeklyLessonsSchedule(parsedStored, previewAll);
+    localStorage.setItem(STORAGE_KEYS.LESSONS, JSON.stringify(scheduledLessons));
+    return scheduledLessons;
   }
 
   // Hoàn thành lesson
   public static completeLesson(lessonId: string): Lesson[] {
-    const list = this.getLessons();
+    const list = this.getLessons(true);
     const updated = list.map(l => l.id === lessonId ? { ...l, isCompleted: true } : l);
     localStorage.setItem(STORAGE_KEYS.LESSONS, JSON.stringify(updated));
 
@@ -1255,7 +1093,17 @@ export class DatabaseService {
     if (target) {
       this.addPoints(target.points, `Hoàn thành bài học: ${target.title}`);
     }
-    return updated;
+    return this.getLessons();
+  }
+
+  // Lấy thông tin chu kỳ tuần hiện tại và đếm ngược bài học kế tiếp
+  public static getAcademyWeeklyInfo() {
+    const currentWeek = getCurrentAcademicWeek();
+    return getNextLessonUnlockInfo(currentWeek);
+  }
+
+  public static getCurrentAcademyWeek() {
+    return getCurrentAcademicWeek();
   }
 
   // Lấy Reports (Admin)

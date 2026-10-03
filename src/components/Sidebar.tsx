@@ -26,7 +26,7 @@ export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, isAdminMode 
     { id: 'search', label: 'Tìm kiếm', icon: Search },
     { id: 'factcheck', label: 'AI Kiểm chứng', icon: Bot, highlight: true },
     { id: 'inspector', label: 'Kiểm tra mã & nội dung', icon: Code2 },
-    { id: 'academy', label: 'Học an toàn số', icon: GraduationCap, badge: '5 bài' },
+    { id: 'academy', label: 'Học an toàn số', icon: GraduationCap, badge: 'Mỗi tuần' },
     { id: 'scenarios', label: 'Tình huống mô phỏng', icon: Gamepad2, badge: 'Hot' },
     { id: 'profile', label: 'Hồ sơ cá nhân', icon: UserCircle2 },
   ];
@@ -62,6 +62,8 @@ export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, isAdminMode 
                     ? 'bg-white/20 text-white' 
                     : item.badge === 'Hot'
                     ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                    : item.badge === 'Mỗi tuần'
+                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                     : 'bg-slate-800 text-slate-400'
                 }`}>
                   {item.badge}

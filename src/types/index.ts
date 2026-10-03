@@ -212,6 +212,10 @@ export interface Lesson {
     explanation: string;
   };
   isCompleted?: boolean;
+  weekNumber?: number;
+  releaseDate?: string;
+  isUnlocked?: boolean;
+  isNewThisWeek?: boolean;
 }
 
 export interface ScenarioOption {
