@@ -275,6 +275,53 @@ app.post(['/api/v1/fact-check/ping', '/v1/fact-check/ping', '/fact-check/ping'],
   }
 });
 
+// [POST] /api/v1/support/chat & /api/support-chat - Chatbot hỗ trợ tinh thần
+app.post(['/api/v1/support/chat', '/api/support-chat'], async (req: Request, res: Response) => {
+  const { message, history } = req.body || {};
+
+  if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'EMPTY_MESSAGE',
+      message: 'Vui lòng nhập nội dung tin nhắn.',
+    });
+  }
+
+  // Validate history format
+  let sanitizedHistory: { role: 'user' | 'assistant'; content: string }[] = [];
+  if (Array.isArray(history)) {
+    sanitizedHistory = history
+      .filter(
+        (m: any) =>
+          m &&
+          typeof m.content === 'string' &&
+          (m.role === 'user' || m.role === 'assistant')
+      )
+      .slice(-20);
+  }
+
+  try {
+    const { handleSupportChat } = await import('./services/supportAIService');
+    const result = await handleSupportChat({
+      message: message.trim(),
+      history: sanitizedHistory,
+    });
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(503).json(result);
+    }
+  } catch (err: any) {
+    console.error('[SUPPORT-CHAT ERROR]', err?.message || err);
+    res.status(500).json({
+      success: false,
+      error: 'SUPPORT_AI_UNAVAILABLE',
+      message: 'Hiện tại hệ thống hỗ trợ AI đang tạm thời không khả dụng.',
+    });
+  }
+});
+
 // [POST] /api/v1/reports & /v1/reports - Báo cáo nội dung đáng ngờ
 app.post(['/api/v1/reports', '/v1/reports'], verifyJwtToken, (req: AuthRequest, res: Response) => {
   res.status(201).json({ message: 'Báo cáo đã được ghi nhận. Cảm ơn bạn đã đóng góp cho không gian số.' });

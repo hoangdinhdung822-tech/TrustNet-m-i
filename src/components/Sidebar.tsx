@@ -9,7 +9,8 @@ import {
   ShieldAlert,
   School,
   Flame,
-  Sparkles
+  Sparkles,
+  HeartHandshake
 } from 'lucide-react';
 
 import { DatabaseService } from '../services/dbMock';
@@ -30,6 +31,7 @@ export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, user }) => {
     { id: 'factcheck', label: 'AI Kiểm chứng', icon: Bot, highlight: true },
     { id: 'academy', label: 'Học an toàn số', icon: GraduationCap, badge: 'Mỗi tuần' },
     { id: 'scenarios', label: 'Tình huống mô phỏng', icon: Gamepad2, badge: 'Hot' },
+    { id: 'support', label: 'Tư vấn tâm lý', icon: HeartHandshake, badge: 'AI Care', highlight: true },
     { id: 'profile', label: 'Hồ sơ cá nhân', icon: UserCircle2 },
   ];
 
@@ -66,6 +68,8 @@ export const Sidebar: React.FC<Props> = ({ activeTab, setActiveTab, user }) => {
                     ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                     : item.badge === 'Mỗi tuần'
                     ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                    : item.badge === '💙'
+                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                     : 'bg-slate-800 text-slate-400'
                 }`}>
                   {item.badge}

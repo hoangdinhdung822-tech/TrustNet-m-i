@@ -10,6 +10,7 @@ import { ScenariosPage } from './pages/ScenariosPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { SchoolIntroPage } from './pages/SchoolIntroPage';
+import { SupportPage } from './pages/SupportPage';
 import { AuthPage } from './pages/AuthPage';
 import { DatabaseService } from './services/dbMock';
 import { User } from './types';
@@ -130,6 +131,10 @@ export function App() {
               user={currentUser}
               onUserUpdate={handleUserUpdate}
             />
+          )}
+
+          {activeTab === 'support' && (
+            <SupportPage />
           )}
 
           {activeTab === 'profile' && (

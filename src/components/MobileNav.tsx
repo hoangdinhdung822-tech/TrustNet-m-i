@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Bot, School, Gamepad2, GraduationCap, UserCircle2 } from 'lucide-react';
+import { Home, Bot, HeartHandshake, Gamepad2, GraduationCap, UserCircle2 } from 'lucide-react';
 
 interface Props {
   activeTab: string;
@@ -10,7 +10,7 @@ export const MobileNav: React.FC<Props> = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'feed', label: 'Trang chủ', icon: Home },
     { id: 'factcheck', label: 'Kiểm chứng', icon: Bot },
-    { id: 'school', label: 'Giới thiệu trường', icon: School },
+    { id: 'support', label: 'Tâm lý', icon: HeartHandshake },
     { id: 'scenarios', label: 'Tình huống', icon: Gamepad2 },
     { id: 'profile', label: 'Hồ sơ', icon: UserCircle2 },
   ];

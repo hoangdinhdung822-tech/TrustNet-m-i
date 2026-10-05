@@ -87,3 +87,51 @@
   animation: radar-sweep 4s linear infinite;
   transform-origin: center;
 }
+
+/* ==============================
+   SUPPORT CHAT ANIMATIONS
+   ============================== */
+
+/* Fade-in animation for chat messages */
+@keyframes support-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-support-fadein {
+  animation: support-fadein 0.3s ease-out forwards;
+}
+
+/* Typing indicator dots */
+@keyframes support-dot-bounce {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.animate-support-dot1 {
+  animation: support-dot-bounce 1.2s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.animate-support-dot2 {
+  animation: support-dot-bounce 1.2s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+
+.animate-support-dot3 {
+  animation: support-dot-bounce 1.2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+

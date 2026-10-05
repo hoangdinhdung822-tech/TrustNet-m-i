@@ -236,6 +236,68 @@ function trustnetApiPlugin(): Plugin {
       }
     }
 
+    // [POST] /api/support-chat - Support AI Chatbot (Hỗ trợ tinh thần)
+    if ((urlPath === '/api/support-chat' || urlPath === '/api/v1/support/chat') && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: any) => { body += chunk; });
+      req.on('end', async () => {
+        try {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          const parsed = body ? JSON.parse(body) : {};
+
+          const { message, history } = parsed;
+
+          if (!message || typeof message !== 'string' || message.trim().length === 0) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({
+              success: false,
+              error: 'EMPTY_MESSAGE',
+              message: 'Vui lòng nhập nội dung tin nhắn.',
+            }));
+            return;
+          }
+
+          // Validate history format
+          let sanitizedHistory: { role: 'user' | 'assistant'; content: string }[] = [];
+          if (Array.isArray(history)) {
+            sanitizedHistory = history
+              .filter(
+                (m: any) =>
+                  m &&
+                  typeof m.content === 'string' &&
+                  (m.role === 'user' || m.role === 'assistant')
+              )
+              .slice(-20);
+          }
+
+          const { handleSupportChat } = await import('./backend/services/supportAIService.ts');
+          const result = await handleSupportChat({
+            message: message.trim(),
+            history: sanitizedHistory,
+          });
+
+          res.setHeader('Content-Type', 'application/json');
+          if (result.success) {
+            res.statusCode = 200;
+          } else {
+            res.statusCode = 503;
+          }
+          res.end(JSON.stringify(result));
+        } catch (err: any) {
+          console.error('[SUPPORT-CHAT ERROR]', err?.message || err);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({
+            success: false,
+            error: 'SUPPORT_AI_UNAVAILABLE',
+            message: 'Hiện tại hệ thống hỗ trợ AI đang tạm thời không khả dụng.',
+          }));
+        }
+      });
+      return;
+    }
+
     next();
   };
 
