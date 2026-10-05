@@ -223,7 +223,10 @@ export const SupportPage: React.FC = () => {
 
       setMessages((prev) => [...prev, aiMsg]);
     } catch {
-      const fallbackResult = SupportChatService.generateEmpatheticLocalReply(text);
+      const historyForApi = messages.filter(
+        (m) => m.role === 'user' || m.role === 'assistant'
+      );
+      const fallbackResult = SupportChatService.generateEmpatheticLocalReply(text, historyForApi);
       const aiMsg: SupportMessage = {
         id: SupportChatService.generateId(),
         role: 'assistant',

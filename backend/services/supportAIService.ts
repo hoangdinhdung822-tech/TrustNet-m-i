@@ -192,13 +192,13 @@ function validateAndParseResponse(raw: string): SupportChatResponse | null {
   try {
     // Try to extract JSON from the response (AI might wrap it in markdown code blocks)
     let jsonStr = raw.trim();
-    
+
     // Remove markdown code block wrappers if present
     const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) {
       jsonStr = jsonMatch[1].trim();
     }
-    
+
     const parsed = JSON.parse(jsonStr);
 
     if (!parsed.reply || typeof parsed.reply !== 'string') return null;
@@ -300,7 +300,7 @@ export async function handleSupportChat(
         clearTimeout(timer);
 
         const rawText = response.text || '';
-        
+
         // Try to parse structured output
         const parsed = validateAndParseResponse(rawText);
         if (parsed) {
