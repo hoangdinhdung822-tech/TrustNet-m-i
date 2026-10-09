@@ -20,7 +20,21 @@ const STORAGE_KEYS = {
   REPORTS: 'trustnet_reports',
   ACCOUNTS: 'trustnet_accounts',
   IS_LOGGED_IN: 'trustnet_is_logged_in',
+  DEVICE_ACCOUNTS: 'trustnet_device_accounts',
 };
+
+export interface DeviceSavedAccount {
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
+  school?: string;
+  className?: string;
+  role?: string;
+  points?: number;
+  lastLogin: string;
+  lastLoginTimestamp: number;
+}
 
 // Initial Accounts Collection
 export const INITIAL_ACCOUNTS: User[] = [
@@ -434,6 +448,85 @@ export class DatabaseService {
     }
   }
 
+  // Lấy danh sách các tài khoản đã đăng nhập trước đây trên thiết bị này
+  public static getDeviceAccounts(): DeviceSavedAccount[] {
+    const raw = localStorage.getItem(STORAGE_KEYS.DEVICE_ACCOUNTS);
+    if (!raw) {
+      const userRaw = localStorage.getItem(STORAGE_KEYS.USER);
+      if (userRaw) {
+        try {
+          const u: User = JSON.parse(userRaw);
+          if (u && u.username) {
+            const initialEntry: DeviceSavedAccount = {
+              id: u.id || 'u-default',
+              name: u.name,
+              username: u.username,
+              avatar: u.avatar,
+              school: u.school,
+              className: u.className,
+              role: u.role,
+              points: u.points,
+              lastLogin: 'Gần đây',
+              lastLoginTimestamp: Date.now()
+            };
+            localStorage.setItem(STORAGE_KEYS.DEVICE_ACCOUNTS, JSON.stringify([initialEntry]));
+            return [initialEntry];
+          }
+        } catch {}
+      }
+      return [];
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
+  // Ghi nhớ tài khoản trên thiết bị này sau khi đăng nhập thành công
+  public static saveDeviceAccount(user: User): void {
+    try {
+      const list = this.getDeviceAccounts();
+      const existingIdx = list.findIndex(a => a.id === user.id || a.username.toLowerCase() === user.username.toLowerCase());
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+      const entry: DeviceSavedAccount = {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        avatar: user.avatar,
+        school: user.school,
+        className: user.className,
+        role: user.role,
+        points: user.points,
+        lastLogin: timeStr,
+        lastLoginTimestamp: Date.now()
+      };
+      if (existingIdx >= 0) {
+        list[existingIdx] = { ...list[existingIdx], ...entry };
+      } else {
+        list.unshift(entry);
+      }
+      list.sort((a, b) => b.lastLoginTimestamp - a.lastLoginTimestamp);
+      localStorage.setItem(STORAGE_KEYS.DEVICE_ACCOUNTS, JSON.stringify(list.slice(0, 5)));
+    } catch (e) {
+      console.error('Error saving device account:', e);
+    }
+  }
+
+  // Xóa tài khoản khỏi danh sách đã lưu trên thiết bị này
+  public static removeDeviceAccount(idOrUsername: string): DeviceSavedAccount[] {
+    try {
+      const list = this.getDeviceAccounts().filter(
+        a => a.id !== idOrUsername && a.username.toLowerCase() !== idOrUsername.toLowerCase()
+      );
+      localStorage.setItem(STORAGE_KEYS.DEVICE_ACCOUNTS, JSON.stringify(list));
+      return list;
+    } catch {
+      return [];
+    }
+  }
+
   // Kiểm tra trạng thái đã đăng nhập hay chưa
   public static isLoggedIn(): boolean {
     return localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true';
@@ -498,6 +591,7 @@ export class DatabaseService {
 
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(found));
     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+    this.saveDeviceAccount(found);
     return { success: true, user: found };
   }
 
@@ -516,6 +610,7 @@ export class DatabaseService {
 
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(found));
     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+    this.saveDeviceAccount(found);
     return { success: true, user: found };
   }
 
@@ -619,6 +714,7 @@ export class DatabaseService {
     localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(updated));
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+    this.saveDeviceAccount(newUser);
     return newUser;
   }
 
@@ -687,6 +783,15 @@ export class DatabaseService {
 
   // Đăng xuất (xóa cờ đăng nhập và trả về tài khoản mặc định)
   public static logout(): User {
+    const raw = localStorage.getItem(STORAGE_KEYS.USER);
+    if (raw) {
+      try {
+        const u = JSON.parse(raw);
+        if (u && u.username) {
+          this.saveDeviceAccount(u);
+        }
+      } catch {}
+    }
     localStorage.removeItem(STORAGE_KEYS.IS_LOGGED_IN);
     const accounts = this.getAllAccounts();
     const fallback = accounts[0] || DEFAULT_USER;

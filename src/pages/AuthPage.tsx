@@ -16,11 +16,13 @@ import {
   Moon,
   Flame,
   Check,
-  ShieldAlert,
-  Upload,
-  RefreshCw
+  ShieldAlert, 
+  Upload, 
+  RefreshCw,
+  Laptop,
+  X
 } from 'lucide-react';
-import { DatabaseService } from '../services/dbMock';
+import { DatabaseService, DeviceSavedAccount } from '../services/dbMock';
 import { User as UserType } from '../types';
 import { processDeviceImage } from '../utils/imageUpload';
 
@@ -73,6 +75,30 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
   const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const loginPasswordInputRef = useRef<HTMLInputElement>(null);
+
+  // Danh sách các tài khoản đã đăng nhập trước đây trên thiết bị này (Local storage của thiết bị)
+  const [deviceAccounts, setDeviceAccounts] = useState<DeviceSavedAccount[]>(() => DatabaseService.getDeviceAccounts());
+
+  // Chọn nhanh tài khoản đã lưu trên thiết bị
+  const handleSelectDeviceAccount = (acc: DeviceSavedAccount) => {
+    setLoginIdentifier(acc.username);
+    setLoginPassword('');
+    setLoginError(null);
+    setTimeout(() => {
+      loginPasswordInputRef.current?.focus();
+    }, 50);
+  };
+
+  // Xóa tài khoản khỏi bộ nhớ thiết bị này
+  const handleRemoveDeviceAccount = (id: string) => {
+    const updated = DatabaseService.removeDeviceAccount(id);
+    setDeviceAccounts(updated);
+    if (loginIdentifier === id) {
+      setLoginIdentifier('');
+      setLoginPassword('');
+    }
+  };
 
   // Register Form State
   const [regName, setRegName] = useState('');
@@ -106,17 +132,6 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
     }
   };
 
-  const initialAccounts = DatabaseService.getAllAccounts();
-  const sampleAccounts = initialAccounts.filter(acc => acc.role !== 'admin');
-
-  // Điền nhanh tài khoản mẫu để người dùng kiểm tra đăng nhập
-  const handleQuickLogin = (acc: UserType) => {
-    setLoginIdentifier(acc.username);
-    const pwd = acc.password || '123456';
-    setLoginPassword(pwd);
-    setLoginError(null);
-  };
-
   // Submit Sign In - BẮT BUỘC nhập đúng tài khoản và đúng mật khẩu
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,6 +149,7 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
       setLoginError(res.error || 'Tài khoản hoặc mật khẩu không chính xác! Vui lòng kiểm tra lại.');
       return;
     }
+    setDeviceAccounts(DatabaseService.getDeviceAccounts());
     onLoginSuccess(res.user);
   };
 
@@ -249,8 +265,8 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Chào mừng bạn đến với <strong className="text-white">TrustNet</strong> — Môi trường mạng xã hội thông minh dành cho học sinh 
-            <span className="text-cyan-300 font-semibold"> Trường THPT Số 1 Phan Đình Phùng</span>. Nơi trang bị cho bạn tư duy phản biện, 
+            Chào mừng bạn đến với <strong className="text-white">TrustNet</strong> — Môi trường mạng xã hội thông minh dành cho 
+            <span className="text-cyan-300 font-semibold"> học sinh THPT toàn quốc</span>. Nơi trang bị cho bạn tư duy phản biện, 
             kỹ năng nhận diện tin giả, và công nghệ AI tra cứu sự thật từ nguồn chính thống.
           </p>
 
@@ -320,63 +336,101 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
             {activeTab === 'login' && (
               <div className="space-y-5">
                 
-                {/* 1-Click Fast Accounts */}
+                {/* Danh sách tài khoản đã đăng nhập trước đây trên thiết bị này */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                      Tài khoản mẫu (Nhấp để điền mật khẩu):
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <Laptop className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Các tài khoản đã đăng nhập trước đây:</span>
                     </span>
-                    <span className="text-[10px] text-cyan-400 font-medium">Bảo mật chuẩn</span>
+                    <span className="text-[10px] text-indigo-400 font-medium bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                      Thiết bị này
+                    </span>
                   </div>
-                  
-                  <div className="space-y-2">
-                    {sampleAccounts.slice(0, 2).map((acc) => {
-                      const pwd = acc.password || '123456';
-                      return (
-                        <button
-                          key={acc.id}
-                          type="button"
-                          onClick={() => handleQuickLogin(acc)}
-                          className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 transition-all group text-left"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <img
-                              src={acc.avatar}
-                              alt={acc.name}
-                              className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-700 group-hover:ring-cyan-400 shrink-0"
-                            />
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="text-xs font-bold text-white group-hover:text-cyan-300 truncate">
-                                  {acc.name}
-                                </span>
-                                <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono font-bold">
-                                  MK: {pwd}
-                                </span>
+
+                  {deviceAccounts.length > 0 ? (
+                    <div className="space-y-2">
+                      {deviceAccounts.map((acc) => {
+                        const isSelected = loginIdentifier.toLowerCase() === acc.username.toLowerCase();
+                        return (
+                          <div
+                            key={acc.id}
+                            className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all border ${
+                              isSelected
+                                ? 'bg-indigo-950/70 border-cyan-400/80 shadow-md shadow-indigo-950/50'
+                                : 'bg-slate-950/60 hover:bg-indigo-950/40 border-slate-800 hover:border-indigo-500/50'
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => handleSelectDeviceAccount(acc)}
+                              className="flex items-center gap-3 min-w-0 flex-1 text-left group"
+                            >
+                              <div className="relative shrink-0">
+                                <img
+                                  src={acc.avatar}
+                                  alt={acc.name}
+                                  className={`w-9 h-9 rounded-xl object-cover ring-1 transition-all ${
+                                    isSelected ? 'ring-cyan-400' : 'ring-slate-700 group-hover:ring-cyan-400'
+                                  }`}
+                                />
+                                {acc.role === 'admin' && (
+                                  <span className="absolute -bottom-1 -right-1 px-1 py-0.2 rounded bg-rose-500 text-[8px] font-bold text-white uppercase">
+                                    Admin
+                                  </span>
+                                )}
                               </div>
-                              <span className="text-[10px] text-slate-400 font-mono block truncate">
-                                @{acc.username} • ⭐ {acc.points} XP
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className={`text-xs font-bold truncate ${
+                                    isSelected ? 'text-cyan-300' : 'text-white group-hover:text-cyan-300'
+                                  }`}>
+                                    {acc.name}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 text-[10px] text-slate-400 truncate mt-0.5">
+                                  <span className="font-mono text-slate-300">@{acc.username}</span>
+                                  {acc.lastLogin && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="text-slate-400">Đăng nhập: {acc.lastLogin}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              <span className="text-xs font-semibold text-indigo-400 group-hover:text-cyan-300 flex items-center gap-1 shrink-0 px-2">
+                                {isSelected ? 'Đang chọn' : 'Chọn'} <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                               </span>
-                            </div>
+                            </button>
+
+                            {/* Xóa tài khoản khỏi thiết bị */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveDeviceAccount(acc.id);
+                              }}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors ml-1 shrink-0"
+                              title="Xóa tài khoản khỏi thiết bị này"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
                           </div>
-
-                          <span className="text-xs font-semibold text-indigo-400 group-hover:text-cyan-300 flex items-center gap-1 shrink-0">
-                            Chọn <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                          </span>
-                        </button>
-                      );
-                    })}
-
-                    <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-300 font-semibold">
-                        <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-                        <span>Cổng Quản trị viên:</span>
-                      </span>
-                      <span className="text-slate-400 italic">
-                        Đăng nhập thủ công bằng tài khoản admin được cấp
-                      </span>
+                        );
+                      })}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="p-3.5 rounded-2xl bg-slate-950/50 border border-dashed border-slate-800 text-center">
+                      <div className="w-7 h-7 rounded-full bg-slate-900 mx-auto flex items-center justify-center text-slate-500 mb-1.5">
+                        <Users className="w-3.5 h-3.5" />
+                      </div>
+                      <p className="text-xs font-medium text-slate-300">Chưa có tài khoản nào từng đăng nhập trên thiết bị này</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Khi bạn đăng nhập, thông tin tài khoản sẽ được ghi nhớ riêng trên thiết bị này để truy cập nhanh lần sau.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="relative flex items-center justify-center my-3">
@@ -406,7 +460,7 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
                         required
                         value={loginIdentifier}
                         onChange={(e) => setLoginIdentifier(e.target.value)}
-                        placeholder="VD: hoangdinhdung822 hoặc baotram_digital"
+                        placeholder="VD: @username hoặc email của bạn"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400 transition-colors"
                       />
                     </div>
@@ -424,11 +478,12 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
                     <div className="relative">
                       <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
                       <input
+                        ref={loginPasswordInputRef}
                         type={showLoginPassword ? 'text' : 'password'}
                         required
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
-                        placeholder="Nhập mật khẩu (Mẫu: 123456 / Admin: admin123)"
+                        placeholder="Nhập mật khẩu tài khoản của bạn"
                         className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400 transition-colors"
                       />
                       <button
