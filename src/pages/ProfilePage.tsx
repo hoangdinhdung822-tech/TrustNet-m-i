@@ -32,6 +32,7 @@ import { DatabaseService } from '../services/dbMock';
 import { User } from '../types';
 import { AiStatusBadge } from '../components/AiStatusBadge';
 import { processDeviceImage } from '../utils/imageUpload';
+import { formatFactCheckDateTime } from '../utils/timeAgo';
 
 interface Props {
   user: User;
@@ -741,28 +742,58 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
           </div>
         ) : (
           <div className="space-y-3">
-            {history.map((record) => (
-              <div
-                key={record.id}
-                className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2 text-xs"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <span className="font-medium text-slate-400 text-[11px] font-mono">
-                    {record.createdAt} • Thể loại: {record.inputCategory}
-                  </span>
-                  <AiStatusBadge status={record.result.status} score={record.result.score} size="sm" />
+            {history.map((record) => {
+              const timeInfo = formatFactCheckDateTime(record.createdAt);
+              const getCategoryLabel = (cat: string) => {
+                switch (cat) {
+                  case 'text': return 'Văn bản';
+                  case 'statement': return 'Phát ngôn';
+                  case 'social_post': return 'Bài đăng MXH';
+                  case 'url': return 'Đường dẫn web';
+                  case 'image': return 'Hình ảnh';
+                  case 'code': return 'Mã nguồn';
+                  default: return cat || 'Văn bản';
+                }
+              };
+
+              return (
+                <div
+                  key={record.id}
+                  className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2.5 text-xs transition-all hover:border-slate-700/80"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-mono flex-wrap">
+                      <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      <span 
+                        title={timeInfo.tooltip} 
+                        className="text-slate-200 font-semibold cursor-help hover:text-indigo-300 transition-colors"
+                      >
+                        {timeInfo.exactFull}
+                      </span>
+                      <span className="text-indigo-400 font-medium">({timeInfo.relative})</span>
+                      <span className="text-slate-600">•</span>
+                      <span className="text-slate-400">Thể loại: {getCategoryLabel(record.inputCategory)}</span>
+                    </div>
+
+                    <AiStatusBadge 
+                      verdict={record.result.verdict} 
+                      status={record.result.status} 
+                      score={record.result.score} 
+                      size="sm" 
+                    />
+                  </div>
+
+                  <p className="font-semibold text-slate-200 line-clamp-2">
+                    "{record.inputText}"
+                  </p>
+
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    <span className="text-indigo-400 font-semibold">Kết luận: </span>
+                    {record.result.summary}
+                  </p>
                 </div>
-
-                <p className="font-semibold text-slate-200 line-clamp-2">
-                  "{record.inputText}"
-                </p>
-
-                <p className="text-slate-400 text-[11px] leading-relaxed">
-                  <span className="text-indigo-400 font-semibold">Kết luận: </span>
-                  {record.result.summary}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

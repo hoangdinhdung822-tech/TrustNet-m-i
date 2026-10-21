@@ -34,7 +34,19 @@ interface FactCheckResultViewProps {
 }
 
 const FactCheckResultView: React.FC<FactCheckResultViewProps> = ({ result, scrollToSource }) => {
-  const confidence = result.confidence ?? result.score ?? 50;
+  const isFalse = result.verdict === 'FALSE' || result.status === 'debunked' || result.directVerdict === 'SAI';
+  const isTrue = result.verdict === 'TRUE' || result.status === 'verified' || result.directVerdict === 'ĐÚNG';
+  const isMisleading = result.verdict === 'MISLEADING' || result.status === 'suspicious' || result.directVerdict === 'CẢNH BÁO';
+
+  // Tính điểm tin cậy thực tế của thông tin (Credibility Score)
+  const credibilityScore = isFalse
+    ? (result.score !== undefined && result.score <= 20 ? result.score : Math.max(4, Math.min(12, 100 - (result.confidence || 90))) || 8)
+    : isTrue
+    ? (result.score ?? result.confidence ?? 92)
+    : isMisleading
+    ? (result.score !== undefined && result.score <= 50 ? result.score : 35)
+    : (result.score !== undefined && result.score <= 35 ? result.score : 15);
+
   const keyEvidence = result.keyEvidence ?? [];
   const limitations = result.limitations ?? result.unverifiedPoints ?? [];
   const searchQueries = result.searchQueries ?? result.googleSearchQueries ?? [];
@@ -71,26 +83,52 @@ const FactCheckResultView: React.FC<FactCheckResultViewProps> = ({ result, scrol
           </div>
         </div>
 
-        {/* Confidence Score Gauge */}
-        <div className="flex items-center gap-4 bg-slate-900/90 p-4 rounded-2xl border border-slate-800 shrink-0">
+        {/* Credibility Score Gauge */}
+        <div className={`flex items-center gap-4 p-4 rounded-2xl border shrink-0 ${
+          isFalse 
+            ? 'bg-rose-950/40 border-rose-500/40' 
+            : isTrue 
+            ? 'bg-emerald-950/40 border-emerald-500/40' 
+            : isMisleading 
+            ? 'bg-amber-950/40 border-amber-500/40' 
+            : 'bg-slate-900/90 border-slate-800'
+        }`}>
           <div className="text-center pr-3 border-r border-slate-800">
             <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
               Mức độ tin cậy
             </span>
             <span className={`text-2xl md:text-3xl font-black font-mono ${
-              confidence >= 80 ? 'text-emerald-400' :
-              confidence >= 50 ? 'text-amber-400' :
-              confidence >= 30 ? 'text-orange-400' : 'text-slate-400'
+              isFalse ? 'text-rose-400' :
+              isTrue ? 'text-emerald-400' :
+              isMisleading ? 'text-amber-400' : 'text-slate-400'
             }`}>
-              {confidence}<span className="text-xs font-normal text-slate-500">/100</span>
+              {credibilityScore}<span className="text-xs font-normal text-slate-500">/100</span>
             </span>
           </div>
-          <div className="text-[11px] text-slate-400 max-w-[140px] leading-tight">
-            {confidence >= 80 
-              ? 'Độ tin cậy cao: Đã được nhiều nguồn uy tín xác thực'
-              : confidence >= 50
-              ? 'Độ tin cậy trung bình: Có căn cứ xác thực'
-              : 'Độ tin cậy thấp: Chưa đủ nguồn kiểm chứng'}
+          <div className="text-[11px] text-slate-300 max-w-[155px] leading-tight space-y-0.5">
+            <div className={`font-bold ${
+              isFalse ? 'text-rose-400' :
+              isTrue ? 'text-emerald-400' :
+              isMisleading ? 'text-amber-400' : 'text-slate-300'
+            }`}>
+              {isFalse ? 'Độ tin cậy rất thấp' :
+               isTrue ? 'Độ tin cậy cao' :
+               isMisleading ? 'Độ tin cậy yếu' : 'Chưa đủ dữ liệu'}
+            </div>
+            <div className="text-[10px] text-slate-400 leading-normal">
+              {isFalse 
+                ? 'Thông tin sai sự thật / Bị bác bỏ bởi các nguồn đối chứng.'
+                : isTrue 
+                ? 'Đã được nhiều nguồn uy tín và chính thống xác thực.'
+                : isMisleading 
+                ? 'Thông tin gây hiểu lầm hoặc sai lệch ngữ cảnh.'
+                : 'Chưa đủ nguồn web độc lập để xác minh.'}
+            </div>
+            {result.confidence && (
+              <div className="text-[9px] font-mono text-cyan-400/90 pt-0.5">
+                Độ chắc chắn AI: {result.confidence}%
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -489,6 +527,11 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
       });
       setResult(res);
 
+      // Đảm bảo mức độ tin cậy của thông tin phản ánh đúng bản chất (thông tin sai thì điểm tin cậy phải thấp 4-12/100)
+      if ((res.verdict === 'FALSE' || res.status === 'debunked') && res.score > 20) {
+        res.score = Math.max(4, Math.min(12, Math.round(100 - res.score))) || 8;
+      }
+
       // Lưu lịch sử kiểm chứng & cộng điểm XP
       const record: FactCheckRecord = {
         id: 'fc-' + Date.now(),
@@ -496,7 +539,7 @@ export const FactCheckPage: React.FC<Props> = ({ user, onUserUpdate }) => {
         inputText: fullText,
         inputCategory: inputMode,
         result: res,
-        createdAt: 'Vừa xong'
+        createdAt: new Date().toISOString()
       };
       DatabaseService.saveFactCheckRecord(record);
       onUserUpdate(DatabaseService.getCurrentUser());

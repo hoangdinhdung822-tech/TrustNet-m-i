@@ -887,8 +887,15 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
         independentComparison: 'Đã đối chiếu nội dung URL với kết quả độc lập từ Google Search.'
       } : undefined,
 
-      // Compatibility fields
-      score: calculatedConfidence,
+      // Compatibility fields: Mức độ tin cậy của thông tin (Credibility Score 0-100)
+      // Nếu là thông tin sai (FALSE), mức độ tin cậy BẮT BUỘC PHẢI THẤP (4 - 12/100)
+      score: verdict === 'TRUE' 
+        ? calculatedConfidence 
+        : verdict === 'FALSE' 
+        ? (Math.max(4, Math.min(12, Math.round(100 - calculatedConfidence))) || 8)
+        : verdict === 'MISLEADING'
+        ? Math.max(25, Math.min(42, Math.round((100 - calculatedConfidence) * 0.4 + 20)))
+        : Math.max(15, Math.min(30, calculatedConfidence)),
       status: statusMap[verdict],
       reasoning: parsed.explanation || '',
       claims: [claimAnalysis.mainClaim, ...(claimAnalysis.subClaims || [])].filter(Boolean),

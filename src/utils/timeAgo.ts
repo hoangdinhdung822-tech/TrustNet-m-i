@@ -29,9 +29,26 @@ export function parseDateInput(dateInput: string | number | Date | undefined | n
     return parsed;
   }
 
+  // Hỗ trợ định dạng ngày Việt Nam DD/MM/YYYY hoặc DD-MM-YYYY kèm HH:mm:ss
+  const str = String(dateInput).trim();
+  const dateMatch = str.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dateMatch) {
+    const timeMatch = str.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+    const d = parseInt(dateMatch[1], 10);
+    const mo = parseInt(dateMatch[2], 10) - 1;
+    const y = parseInt(dateMatch[3], 10);
+    const h = timeMatch ? parseInt(timeMatch[1], 10) : 0;
+    const min = timeMatch ? parseInt(timeMatch[2], 10) : 0;
+    const s = timeMatch && timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
+    const dObj = new Date(y, mo, d, h, min, s);
+    if (!isNaN(dObj.getTime())) {
+      return dObj;
+    }
+  }
+
   // Xử lý các chuỗi tương đối cũ (legacy) như "2 giờ trước", "4 giờ trước", "Vừa xong"
   const now = Date.now();
-  const lower = String(dateInput).toLowerCase().trim();
+  const lower = str.toLowerCase();
 
   if (lower.includes('vừa xong') || lower === 'just now') {
     return new Date(now - 30 * 1000); // 30s trước
@@ -136,4 +153,38 @@ export function formatFacebookFullTime(dateInput: string | number | Date | undef
   const seconds = String(date.getSeconds()).padStart(2, '0');
 
   return `${dayName}, ${day} tháng ${month}, ${year} lúc ${hours}:${minutes}:${seconds}`;
+}
+
+/**
+ * Định dạng thời gian dành riêng cho lịch sử kiểm chứng Fact-Check:
+ * Trả về giờ:phút:giây - ngày/tháng/năm thật và thời gian tương đối chính xác với thời điểm tra cứu
+ */
+export function formatFactCheckDateTime(dateInput: string | number | Date | undefined | null): {
+  exactTime: string;
+  exactDate: string;
+  exactFull: string;
+  relative: string;
+  tooltip: string;
+} {
+  const d = parseDateInput(dateInput);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const seconds = String(d.getSeconds()).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+
+  const exactTime = `${hours}:${minutes}:${seconds}`;
+  const exactDate = `${day}/${month}/${year}`;
+  const exactFull = `${exactTime} - ${exactDate}`;
+  const relative = formatFacebookTime(d);
+  const tooltip = formatFacebookFullTime(d);
+
+  return {
+    exactTime,
+    exactDate,
+    exactFull,
+    relative,
+    tooltip
+  };
 }

@@ -1696,14 +1696,100 @@ export class DatabaseService {
     return results;
   }
 
-  // Lịch sử Fact-Check cá nhân
+  // Lịch sử Fact-Check cá nhân: Tự động chuẩn hóa thời gian thực tế và điểm tin cậy
   public static getFactCheckHistory(): FactCheckRecord[] {
     const raw = localStorage.getItem(STORAGE_KEYS.FACT_CHECKS);
     if (!raw) return [];
-    return JSON.parse(raw);
+    try {
+      const list: FactCheckRecord[] = JSON.parse(raw);
+      if (!Array.isArray(list)) return [];
+
+      let needsSync = false;
+      const normalized = list.map((record, index) => {
+        let changed = false;
+
+        // 1. Chuẩn hóa thời gian tìm kiếm thật chính xác với lúc kiểm tra
+        // Khắc phục lỗi hiển thị tĩnh 'Vừa xong' hoặc thiếu timestamp chuẩn
+        if (!record.createdAt || record.createdAt === 'Vừa xong' || !record.createdAt.includes('T')) {
+          let realTimestampMs = 0;
+
+          // Trích xuất mốc thời gian thực từ ID dạng fc-179257...
+          if (record.id && record.id.startsWith('fc-')) {
+            const rawIdNum = parseInt(record.id.replace('fc-', ''), 10);
+            if (!isNaN(rawIdNum) && rawIdNum > 1600000000000 && rawIdNum < 3000000000000) {
+              realTimestampMs = rawIdNum;
+            }
+          }
+
+          // Hoặc đối soát qua timestampChecked được ghi lại lúc kiểm chứng
+          if (!realTimestampMs && record.result?.timestampChecked) {
+            const parsedChecked = parseDateInput(record.result.timestampChecked);
+            if (!isNaN(parsedChecked.getTime()) && parsedChecked.getTime() > 1600000000000) {
+              realTimestampMs = parsedChecked.getTime();
+            }
+          }
+
+          // Nếu không có, gán thời gian lùi dần hợp lý theo thứ tự
+          if (!realTimestampMs) {
+            realTimestampMs = Date.now() - (index * 6 + 1) * 60 * 1000;
+          }
+
+          record.createdAt = new Date(realTimestampMs).toISOString();
+          changed = true;
+        }
+
+        // 2. Chuẩn hóa mức độ tin cậy của thông tin:
+        // Đã là thông tin sai (FALSE / debunked) thì mức độ tin cậy PHẢI THẤP (3 - 12/100), không thể là 60/100!
+        const isFalse = 
+          record.result?.verdict === 'FALSE' || 
+          record.result?.status === 'debunked' || 
+          record.result?.directVerdict === 'SAI';
+
+        if (isFalse && record.result) {
+          if (record.result.score > 20) {
+            // Chuẩn hóa điểm tin cậy về mức thấp chuẩn xác (3-12/100)
+            const lowCredibility = Math.max(4, Math.min(12, Math.round(100 - record.result.score))) || 8;
+            record.result.score = lowCredibility;
+            changed = true;
+          }
+          if (record.result.verdict !== 'FALSE') {
+            record.result.verdict = 'FALSE';
+            changed = true;
+          }
+        }
+
+        if (changed) {
+          needsSync = true;
+        }
+
+        return record;
+      });
+
+      if (needsSync) {
+        localStorage.setItem(STORAGE_KEYS.FACT_CHECKS, JSON.stringify(normalized));
+      }
+
+      return normalized;
+    } catch {
+      return [];
+    }
   }
 
   public static saveFactCheckRecord(record: FactCheckRecord): void {
+    // Đảm bảo thời gian tạo là ISO chuẩn
+    if (!record.createdAt || record.createdAt === 'Vừa xong') {
+      record.createdAt = new Date().toISOString();
+    }
+
+    // Đảm bảo nếu là thông tin sai thì điểm tin cậy phải thấp
+    const isFalse = 
+      record.result?.verdict === 'FALSE' || 
+      record.result?.status === 'debunked' || 
+      record.result?.directVerdict === 'SAI';
+    if (isFalse && record.result && record.result.score > 20) {
+      record.result.score = Math.max(4, Math.min(12, Math.round(100 - record.result.score))) || 8;
+    }
+
     const list = this.getFactCheckHistory();
     list.unshift(record);
     localStorage.setItem(STORAGE_KEYS.FACT_CHECKS, JSON.stringify(list));
