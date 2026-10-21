@@ -359,10 +359,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Nguyễn Tấn Đạt',
       username: 'dat_nguyen',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Học sinh Lớp 12',
+      school: 'THPT Số 1 Phan Đình Phùng'
     },
     content: 'Cảm ơn TrustNet đã gắn nhãn Đã kiểm chứng! Nhiều trang mạng xã hội đăng tin đổi môn thi làm mình hoang mang mãi.',
-    createdAt: getIsoHoursAgo(2)
+    createdAt: getIsoHoursAgo(2),
+    likesCount: 3,
+    likedBy: ['u-dung-01', 'u-genz-01', 'u-admin-01']
   },
   {
     id: 'c-102',
@@ -371,10 +375,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Bảo Trâm',
       username: 'baotram_digital',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Người kiểm chứng',
+      school: 'THPT Số 1 Phan Đình Phùng'
     },
     content: 'Mình vừa tải đề thi minh họa trên trang moet.gov.vn về rồi, cấu trúc đề thi rất sát với hướng dẫn đổi mới năm nay.',
-    createdAt: getIsoHoursAgo(1.5)
+    createdAt: getIsoHoursAgo(1.5),
+    likesCount: 2,
+    likedBy: ['u-dung-01', 'u-user-4']
   },
   {
     id: 'c-103',
@@ -383,10 +391,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Quản Trị Viên TrustNet',
       username: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Hiệp sĩ an toàn số',
+      school: 'Ban Quản trị An toàn Thông tin'
     },
     content: 'Đoàn trường THPT Số 1 Phan Đình Phùng cũng đã ghim thông báo này vào bảng tin học tập của các lớp 12.',
-    createdAt: getIsoMinutesAgo(35)
+    createdAt: getIsoMinutesAgo(35),
+    likesCount: 4,
+    likedBy: ['u-dung-01', 'u-genz-01', 'u-user-4', 'u-user-22']
   },
   {
     id: 'c-201',
@@ -395,10 +407,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Bảo Trâm',
       username: 'baotram_digital',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Người kiểm chứng',
+      school: 'THPT Số 1 Phan Đình Phùng'
     },
     content: 'Mọi người nhớ bấm xem giải thích của AI nhé. Đừng tin ba cái bài thuốc thần dược trên mạng, rất hại dạ dày.',
-    createdAt: getIsoHoursAgo(3.5)
+    createdAt: getIsoHoursAgo(3.5),
+    likesCount: 3,
+    likedBy: ['u-dung-01', 'u-admin-01', 'u-user-4']
   },
   {
     id: 'c-202',
@@ -407,10 +423,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Hoàng Đình Dũng',
       username: 'hoangdinhdung822',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80'
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80',
+      rankTitle: 'Đại sứ THPT Số 1',
+      school: 'Khối 11 - Đoàn Trường'
     },
     content: 'Bộ Y tế đã có văn bản cảnh báo thông tin này từ lâu. Uống chanh gừng chỉ hỗ trợ giữ ấm chứ không tiêu diệt được virus cúm.',
-    createdAt: getIsoHoursAgo(2)
+    createdAt: getIsoHoursAgo(2),
+    likesCount: 2,
+    likedBy: ['u-genz-01', 'u-admin-01']
   },
   {
     id: 'c-301',
@@ -419,10 +439,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Bảo Trâm',
       username: 'baotram_digital',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Người kiểm chứng',
+      school: 'THPT Số 1 Phan Đình Phùng'
     },
     content: 'Cảnh báo lừa đảo phishing! Mình đã gửi báo cáo cho Quản trị viên để gỡ bài này khỏi nền tảng.',
-    createdAt: getIsoHoursAgo(5.5)
+    createdAt: getIsoHoursAgo(5.5),
+    likesCount: 5,
+    likedBy: ['u-dung-01', 'u-admin-01', 'u-user-22', 'u-user-4', 'u-user-eco']
   },
   {
     id: 'c-302',
@@ -431,10 +455,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Quản Trị Viên TrustNet',
       username: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Tổng Quản Trị',
+      school: 'Ban Quản trị Hệ Thống'
     },
     content: 'Hệ thống AI đã phát hiện tên miền độc hại .xyz và gắn nhãn Cảnh báo đỏ. Đề nghị người dùng không truy cập liên kết.',
-    createdAt: getIsoHoursAgo(4.8)
+    createdAt: getIsoHoursAgo(4.8),
+    likesCount: 3,
+    likedBy: ['u-dung-01', 'u-genz-01', 'u-user-4']
   },
   {
     id: 'c-401',
@@ -443,10 +471,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Hoàng Đình Dũng',
       username: 'hoangdinhdung822',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80'
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80',
+      rankTitle: 'Đại sứ THPT Số 1',
+      school: 'Khối 11 - Đoàn Trường'
     },
     content: 'Công nghệ này tiềm năng thật nhưng cần đợi các viện kiểm định an toàn cháy nổ trước khi áp dụng thương mại.',
-    createdAt: getIsoHoursAgo(8)
+    createdAt: getIsoHoursAgo(8),
+    likesCount: 2,
+    likedBy: ['u-genz-01', 'u-user-22']
   },
   {
     id: 'c-402',
@@ -455,10 +487,14 @@ export const INITIAL_COMMENTS: Comment[] = [
     author: {
       name: 'Hoàng Minh Quân',
       username: 'minhquan_vlog',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'
+      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+      rankTitle: 'Người dùng mới',
+      school: 'THPT Số 1 Phan Đình Phùng'
     },
     content: 'Mình cũng đang đọc báo cáo của SAE, có vẻ chi phí sản xuất pin thể rắn vẫn cao gấp 3 lần pin lithium hiện tại.',
-    createdAt: getIsoHoursAgo(6.5)
+    createdAt: getIsoHoursAgo(6.5),
+    likesCount: 1,
+    likedBy: ['u-dung-01']
   }
 ];
 
@@ -1015,10 +1051,10 @@ export class DatabaseService {
     const currentUser = this.getCurrentUser();
     const raw = localStorage.getItem(STORAGE_KEYS.POSTS);
     
-    // Migration v4: Nâng cấp số liệu thực tế và chuẩn hóa ISO timestamp
-    const migrationFlag = localStorage.getItem('trustnet_metrics_v4_real');
+    // Migration v5: Nâng cấp số liệu thực tế, bình luận công khai đa người dùng và chia sẻ ra ngoài
+    const migrationFlag = localStorage.getItem('trustnet_metrics_v5_comments_share');
     if (!migrationFlag) {
-      localStorage.setItem('trustnet_metrics_v4_real', 'true');
+      localStorage.setItem('trustnet_metrics_v5_comments_share', 'true');
       localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(INITIAL_POSTS));
       localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(INITIAL_COMMENTS));
       localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
@@ -1328,13 +1364,22 @@ export class DatabaseService {
       author: {
         name: user.name,
         username: user.username,
-        avatar: user.avatar
+        avatar: user.avatar,
+        rankTitle: user.rankTitle,
+        school: user.school
       },
       content,
-      createdAt: nowIso
+      createdAt: nowIso,
+      likesCount: 0,
+      likedBy: []
     };
     all.push(newComment);
     localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(all));
+
+    // Bắn event để tất cả PostCard và cửa sổ khác nhận được bình luận ngay lập tức
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('trustnet_comment_event', { detail: { postId } }));
+    }
 
     // Update commentsCount trên post theo số lượng bình luận thực
     const posts = this.getPosts();
@@ -1377,6 +1422,34 @@ export class DatabaseService {
     }
 
     return newComment;
+  }
+
+  // Toggle thích bình luận của người khác
+  public static toggleLikeComment(commentId: string): Comment[] {
+    const user = this.getCurrentUser();
+    const all = this.getRawComments();
+    const updated = all.map(c => {
+      if (c.id === commentId) {
+        const likedBy = Array.isArray(c.likedBy) ? [...c.likedBy] : [];
+        const idx = likedBy.indexOf(user.id);
+        if (idx >= 0) {
+          likedBy.splice(idx, 1);
+        } else {
+          likedBy.push(user.id);
+        }
+        return {
+          ...c,
+          likedBy,
+          likesCount: likedBy.length
+        };
+      }
+      return c;
+    });
+    localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('trustnet_comment_event'));
+    }
+    return updated;
   }
 
   // Lấy danh sách thông báo thực tế

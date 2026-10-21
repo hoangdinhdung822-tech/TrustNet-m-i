@@ -156,9 +156,14 @@ export interface Comment {
     name: string;
     username: string;
     avatar: string;
+    rankTitle?: string;
+    school?: string;
   };
   content: string;
   createdAt: string;
+  likesCount?: number;
+  likedBy?: string[];
+  replyTo?: string;
 }
 
 export interface AppNotification {

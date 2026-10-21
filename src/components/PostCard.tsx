@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, 
   MessageSquare, 
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Post, Comment } from '../types';
 import { AiStatusBadge } from './AiStatusBadge';
+import { ShareModal } from './ShareModal';
 import { DatabaseService } from '../services/dbMock';
 import { formatFacebookTime, formatFacebookFullTime } from '../utils/timeAgo';
 
@@ -38,16 +39,28 @@ export const PostCard: React.FC<Props> = ({
 }) => {
   const [showAiDetails, setShowAiDetails] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<Comment[]>(() => DatabaseService.getComments(post.id));
   const [newCommentText, setNewCommentText] = useState('');
   const [isSaved, setIsSaved] = useState(post.isSaved || false);
-  const [showShareNotification, setShowShareNotification] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const currentUser = DatabaseService.getCurrentUser();
+
+  // Đồng bộ bình luận thời gian thực để mọi người dùng đều thấy bình luận của nhau ngay lập tức
+  useEffect(() => {
+    const handleCommentEvent = (e?: any) => {
+      if (!e?.detail?.postId || e.detail.postId === post.id) {
+        setComments(DatabaseService.getComments(post.id));
+      }
+    };
+    window.addEventListener('trustnet_comment_event', handleCommentEvent);
+    window.addEventListener('storage', handleCommentEvent);
+    return () => {
+      window.removeEventListener('trustnet_comment_event', handleCommentEvent);
+      window.removeEventListener('storage', handleCommentEvent);
+    };
+  }, [post.id]);
 
   const handleToggleComments = () => {
-    if (!showComments) {
-      const list = DatabaseService.getComments(post.id);
-      setComments(list);
-    }
     setShowComments(!showComments);
   };
 
@@ -56,38 +69,27 @@ export const PostCard: React.FC<Props> = ({
     if (!newCommentText.trim()) return;
 
     const created = DatabaseService.addComment(post.id, newCommentText.trim());
-    setComments([...comments, created]);
+    setComments(DatabaseService.getComments(post.id));
     setNewCommentText('');
+    setShowComments(true);
     if (onCommentAdded) {
       onCommentAdded(post.id);
     }
   };
 
+  const handleLikeComment = (commentId: string) => {
+    DatabaseService.toggleLikeComment(commentId);
+    setComments(DatabaseService.getComments(post.id));
+  };
+
   const handleShare = () => {
-    DatabaseService.sharePost(post.id);
-    if (onSharePost) {
-      onSharePost(post.id);
-    }
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.origin + '?post=' + post.id).catch(() => {});
-    }
-    setShowShareNotification(true);
-    setTimeout(() => setShowShareNotification(false), 3000);
+    setIsShareModalOpen(true);
   };
 
   const ai = post.aiExplanation;
 
   return (
     <article className="glass-panel glass-card-hover rounded-3xl p-5 md:p-6 text-slate-100 relative overflow-hidden transition-all">
-      
-      {/* Share Safety Confirmation Toast */}
-      {showShareNotification && (
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-lg animate-in slide-in-from-top-2">
-          <ShieldCheck className="w-4 h-4 text-cyan-300" />
-          <span>Đã chia sẻ bài viết lên bảng tin & sao chép liên kết (+5 XP)!</span>
-        </div>
-      )}
-
       {/* Post Header: Author info & AI Badge */}
       <div className="flex items-start justify-between gap-3 mb-4">
         
@@ -294,16 +296,20 @@ export const PostCard: React.FC<Props> = ({
         {/* Comment Drawer Toggle */}
         <button
           onClick={handleToggleComments}
-          className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-xl hover:text-indigo-300 hover:bg-slate-900 transition-colors"
+          className={`flex items-center gap-1.5 py-1.5 px-2.5 rounded-xl transition-colors cursor-pointer ${
+            showComments ? 'text-indigo-400 bg-indigo-500/10 font-semibold' : 'hover:text-indigo-300 hover:bg-slate-900'
+          }`}
+          title="Xem và gửi bình luận"
         >
           <MessageSquare className="w-4 h-4" />
-          <span>{post.commentsCount}</span>
+          <span>{comments.length}</span>
         </button>
 
-        {/* Share */}
+        {/* Share Button (Mở Modal Chia sẻ ra ngoài) */}
         <button
           onClick={handleShare}
-          className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-xl hover:text-cyan-300 hover:bg-slate-900 transition-colors"
+          className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-xl hover:text-cyan-300 hover:bg-slate-900 transition-colors cursor-pointer"
+          title="Chia sẻ bài viết ra mạng xã hội ngoài"
         >
           <Share2 className="w-4 h-4" />
           <span>{post.sharesCount}</span>
@@ -332,75 +338,150 @@ export const PostCard: React.FC<Props> = ({
 
       </div>
 
-      {/* Comments Section Drawer */}
-      {showComments && (
-        <div className="mt-4 pt-4 border-t border-slate-800 space-y-3 animate-in fade-in duration-200">
-          
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Bình luận & Thảo luận kiểm chứng ({comments.length})
-          </h4>
+      {/* Hiển thị tóm tắt bình luận công khai khi chưa mở rộng (để mọi người thấy được thảo luận của nhau ngay lập tức) */}
+      {!showComments && comments.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-slate-800/60 space-y-2">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setShowComments(true)}
+              className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1.5 cursor-pointer hover:underline"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Xem tất cả {comments.length} bình luận từ cộng đồng...</span>
+            </button>
+            <span className="text-[11px] text-slate-500">
+              Mới nhất: {formatFacebookTime(comments[comments.length - 1].createdAt)}
+            </span>
+          </div>
 
-          {/* Comment list */}
-          <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+          {/* Preview bình luận mới nhất của cộng đồng */}
+          {comments.slice(-1).map((latest) => (
+            <div 
+              key={latest.id} 
+              onClick={() => setShowComments(true)}
+              className="p-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 flex items-start gap-2.5 text-xs cursor-pointer hover:bg-slate-900/60 transition-colors"
+            >
+              <img
+                src={latest.author.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+                alt={latest.author.name}
+                className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-700 shrink-0 mt-0.5"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="font-bold text-indigo-300 mr-1.5">{latest.author.name}:</span>
+                <span className="text-slate-300 line-clamp-1">{latest.content}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Comments Section Drawer - Toàn bộ bình luận công khai của mọi người */}
+      {showComments && (
+        <div className="mt-4 pt-4 border-t border-slate-800 space-y-3.5 animate-in fade-in duration-200">
+          
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Bình luận & Thảo luận công khai ({comments.length})</span>
+            </h4>
+            <button
+              onClick={() => setShowComments(false)}
+              className="text-xs text-slate-400 hover:text-slate-200 cursor-pointer"
+            >
+              Thu gọn
+            </button>
+          </div>
+
+          {/* Comment list của mọi người */}
+          <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
             {comments.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-2">
+              <p className="text-xs text-slate-500 italic py-2 text-center bg-slate-950/50 rounded-2xl border border-slate-800/50">
                 Chưa có bình luận nào. Hãy là người đầu tiên trao đổi góc nhìn phản biện!
               </p>
             ) : (
-              comments.map((c) => (
-                <div key={c.id} className="flex items-start gap-2.5 text-xs animate-in fade-in duration-150">
-                  <img
-                    src={c.author.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
-                    alt={c.author.name}
-                    className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-800 shrink-0 mt-0.5"
-                  />
-                  <div className="flex-1 space-y-1">
-                    <div className="p-3 rounded-2xl bg-slate-950/90 border border-slate-800/80 space-y-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-bold text-indigo-300 hover:underline cursor-pointer">
-                          {c.author.name}
-                        </span>
-                        {c.author.username && (
-                          <span className="text-[10px] text-slate-500">@{c.author.username}</span>
-                        )}
+              comments.map((c) => {
+                const isCommentLiked = Boolean(c.likedBy && c.likedBy.includes(currentUser.id));
+                return (
+                  <div key={c.id} className="flex items-start gap-2.5 text-xs animate-in fade-in duration-150">
+                    <img
+                      src={c.author.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+                      alt={c.author.name}
+                      className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-800 shrink-0 mt-0.5"
+                    />
+                    <div className="flex-1 space-y-1">
+                      <div className="p-3 rounded-2xl bg-slate-950/90 border border-slate-800/80 space-y-1">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-indigo-300 hover:underline cursor-pointer">
+                              {c.author.name}
+                            </span>
+                            {c.author.rankTitle && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                                {c.author.rankTitle}
+                              </span>
+                            )}
+                          </div>
+                          {c.author.username && (
+                            <span className="text-[10px] text-slate-500">@{c.author.username}</span>
+                          )}
+                        </div>
+                        <p className="text-slate-200 leading-relaxed break-words">{c.content}</p>
                       </div>
-                      <p className="text-slate-200 leading-relaxed break-words">{c.content}</p>
-                    </div>
-                    <div className="flex items-center gap-3 px-2 text-[11px] text-slate-400">
-                      <span 
-                        title={formatFacebookFullTime(c.createdAt)} 
-                        className="cursor-pointer hover:underline text-slate-400 hover:text-slate-300"
-                      >
-                        {formatFacebookTime(c.createdAt)}
-                      </span>
-                      <span>•</span>
-                      <button 
-                        type="button" 
-                        onClick={() => setNewCommentText(`@${c.author.username || c.author.name} `)}
-                        className="font-semibold hover:text-indigo-300 transition-colors"
-                      >
-                        Trả lời
-                      </button>
+
+                      {/* Comment Actions: Like, Time, Reply */}
+                      <div className="flex items-center gap-3 px-2 text-[11px] text-slate-400">
+                        <span 
+                          title={formatFacebookFullTime(c.createdAt)} 
+                          className="cursor-pointer hover:underline text-slate-400 hover:text-slate-300"
+                        >
+                          {formatFacebookTime(c.createdAt)}
+                        </span>
+                        <span>•</span>
+                        <button 
+                          type="button" 
+                          onClick={() => handleLikeComment(c.id)}
+                          className={`flex items-center gap-1 font-semibold transition-colors cursor-pointer ${
+                            isCommentLiked ? 'text-rose-400' : 'hover:text-rose-300'
+                          }`}
+                        >
+                          <Heart className={`w-3 h-3 ${isCommentLiked ? 'fill-rose-400 text-rose-400' : ''}`} />
+                          <span>{c.likesCount || 0 > 0 ? c.likesCount : 'Thích'}</span>
+                        </button>
+                        <span>•</span>
+                        <button 
+                          type="button" 
+                          onClick={() => setNewCommentText(`@${c.author.username || c.author.name} `)}
+                          className="font-semibold hover:text-indigo-300 transition-colors cursor-pointer"
+                        >
+                          Trả lời
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
           {/* Add comment input */}
-          <form onSubmit={handleAddComment} className="flex items-center gap-2 pt-1">
+          <form onSubmit={handleAddComment} className="flex items-center gap-2 pt-1.5">
+            <img
+              src={currentUser.avatar}
+              alt={currentUser.name}
+              className="w-7 h-7 rounded-full object-cover ring-1 ring-slate-700 shrink-0"
+            />
             <input
               type="text"
               value={newCommentText}
               onChange={(e) => setNewCommentText(e.target.value)}
-              placeholder="Viết nhận xét hoặc cung cấp thêm nguồn xác minh..."
+              placeholder="Viết nhận xét hoặc cung cấp thêm nguồn xác minh phản biện..."
               className="flex-1 px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
             />
             <button
               type="submit"
               disabled={!newCommentText.trim()}
-              className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white transition-colors"
+              className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white transition-colors cursor-pointer"
+              title="Gửi bình luận"
             >
               <Send className="w-4 h-4" />
             </button>
@@ -408,6 +489,14 @@ export const PostCard: React.FC<Props> = ({
 
         </div>
       )}
+
+      {/* Share Modal - Cho phép chia sẻ bài đăng ra ngoài */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        post={post}
+        onShareSuccess={onSharePost}
+      />
 
     </article>
   );
