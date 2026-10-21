@@ -1,6 +1,7 @@
 import { 
-  User, Post, Comment, FactCheckRecord, Lesson, Scenario, ReportItem, SearchResultItem 
+  User, Post, Comment, FactCheckRecord, Lesson, Scenario, ReportItem, SearchResultItem, AppNotification 
 } from '../types';
+import { parseDateInput } from '../utils/timeAgo';
 import { 
   MASTER_LESSONS_CATALOG, 
   buildWeeklyLessonsSchedule, 
@@ -14,6 +15,7 @@ const STORAGE_KEYS = {
   USER: 'trustnet_current_user',
   POSTS: 'trustnet_posts',
   COMMENTS: 'trustnet_comments',
+  NOTIFICATIONS: 'trustnet_notifications',
   FACT_CHECKS: 'trustnet_fact_checks',
   LESSONS: 'trustnet_lessons',
   SCENARIOS: 'trustnet_scenarios',
@@ -151,8 +153,13 @@ export const INITIAL_ACCOUNTS: User[] = [
 // Initial Current User
 const DEFAULT_USER: User = INITIAL_ACCOUNTS[0];
 
-// Initial Posts
-const INITIAL_POSTS: Post[] = [
+// Dynamic ISO Time Generator Helpers
+const getIsoMinutesAgo = (mins: number) => new Date(Date.now() - mins * 60 * 1000).toISOString();
+const getIsoHoursAgo = (hours: number) => new Date(Date.now() - Math.round(hours * 3600 * 1000)).toISOString();
+const getIsoDaysAgo = (days: number) => new Date(Date.now() - Math.round(days * 86400 * 1000)).toISOString();
+
+// Initial Posts with 100% Real Metrics (likesCount matches likedBy.length, commentsCount matches INITIAL_COMMENTS, sharesCount matches sharedBy.length)
+export const INITIAL_POSTS: Post[] = [
   {
     id: 'post-01',
     userId: 'u-official-01',
@@ -190,12 +197,14 @@ const INITIAL_POSTS: Post[] = [
       misleadingTerms: [],
       recommendation: 'Học sinh lớp 12 nên lưu lại và truy cập trực tiếp website Bộ để tải tài liệu chính xác.'
     },
-    likesCount: 142,
-    commentsCount: 28,
-    sharesCount: 56,
-    isLiked: false,
+    likesCount: 4,
+    commentsCount: 3,
+    sharesCount: 2,
+    likedBy: ['u-dung-01', 'u-genz-01', 'u-admin-01', 'u-user-4'],
+    sharedBy: ['u-dung-01', 'u-genz-01'],
+    isLiked: true,
     isSaved: true,
-    createdAt: '2 giờ trước'
+    createdAt: getIsoHoursAgo(2)
   },
   {
     id: 'post-02',
@@ -238,12 +247,14 @@ const INITIAL_POSTS: Post[] = [
       misleadingTerms: ['chữa khỏi 100%', 'bí quyết bị giấu kín', 'chia sẻ ngay'],
       recommendation: '⚠️ Đừng vội chia sẻ! Hãy đi khám bác sĩ khi có triệu chứng sốt hoặc ho kéo dài.'
     },
-    likesCount: 19,
-    commentsCount: 45,
-    sharesCount: 4,
+    likesCount: 1,
+    commentsCount: 2,
+    sharesCount: 0,
+    likedBy: ['u-user-scam'],
+    sharedBy: [],
     isLiked: false,
     isSaved: false,
-    createdAt: '4 giờ trước'
+    createdAt: getIsoHoursAgo(4)
   },
   {
     id: 'post-03',
@@ -280,12 +291,14 @@ const INITIAL_POSTS: Post[] = [
       misleadingTerms: ['trúng thưởng', 'nhấp ngay vào link', 'nhận mã quà tặng'],
       recommendation: '🚫 KHÔNG click vào link! Báo cáo ngay cho ban quản trị để ngăn chặn phát tán.'
     },
-    likesCount: 3,
-    commentsCount: 62,
-    sharesCount: 1,
+    likesCount: 0,
+    commentsCount: 2,
+    sharesCount: 0,
+    likedBy: [],
+    sharedBy: [],
     isLiked: false,
     isSaved: false,
-    createdAt: '6 giờ trước'
+    createdAt: getIsoHoursAgo(6)
   },
   {
     id: 'post-04',
@@ -326,19 +339,21 @@ const INITIAL_POSTS: Post[] = [
       misleadingTerms: [],
       recommendation: '🟡 Theo dõi thông cáo từ các nhà sản xuất xe điện chính thức trước khi đặt cọc.'
     },
-    likesCount: 88,
-    commentsCount: 16,
-    sharesCount: 12,
+    likesCount: 3,
+    commentsCount: 2,
+    sharesCount: 1,
+    likedBy: ['u-dung-01', 'u-user-22', 'u-genz-01'],
+    sharedBy: ['u-dung-01'],
     isLiked: true,
     isSaved: false,
-    createdAt: '12 giờ trước'
+    createdAt: getIsoHoursAgo(12)
   }
 ];
 
-// Initial Comments
-const INITIAL_COMMENTS: Comment[] = [
+// Initial Comments (All matching post IDs with real ISO timestamps)
+export const INITIAL_COMMENTS: Comment[] = [
   {
-    id: 'c-1',
+    id: 'c-101',
     postId: 'post-01',
     userId: 'u-user-4',
     author: {
@@ -347,10 +362,34 @@ const INITIAL_COMMENTS: Comment[] = [
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
     },
     content: 'Cảm ơn TrustNet đã gắn nhãn Đã kiểm chứng! Nhiều trang mạng xã hội đăng tin đổi môn thi làm mình hoang mang mãi.',
-    createdAt: '1 giờ trước'
+    createdAt: getIsoHoursAgo(2)
   },
   {
-    id: 'c-2',
+    id: 'c-102',
+    postId: 'post-01',
+    userId: 'u-genz-01',
+    author: {
+      name: 'Bảo Trâm',
+      username: 'baotram_digital',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+    },
+    content: 'Mình vừa tải đề thi minh họa trên trang moet.gov.vn về rồi, cấu trúc đề thi rất sát với hướng dẫn đổi mới năm nay.',
+    createdAt: getIsoHoursAgo(1.5)
+  },
+  {
+    id: 'c-103',
+    postId: 'post-01',
+    userId: 'u-admin-01',
+    author: {
+      name: 'Quản Trị Viên TrustNet',
+      username: 'admin',
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80'
+    },
+    content: 'Đoàn trường THPT Số 1 Phan Đình Phùng cũng đã ghim thông báo này vào bảng tin học tập của các lớp 12.',
+    createdAt: getIsoMinutesAgo(35)
+  },
+  {
+    id: 'c-201',
     postId: 'post-02',
     userId: 'u-genz-01',
     author: {
@@ -359,7 +398,137 @@ const INITIAL_COMMENTS: Comment[] = [
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
     },
     content: 'Mọi người nhớ bấm xem giải thích của AI nhé. Đừng tin ba cái bài thuốc thần dược trên mạng, rất hại dạ dày.',
-    createdAt: '3 giờ trước'
+    createdAt: getIsoHoursAgo(3.5)
+  },
+  {
+    id: 'c-202',
+    postId: 'post-02',
+    userId: 'u-dung-01',
+    author: {
+      name: 'Hoàng Đình Dũng',
+      username: 'hoangdinhdung822',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80'
+    },
+    content: 'Bộ Y tế đã có văn bản cảnh báo thông tin này từ lâu. Uống chanh gừng chỉ hỗ trợ giữ ấm chứ không tiêu diệt được virus cúm.',
+    createdAt: getIsoHoursAgo(2)
+  },
+  {
+    id: 'c-301',
+    postId: 'post-03',
+    userId: 'u-genz-01',
+    author: {
+      name: 'Bảo Trâm',
+      username: 'baotram_digital',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+    },
+    content: 'Cảnh báo lừa đảo phishing! Mình đã gửi báo cáo cho Quản trị viên để gỡ bài này khỏi nền tảng.',
+    createdAt: getIsoHoursAgo(5.5)
+  },
+  {
+    id: 'c-302',
+    postId: 'post-03',
+    userId: 'u-admin-01',
+    author: {
+      name: 'Quản Trị Viên TrustNet',
+      username: 'admin',
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80'
+    },
+    content: 'Hệ thống AI đã phát hiện tên miền độc hại .xyz và gắn nhãn Cảnh báo đỏ. Đề nghị người dùng không truy cập liên kết.',
+    createdAt: getIsoHoursAgo(4.8)
+  },
+  {
+    id: 'c-401',
+    postId: 'post-04',
+    userId: 'u-dung-01',
+    author: {
+      name: 'Hoàng Đình Dũng',
+      username: 'hoangdinhdung822',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80'
+    },
+    content: 'Công nghệ này tiềm năng thật nhưng cần đợi các viện kiểm định an toàn cháy nổ trước khi áp dụng thương mại.',
+    createdAt: getIsoHoursAgo(8)
+  },
+  {
+    id: 'c-402',
+    postId: 'post-04',
+    userId: 'u-user-22',
+    author: {
+      name: 'Hoàng Minh Quân',
+      username: 'minhquan_vlog',
+      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'
+    },
+    content: 'Mình cũng đang đọc báo cáo của SAE, có vẻ chi phí sản xuất pin thể rắn vẫn cao gấp 3 lần pin lithium hiện tại.',
+    createdAt: getIsoHoursAgo(6.5)
+  }
+];
+
+// Initial Real Notifications
+export const INITIAL_NOTIFICATIONS: AppNotification[] = [
+  {
+    id: 'notif-1',
+    userId: 'u-dung-01',
+    actor: {
+      id: 'u-genz-01',
+      name: 'Bảo Trâm',
+      username: 'baotram_digital',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'
+    },
+    type: 'comment',
+    title: 'Bảo Trâm đã bình luận về bài viết quy chế thi Bộ GD&ĐT',
+    content: '"Mình vừa tải đề thi minh họa trên trang moet.gov.vn về rồi, cấu trúc đề thi rất sát..."',
+    targetPostId: 'post-01',
+    targetTab: 'feed',
+    read: false,
+    createdAt: getIsoMinutesAgo(15)
+  },
+  {
+    id: 'notif-2',
+    userId: 'u-dung-01',
+    actor: {
+      id: 'u-system',
+      name: 'Hệ Thống TrustNet AI',
+      username: 'trustnet_ai',
+      avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80'
+    },
+    type: 'fact_check',
+    title: 'AI đã kiểm chứng bài viết của bạn: Đã kiểm chứng (95/100)',
+    content: 'Nội dung trùng khớp 100% với văn bản quy phạm pháp luật của Bộ GD&ĐT. Bạn nhận +25 XP!',
+    targetPostId: 'post-01',
+    targetTab: 'feed',
+    read: false,
+    createdAt: getIsoHoursAgo(1.2)
+  },
+  {
+    id: 'notif-3',
+    userId: 'u-dung-01',
+    actor: {
+      id: 'u-admin-01',
+      name: 'Quản Trị Viên TrustNet',
+      username: 'admin',
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=250&q=80'
+    },
+    type: 'like',
+    title: 'Quản Trị Viên đã thích bài viết kiểm chứng của bạn',
+    targetPostId: 'post-01',
+    targetTab: 'feed',
+    read: true,
+    createdAt: getIsoHoursAgo(3)
+  },
+  {
+    id: 'notif-4',
+    userId: 'u-dung-01',
+    actor: {
+      id: 'u-system',
+      name: 'Trường THPT Số 1 Phan Đình Phùng',
+      username: 'thpt_phandinhphung',
+      avatar: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=200&q=80'
+    },
+    type: 'reward',
+    title: 'Bạn nhận được huy hiệu Đại sứ THPT Số 1 Phan Đình Phùng!',
+    content: 'Ghi nhận đóng góp tích cực trong việc lan tỏa văn hóa kiểm chứng an toàn mạng.',
+    targetTab: 'school',
+    read: true,
+    createdAt: getIsoDaysAgo(1)
   }
 ];
 
@@ -367,10 +536,8 @@ const INITIAL_COMMENTS: Comment[] = [
 // Danh mục bài học an toàn số (15 tuần và tự động mở rộng theo chu kỳ hàng tuần)
 const INITIAL_LESSONS: Lesson[] = MASTER_LESSONS_CATALOG;
 
-
 // Danh mục 12 kịch bản an toàn số tương tác cao
 const INITIAL_SCENARIOS: Scenario[] = MASTER_SCENARIOS_CATALOG;
-
 
 // Cơ sở dữ liệu tra cứu chính thống kết nối chinhphu.vn, tuoitre.vn, moh.gov.vn
 const INITIAL_SEARCH_RESULTS: SearchResultItem[] = MASTER_SEARCH_CATALOG;
@@ -386,7 +553,7 @@ const INITIAL_REPORTS: ReportItem[] = [
     postAuthor: 'Tri Ân Khách Hàng Online',
     reason: 'Đường link lừa đảo mạo danh ngân hàng và Shopee, có dấu hiệu đánh cắp OTP.',
     status: 'pending',
-    createdAt: '30 phút trước'
+    createdAt: getIsoMinutesAgo(30)
   },
   {
     id: 'rep-02',
@@ -397,7 +564,7 @@ const INITIAL_REPORTS: ReportItem[] = [
     postAuthor: 'Hoàng Minh Quân',
     reason: 'Thông tin y tế sai lệch gây nguy hiểm cho người già và trẻ nhỏ.',
     status: 'pending',
-    createdAt: '1 giờ trước'
+    createdAt: getIsoHoursAgo(1)
   }
 ];
 
@@ -843,14 +1010,90 @@ export class DatabaseService {
     return user;
   }
 
-  // Lấy Posts
+  // Lấy Posts với số liệu thực tế (likes, comments, shares, ISO timestamps)
   public static getPosts(): Post[] {
+    const currentUser = this.getCurrentUser();
     const raw = localStorage.getItem(STORAGE_KEYS.POSTS);
+    
+    // Migration v4: Nâng cấp số liệu thực tế và chuẩn hóa ISO timestamp
+    const migrationFlag = localStorage.getItem('trustnet_metrics_v4_real');
+    if (!migrationFlag) {
+      localStorage.setItem('trustnet_metrics_v4_real', 'true');
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(INITIAL_POSTS));
+      localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(INITIAL_COMMENTS));
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
+      return INITIAL_POSTS.map(p => ({
+        ...p,
+        isLiked: Boolean(p.likedBy && p.likedBy.includes(currentUser.id))
+      }));
+    }
+
     if (!raw) {
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(INITIAL_POSTS));
+      return INITIAL_POSTS.map(p => ({
+        ...p,
+        isLiked: Boolean(p.likedBy && p.likedBy.includes(currentUser.id))
+      }));
+    }
+
+    try {
+      const posts: Post[] = JSON.parse(raw);
+      const comments = this.getRawComments();
+      let changed = false;
+
+      const processed = posts.map(p => {
+        // Chuẩn hóa likedBy và likesCount
+        const likedBy = Array.isArray(p.likedBy) ? p.likedBy : (p.isLiked ? [currentUser.id] : []);
+        const likesCount = likedBy.length;
+        
+        // Chuẩn hóa sharedBy và sharesCount
+        const sharedBy = Array.isArray(p.sharedBy) ? p.sharedBy : [];
+        const sharesCount = sharedBy.length;
+
+        // Chuẩn hóa commentsCount theo số bình luận thực tế trong database
+        const realCommentsCount = comments.filter(c => c.postId === p.id).length;
+
+        // Chuẩn hóa createdAt sang ISO nếu đang là chuỗi legacy như '2 giờ trước'
+        let createdAtIso = p.createdAt;
+        if (!p.createdAt || p.createdAt.includes('trước') || p.createdAt.includes('Vừa xong')) {
+          createdAtIso = parseDateInput(p.createdAt).toISOString();
+          changed = true;
+        }
+
+        const isLiked = likedBy.includes(currentUser.id);
+
+        if (
+          p.likesCount !== likesCount ||
+          p.commentsCount !== realCommentsCount ||
+          p.sharesCount !== sharesCount ||
+          p.isLiked !== isLiked ||
+          p.createdAt !== createdAtIso ||
+          !p.likedBy ||
+          !p.sharedBy
+        ) {
+          changed = true;
+          return {
+            ...p,
+            likedBy,
+            likesCount,
+            sharedBy,
+            sharesCount,
+            commentsCount: realCommentsCount,
+            isLiked,
+            createdAt: createdAtIso
+          };
+        }
+        return p;
+      });
+
+      if (changed) {
+        localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(processed));
+      }
+      return processed;
+    } catch {
       localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(INITIAL_POSTS));
       return INITIAL_POSTS;
     }
-    return JSON.parse(raw);
   }
 
   // Thêm Post mới
@@ -923,36 +1166,161 @@ export class DatabaseService {
     return { success: true, accounts: updated };
   }
 
-  // Toggle Like Post
+  // Toggle Like Post (Thực tế: Quản lý danh sách likedBy, likesCount = likedBy.length)
   public static toggleLike(postId: string): Post[] {
+    const user = this.getCurrentUser();
     const posts = this.getPosts();
+    let authorToNotify: { userId: string; postTitle: string } | null = null;
+    let isNowLiked = false;
+
     const updated = posts.map(p => {
       if (p.id === postId) {
-        const isLiked = !p.isLiked;
+        const likedBy = Array.isArray(p.likedBy) ? [...p.likedBy] : [];
+        const userIndex = likedBy.indexOf(user.id);
+
+        if (userIndex >= 0) {
+          // Bỏ like
+          likedBy.splice(userIndex, 1);
+          isNowLiked = false;
+        } else {
+          // Thêm like
+          likedBy.push(user.id);
+          isNowLiked = true;
+          if (p.userId !== user.id) {
+            authorToNotify = {
+              userId: p.userId,
+              postTitle: p.content.slice(0, 45) + (p.content.length > 45 ? '...' : '')
+            };
+          }
+        }
+
         return {
           ...p,
-          isLiked,
-          likesCount: isLiked ? p.likesCount + 1 : p.likesCount - 1
+          likedBy,
+          likesCount: likedBy.length,
+          isLiked: isNowLiked
         };
       }
       return p;
     });
+
     localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
+
+    // Tạo thông báo thực tế nếu vừa like bài người khác
+    if (authorToNotify && isNowLiked) {
+      this.addNotification({
+        userId: (authorToNotify as any).userId,
+        actor: {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          avatar: user.avatar
+        },
+        type: 'like',
+        title: `${user.name} đã thích bài viết của bạn`,
+        content: `"${(authorToNotify as any).postTitle}"`,
+        targetPostId: postId,
+        targetTab: 'feed'
+      });
+    }
+
     return updated;
+  }
+
+  // Chia sẻ bài viết (Thực tế: quản lý sharedBy, sharesCount = sharedBy.length)
+  public static sharePost(postId: string): Post[] {
+    const user = this.getCurrentUser();
+    const posts = this.getPosts();
+    let authorToNotify: { userId: string; snippet: string } | null = null;
+
+    const updated = posts.map(p => {
+      if (p.id === postId) {
+        const sharedBy = Array.isArray(p.sharedBy) ? [...p.sharedBy] : [];
+        if (!sharedBy.includes(user.id)) {
+          sharedBy.push(user.id);
+        }
+        if (p.userId !== user.id) {
+          authorToNotify = {
+            userId: p.userId,
+            snippet: p.content.slice(0, 45) + (p.content.length > 45 ? '...' : '')
+          };
+        }
+        return {
+          ...p,
+          sharedBy,
+          sharesCount: sharedBy.length
+        };
+      }
+      return p;
+    });
+
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updated));
+
+    // Thưởng 5 XP cho hành động lan tỏa thông tin kiểm chứng
+    this.addPoints(5, 'Lan tỏa thông tin kiểm chứng an toàn');
+
+    // Tạo thông báo thực tế cho tác giả
+    if (authorToNotify) {
+      this.addNotification({
+        userId: (authorToNotify as any).userId,
+        actor: {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          avatar: user.avatar
+        },
+        type: 'share',
+        title: `${user.name} đã chia sẻ bài viết của bạn`,
+        content: `"${(authorToNotify as any).snippet}"`,
+        targetPostId: postId,
+        targetTab: 'feed'
+      });
+    }
+
+    return updated;
+  }
+
+  // Lấy toàn bộ bình luận từ database
+  public static getRawComments(): Comment[] {
+    const raw = localStorage.getItem(STORAGE_KEYS.COMMENTS);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(INITIAL_COMMENTS));
+      return INITIAL_COMMENTS;
+    }
+    try {
+      const parsed: Comment[] = JSON.parse(raw);
+      let changed = false;
+      const normalized = parsed.map(c => {
+        if (!c.createdAt || c.createdAt.includes('trước') || c.createdAt.includes('Vừa xong')) {
+          changed = true;
+          return {
+            ...c,
+            createdAt: parseDateInput(c.createdAt).toISOString()
+          };
+        }
+        return c;
+      });
+      if (changed) {
+        localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(normalized));
+      }
+      return normalized;
+    } catch {
+      localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(INITIAL_COMMENTS));
+      return INITIAL_COMMENTS;
+    }
   }
 
   // Lấy bình luận của post
   public static getComments(postId: string): Comment[] {
-    const raw = localStorage.getItem(STORAGE_KEYS.COMMENTS);
-    const all: Comment[] = raw ? JSON.parse(raw) : INITIAL_COMMENTS;
-    return all.filter(c => c.postId === postId);
+    return this.getRawComments().filter(c => c.postId === postId);
   }
 
-  // Thêm bình luận
+  // Thêm bình luận thực tế
   public static addComment(postId: string, content: string): Comment {
     const user = this.getCurrentUser();
-    const raw = localStorage.getItem(STORAGE_KEYS.COMMENTS);
-    const all: Comment[] = raw ? JSON.parse(raw) : INITIAL_COMMENTS;
+    const all = this.getRawComments();
+    const nowIso = new Date().toISOString();
+
     const newComment: Comment = {
       id: 'c-' + Date.now(),
       postId,
@@ -963,17 +1331,137 @@ export class DatabaseService {
         avatar: user.avatar
       },
       content,
-      createdAt: 'Vừa xong'
+      createdAt: nowIso
     };
     all.push(newComment);
     localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(all));
 
-    // Update commentsCount trên post
+    // Update commentsCount trên post theo số lượng bình luận thực
     const posts = this.getPosts();
-    const updatedPosts = posts.map(p => p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p);
+    let authorToNotify: { userId: string } | null = null;
+    const postCommentsCount = all.filter(c => c.postId === postId).length;
+
+    const updatedPosts = posts.map(p => {
+      if (p.id === postId) {
+        if (p.userId !== user.id) {
+          authorToNotify = { userId: p.userId };
+        }
+        return {
+          ...p,
+          commentsCount: postCommentsCount
+        };
+      }
+      return p;
+    });
     localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(updatedPosts));
 
+    // Thưởng điểm tương tác phản biện
+    this.addPoints(5, 'Tham gia bình luận & thảo luận kiểm chứng');
+
+    // Tạo thông báo thực tế gửi đến tác giả bài viết
+    if (authorToNotify) {
+      this.addNotification({
+        userId: (authorToNotify as any).userId,
+        actor: {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          avatar: user.avatar
+        },
+        type: 'comment',
+        title: `${user.name} đã bình luận về bài viết của bạn`,
+        content: content.length > 60 ? `"${content.slice(0, 57)}..."` : `"${content}"`,
+        targetPostId: postId,
+        targetTab: 'feed'
+      });
+    }
+
     return newComment;
+  }
+
+  // Lấy danh sách thông báo thực tế
+  public static getNotifications(userId?: string): AppNotification[] {
+    const raw = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    const targetUserId = userId || this.getCurrentUser().id;
+
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
+      return INITIAL_NOTIFICATIONS.filter(n => n.userId === targetUserId || n.userId === 'all');
+    }
+
+    try {
+      const all: AppNotification[] = JSON.parse(raw);
+      const filtered = all.filter(n => n.userId === targetUserId || n.userId === 'all');
+      return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } catch {
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
+      return INITIAL_NOTIFICATIONS.filter(n => n.userId === targetUserId || n.userId === 'all');
+    }
+  }
+
+  // Thêm thông báo mới vào hệ thống
+  public static addNotification(data: Omit<AppNotification, 'id' | 'createdAt' | 'read'>): AppNotification {
+    const raw = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    const all: AppNotification[] = raw ? JSON.parse(raw) : [...INITIAL_NOTIFICATIONS];
+
+    const newNotif: AppNotification = {
+      ...data,
+      id: 'notif-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      read: false,
+      createdAt: new Date().toISOString()
+    };
+
+    all.unshift(newNotif);
+    localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(all));
+
+    // Bắn event để Navbar hoặc các component lắng nghe cập nhật realtime
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('trustnet_notification_event', { detail: newNotif }));
+    }
+
+    return newNotif;
+  }
+
+  // Đánh dấu thông báo đã đọc
+  public static markNotificationAsRead(notifId: string): AppNotification[] {
+    const raw = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    if (!raw) return [];
+    try {
+      const all: AppNotification[] = JSON.parse(raw);
+      const updated = all.map(n => n.id === notifId ? { ...n, read: true } : n);
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(updated));
+      
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('trustnet_notification_event'));
+      }
+      return this.getNotifications();
+    } catch {
+      return [];
+    }
+  }
+
+  // Đánh dấu tất cả thông báo đã đọc
+  public static markAllNotificationsAsRead(userId?: string): AppNotification[] {
+    const targetUserId = userId || this.getCurrentUser().id;
+    const raw = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    if (!raw) return [];
+    try {
+      const all: AppNotification[] = JSON.parse(raw);
+      const updated = all.map(n => {
+        if (n.userId === targetUserId || n.userId === 'all') {
+          return { ...n, read: true };
+        }
+        return n;
+      });
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(updated));
+      
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('trustnet_notification_event'));
+      }
+      return this.getNotifications(targetUserId);
+    } catch {
+      return [];
+    }
   }
 
   // Lấy danh sách Scenarios (Tự động nâng cấp danh mục 12+ kịch bản đa tương tác)
@@ -1018,6 +1506,21 @@ export class DatabaseService {
       const user = this.getCurrentUser();
       user.scenariosCompletedCount += 1;
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+
+      // Tạo thông báo thực tế chúc mừng hoàn thành tình huống
+      this.addNotification({
+        userId: user.id,
+        actor: {
+          id: 'u-system',
+          name: 'Phòng Huấn Luyện Kỹ Năng Số',
+          username: 'trustnet_academy',
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80'
+        },
+        type: 'reward',
+        title: `Hoàn thành tình huống: ${target.title} (+${target.pointsReward} XP)`,
+        content: `Bạn đã xuất sắc phân tích và đưa ra quyết định an toàn chính xác.`,
+        targetTab: 'scenarios'
+      });
     }
     return updated;
   }

@@ -1,6 +1,23 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Sparkles, Bell, Sun, Moon, Search, Award, CheckCircle, LogOut, ShieldAlert } from 'lucide-react';
-import { User } from '../types';
+import React, { useState, useEffect } from 'react';
+import { 
+  ShieldCheck, 
+  Sparkles, 
+  Bell, 
+  Sun, 
+  Moon, 
+  Search, 
+  Award, 
+  CheckCircle, 
+  LogOut, 
+  ShieldAlert,
+  Heart,
+  MessageSquare,
+  Share2,
+  Check
+} from 'lucide-react';
+import { User, AppNotification } from '../types';
+import { DatabaseService } from '../services/dbMock';
+import { formatFacebookTime, formatFacebookFullTime } from '../utils/timeAgo';
 
 interface Props {
   user: User;
@@ -23,12 +40,47 @@ export const Navbar: React.FC<Props> = ({
   onLogout,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => 
+    DatabaseService.getNotifications(user.id)
+  );
+  const [notifFilter, setNotifFilter] = useState<'all' | 'unread'>('all');
 
-  const notifications = [
-    { id: 1, title: 'AI đã kiểm chứng bài viết của bạn', time: '10 phút trước', read: false },
-    { id: 2, title: '🔥 Thử thách hôm nay: Tình huống Tin nóng khẩn cấp (+50 XP)', time: '1 giờ trước', read: false },
-    { id: 3, title: 'Bạn nhận được huy hiệu Fact Checker!', time: '1 ngày trước', read: true },
-  ];
+  // Lắng nghe cập nhật thông báo realtime khi có like, comment, share, fact-check
+  useEffect(() => {
+    const refresh = () => {
+      setNotifications(DatabaseService.getNotifications(user.id));
+    };
+    refresh();
+    window.addEventListener('trustnet_notification_event', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('trustnet_notification_event', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, [user.id]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleMarkAllAsRead = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = DatabaseService.markAllNotificationsAsRead(user.id);
+    setNotifications(updated);
+  };
+
+  const handleNotificationClick = (notif: AppNotification) => {
+    DatabaseService.markNotificationAsRead(notif.id);
+    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+    setShowNotifications(false);
+    if (notif.targetTab) {
+      setActiveTab(notif.targetTab);
+    } else {
+      setActiveTab('feed');
+    }
+  };
+
+  const filteredNotifications = notifFilter === 'unread' 
+    ? notifications.filter(n => !n.read) 
+    : notifications;
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 dark:bg-slate-950/80 border-b border-slate-800/80 transition-colors">
@@ -135,37 +187,135 @@ export const Navbar: React.FC<Props> = ({
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-2 rounded-xl text-slate-400 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-colors"
+              title="Thông báo hệ thống"
             >
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+              {unreadCount > 0 ? (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center font-mono shadow-md animate-in zoom-in">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              ) : (
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-500/50 rounded-full" />
+              )}
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                    Thông báo mới
-                  </span>
-                  <span className="text-[11px] text-indigo-400 cursor-pointer hover:underline">
-                    Đánh dấu đã đọc
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {notifications.map((n) => (
-                    <div 
-                      key={n.id} 
-                      className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer ${
-                        n.read ? 'bg-slate-950/40 text-slate-400' : 'bg-indigo-950/30 text-slate-200 border border-indigo-500/20'
-                      }`}
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">
+                      Thông báo
+                    </span>
+                    {unreadCount > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold font-mono">
+                        {unreadCount} mới
+                      </span>
+                    )}
+                  </div>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={handleMarkAllAsRead}
+                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer hover:underline"
                     >
-                      <div className="font-semibold flex items-center justify-between">
-                        <span>{n.title}</span>
-                        {!n.read && <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />}
-                      </div>
-                      <span className="text-[10px] text-slate-500 mt-1 block">{n.time}</span>
-                    </div>
-                  ))}
+                      Đánh dấu tất cả đã đọc
+                    </button>
+                  )}
                 </div>
+
+                {/* Filter Pills */}
+                <div className="flex items-center gap-1.5 pb-2 mb-2 border-b border-slate-800/60">
+                  <button
+                    onClick={() => setNotifFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                      notifFilter === 'all'
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    }`}
+                  >
+                    Tất cả ({notifications.length})
+                  </button>
+                  <button
+                    onClick={() => setNotifFilter('unread')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                      notifFilter === 'unread'
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    }`}
+                  >
+                    Chưa đọc ({unreadCount})
+                  </button>
+                </div>
+
+                {/* Notifications list */}
+                <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
+                  {filteredNotifications.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-slate-500">
+                      {notifFilter === 'unread' ? 'Không có thông báo chưa đọc nào.' : 'Chưa có thông báo nào.'}
+                    </div>
+                  ) : (
+                    filteredNotifications.map((n) => (
+                      <div 
+                        key={n.id} 
+                        onClick={() => handleNotificationClick(n)}
+                        className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer flex items-start gap-2.5 ${
+                          n.read 
+                            ? 'bg-slate-950/40 hover:bg-slate-800/50 text-slate-400' 
+                            : 'bg-indigo-950/30 hover:bg-indigo-950/50 text-slate-200 border border-indigo-500/20'
+                        }`}
+                      >
+                        {/* Actor Avatar with Icon Overlay */}
+                        <div className="relative shrink-0 mt-0.5">
+                          <img
+                            src={n.actor?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+                            alt={n.actor?.name || 'User'}
+                            className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-800"
+                          />
+                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+                            n.type === 'like' ? 'bg-rose-500 text-white' :
+                            n.type === 'comment' ? 'bg-indigo-500 text-white' :
+                            n.type === 'share' ? 'bg-cyan-500 text-slate-950' :
+                            n.type === 'fact_check' ? 'bg-emerald-500 text-white' :
+                            n.type === 'reward' ? 'bg-amber-500 text-slate-950' :
+                            'bg-slate-700 text-white'
+                          }`}>
+                            {n.type === 'like' && <Heart className="w-2.5 h-2.5 fill-current" />}
+                            {n.type === 'comment' && <MessageSquare className="w-2.5 h-2.5 fill-current" />}
+                            {n.type === 'share' && <Share2 className="w-2.5 h-2.5" />}
+                            {n.type === 'fact_check' && <Sparkles className="w-2.5 h-2.5" />}
+                            {n.type === 'reward' && <Award className="w-2.5 h-2.5" />}
+                            {n.type === 'system' && <ShieldCheck className="w-2.5 h-2.5" />}
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold flex items-start justify-between gap-1 leading-snug">
+                            <span className={n.read ? 'text-slate-300' : 'text-white'}>
+                              {n.title}
+                            </span>
+                            {!n.read && (
+                              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0 mt-1" />
+                            )}
+                          </div>
+                          {n.content && (
+                            <p className="text-[11px] text-slate-400 line-clamp-2 mt-0.5 leading-relaxed">
+                              {n.content}
+                            </p>
+                          )}
+                          <span 
+                            title={formatFacebookFullTime(n.createdAt)}
+                            className="text-[10px] text-slate-500 mt-1 block"
+                          >
+                            {formatFacebookTime(n.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
               </div>
             )}
           </div>

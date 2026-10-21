@@ -24,6 +24,7 @@ import {
 import { DatabaseService } from '../services/dbMock';
 import { Post, ReportItem, User } from '../types';
 import { AiStatusBadge } from '../components/AiStatusBadge';
+import { formatFacebookTime, formatFacebookFullTime } from '../utils/timeAgo';
 
 export const AdminDashboard: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>(() => DatabaseService.getPosts());
@@ -356,8 +357,11 @@ export const AdminDashboard: React.FC = () => {
                             🔗 {post.sourceUrl}
                           </span>
                         )}
-                        <span className="text-[10px] text-slate-500 block mt-0.5">
-                          {post.createdAt} • ❤️ {post.likesCount}
+                        <span 
+                          title={formatFacebookFullTime(post.createdAt)} 
+                          className="text-[10px] text-slate-500 block mt-0.5 cursor-pointer hover:underline"
+                        >
+                          {formatFacebookTime(post.createdAt)} • ❤️ {post.likesCount}
                         </span>
                       </td>
 
@@ -460,7 +464,12 @@ export const AdminDashboard: React.FC = () => {
                       <Flag className="w-3.5 h-3.5" /> Người gửi báo cáo: {r.reporterName}
                     </span>
                     <span className="text-slate-500">•</span>
-                    <span className="text-slate-400">{r.createdAt}</span>
+                    <span 
+                      title={formatFacebookFullTime(r.createdAt)} 
+                      className="text-slate-400 cursor-pointer hover:underline"
+                    >
+                      {formatFacebookTime(r.createdAt)}
+                    </span>
                   </div>
 
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${

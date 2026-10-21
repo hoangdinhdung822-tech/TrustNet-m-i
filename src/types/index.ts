@@ -139,6 +139,8 @@ export interface Post {
   likesCount: number;
   commentsCount: number;
   sharesCount: number;
+  likedBy?: string[];
+  sharedBy?: string[];
   isLiked?: boolean;
   isSaved?: boolean;
   isReported?: boolean;
@@ -158,6 +160,26 @@ export interface Comment {
   content: string;
   createdAt: string;
 }
+
+export interface AppNotification {
+  id: string;
+  userId: string; // Người nhận thông báo
+  actor: {
+    id: string;
+    name: string;
+    avatar: string;
+    username: string;
+  };
+  type: 'like' | 'comment' | 'share' | 'fact_check' | 'reward' | 'system';
+  title: string;
+  content?: string;
+  targetPostId?: string;
+  targetTab?: string;
+  targetUrl?: string;
+  read: boolean;
+  createdAt: string; // ISO string
+}
+
 
 export interface FactCheckRecord {
   id: string;

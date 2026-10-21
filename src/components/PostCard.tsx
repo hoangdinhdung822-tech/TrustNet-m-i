@@ -19,14 +19,23 @@ import {
 import { Post, Comment } from '../types';
 import { AiStatusBadge } from './AiStatusBadge';
 import { DatabaseService } from '../services/dbMock';
+import { formatFacebookTime, formatFacebookFullTime } from '../utils/timeAgo';
 
 interface Props {
   post: Post;
   onLikeToggle: (postId: string) => void;
   onReportClick: (post: Post) => void;
+  onSharePost?: (postId: string) => void;
+  onCommentAdded?: (postId: string) => void;
 }
 
-export const PostCard: React.FC<Props> = ({ post, onLikeToggle, onReportClick }) => {
+export const PostCard: React.FC<Props> = ({ 
+  post, 
+  onLikeToggle, 
+  onReportClick,
+  onSharePost,
+  onCommentAdded 
+}) => {
   const [showAiDetails, setShowAiDetails] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -49,11 +58,21 @@ export const PostCard: React.FC<Props> = ({ post, onLikeToggle, onReportClick })
     const created = DatabaseService.addComment(post.id, newCommentText.trim());
     setComments([...comments, created]);
     setNewCommentText('');
+    if (onCommentAdded) {
+      onCommentAdded(post.id);
+    }
   };
 
   const handleShare = () => {
+    DatabaseService.sharePost(post.id);
+    if (onSharePost) {
+      onSharePost(post.id);
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.origin + '?post=' + post.id).catch(() => {});
+    }
     setShowShareNotification(true);
-    setTimeout(() => setShowShareNotification(false), 2500);
+    setTimeout(() => setShowShareNotification(false), 3000);
   };
 
   const ai = post.aiExplanation;
@@ -65,7 +84,7 @@ export const PostCard: React.FC<Props> = ({ post, onLikeToggle, onReportClick })
       {showShareNotification && (
         <div className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-lg animate-in slide-in-from-top-2">
           <ShieldCheck className="w-4 h-4 text-cyan-300" />
-          <span>Đã sao chép link kèm Cam kết Kiểm chứng!</span>
+          <span>Đã chia sẻ bài viết lên bảng tin & sao chép liên kết (+5 XP)!</span>
         </div>
       )}
 
@@ -93,7 +112,12 @@ export const PostCard: React.FC<Props> = ({ post, onLikeToggle, onReportClick })
             <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
               <span>@{post.author.username}</span>
               <span>•</span>
-              <span>{post.createdAt}</span>
+              <span 
+                title={formatFacebookFullTime(post.createdAt)} 
+                className="hover:underline cursor-pointer hover:text-slate-200 transition-colors"
+              >
+                {formatFacebookTime(post.createdAt)}
+              </span>
             </div>
           </div>
         </div>
@@ -317,19 +341,48 @@ export const PostCard: React.FC<Props> = ({ post, onLikeToggle, onReportClick })
           </h4>
 
           {/* Comment list */}
-          <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
             {comments.length === 0 ? (
               <p className="text-xs text-slate-500 italic py-2">
                 Chưa có bình luận nào. Hãy là người đầu tiên trao đổi góc nhìn phản biện!
               </p>
             ) : (
               comments.map((c) => (
-                <div key={c.id} className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-indigo-300">{c.author.name}</span>
-                    <span className="text-[10px] text-slate-500">{c.createdAt}</span>
+                <div key={c.id} className="flex items-start gap-2.5 text-xs animate-in fade-in duration-150">
+                  <img
+                    src={c.author.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+                    alt={c.author.name}
+                    className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-800 shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 space-y-1">
+                    <div className="p-3 rounded-2xl bg-slate-950/90 border border-slate-800/80 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-indigo-300 hover:underline cursor-pointer">
+                          {c.author.name}
+                        </span>
+                        {c.author.username && (
+                          <span className="text-[10px] text-slate-500">@{c.author.username}</span>
+                        )}
+                      </div>
+                      <p className="text-slate-200 leading-relaxed break-words">{c.content}</p>
+                    </div>
+                    <div className="flex items-center gap-3 px-2 text-[11px] text-slate-400">
+                      <span 
+                        title={formatFacebookFullTime(c.createdAt)} 
+                        className="cursor-pointer hover:underline text-slate-400 hover:text-slate-300"
+                      >
+                        {formatFacebookTime(c.createdAt)}
+                      </span>
+                      <span>•</span>
+                      <button 
+                        type="button" 
+                        onClick={() => setNewCommentText(`@${c.author.username || c.author.name} `)}
+                        className="font-semibold hover:text-indigo-300 transition-colors"
+                      >
+                        Trả lời
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-slate-200">{c.content}</p>
                 </div>
               ))
             )}

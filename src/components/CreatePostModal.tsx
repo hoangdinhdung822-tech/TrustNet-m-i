@@ -61,6 +61,8 @@ export const CreatePostModal: React.FC<Props> = ({
   const handlePublish = () => {
     if (!content.trim() || !aiResult) return;
 
+    const nowIso = new Date().toISOString();
+
     const newPost: Post = {
       id: 'post-' + Date.now(),
       userId: currentUser.id,
@@ -81,12 +83,31 @@ export const CreatePostModal: React.FC<Props> = ({
       likesCount: 0,
       commentsCount: 0,
       sharesCount: 0,
+      likedBy: [],
+      sharedBy: [],
       isLiked: false,
       isSaved: false,
-      createdAt: 'Vừa xong'
+      createdAt: nowIso
     };
 
     DatabaseService.createPost(newPost);
+    
+    // Tạo thông báo thực tế từ AI kiểm chứng và nhận thưởng XP
+    DatabaseService.addNotification({
+      userId: currentUser.id,
+      actor: {
+        id: 'u-system',
+        name: 'Hệ Thống TrustNet AI',
+        username: 'trustnet_ai',
+        avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80'
+      },
+      type: 'fact_check',
+      title: `AI đã kiểm chứng bài viết của bạn: ${aiResult.status === 'verified' ? 'Đã kiểm chứng' : aiResult.status === 'suspicious' ? 'Đáng ngờ' : aiResult.status === 'debunked' ? 'Cảnh báo tin giả' : 'Chờ xác minh'} (${aiResult.score}/100)`,
+      content: `${aiResult.summary} (Đã cộng +25 XP vào tài khoản)`,
+      targetPostId: newPost.id,
+      targetTab: 'feed'
+    });
+
     onPostCreated(newPost);
     
     // Reset form

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   PlusCircle, 
   Sparkles, 
@@ -7,10 +7,10 @@ import {
   Target, 
   Gamepad2, 
   Award, 
-  Filter,
-  ShieldCheck,
-  TrendingUp,
-  AlertTriangle
+  Filter, 
+  ShieldCheck, 
+  TrendingUp, 
+  AlertTriangle 
 } from 'lucide-react';
 import { Post, User, Scenario } from '../types';
 import { PostCard } from '../components/PostCard';
@@ -30,6 +30,15 @@ export const HomeFeed: React.FC<Props> = ({ user, onUserUpdate, setActiveTab }) 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [reportingPost, setReportingPost] = useState<Post | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [, setTick] = useState(0);
+
+  // Tự động làm mới thời gian tương đối ("Vừa xong", "1 phút trước", ...) mỗi 30s như Facebook
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTick(t => t + 1);
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Featured Daily Scenario (Tình huống hôm nay)
   const todayScenario = scenarios.find(s => !s.isCompleted) || scenarios[0];
@@ -37,6 +46,18 @@ export const HomeFeed: React.FC<Props> = ({ user, onUserUpdate, setActiveTab }) 
   const handleLikeToggle = (postId: string) => {
     const updated = DatabaseService.toggleLike(postId);
     setPosts(updated);
+  };
+
+  const handleSharePost = (postId: string) => {
+    const updated = DatabaseService.getPosts();
+    setPosts(updated);
+    onUserUpdate(DatabaseService.getCurrentUser());
+  };
+
+  const handleCommentAdded = (postId: string) => {
+    const updated = DatabaseService.getPosts();
+    setPosts(updated);
+    onUserUpdate(DatabaseService.getCurrentUser());
   };
 
   const handlePostCreated = (newPost: Post) => {
@@ -215,6 +236,8 @@ export const HomeFeed: React.FC<Props> = ({ user, onUserUpdate, setActiveTab }) 
             post={post}
             onLikeToggle={handleLikeToggle}
             onReportClick={(p) => setReportingPost(p)}
+            onSharePost={handleSharePost}
+            onCommentAdded={handleCommentAdded}
           />
         ))}
       </div>
