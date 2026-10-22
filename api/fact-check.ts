@@ -555,20 +555,21 @@ Bước 1: Bóc tách Luận điểm (Claim Extraction)
 - Xác định: mainClaim, subClaims, subject, actionOrEvent, time, location, numbersOrMetrics, isVerifiable.
 
 Bước 2: Tìm kiếm Bằng chứng qua Google Search Grounding
-- Sử dụng Google Search với các từ khóa bám sát thực thể và tuyên bố.
-- Đối chiếu với các cổng thông tin Nhà nước (.gov.vn), tổ chức quốc tế (WHO, UNESCO), báo chí chính thống uy tín.
+- TỪ KHÓA TÌM KIẾM (BẮT BUỘC): Bóc tách thành các cụm từ khóa thực thể ngắn gọn, tập trung (Entity Keywords) như: tên đơn vị/trường học, địa danh, hành động cốt lõi (Ví dụ: "Trường Mầm non Quốc tế Đắk Lắk quỹ phụ huynh", "Trường Mầm non Quốc tế Đắk Lắk 700.000"). Tuyệt đối KHÔNG tìm kiếm cả câu văn dài chứa từ nối hoặc từ cảm xúc như "bị phản ánh về lùm xùm liên quan đến".
+- Quét qua các báo chí chính thống uy tín (Tiền Phong, Dân Trí, Tuổi Trẻ, VnExpress, Thanh Niên, VTV, Người Lao Động...) và cổng thông tin cơ quan ban ngành (.gov.vn).
 
 Bước 3: Đánh giá Nguồn tin (Source Evaluation)
-- Mỗi nguồn tìm thấy phải có: title, url, publisher, domain, sourceType, supportsClaim, contradictsClaim, relevance, reliability, summary.
+- BẮT BUỘC: Nếu Google Search tìm thấy các bài báo về sự việc (kể cả bài báo mới xuất bản vài giờ trước như Tiền Phong, Dân Trí...), BẮT BUỘC phải đưa các bài báo đó vào mảng "sources" với URL thực tế, tiêu đề, nhà xuất bản và tóm tắt, TUYỆT ĐỐI KHÔNG bỏ trống danh sách nguồn.
+- Mỗi nguồn gồm: title, url, publisher, domain, sourceType, supportsClaim, contradictsClaim, relevance, reliability, summary.
 
 Bước 4: Phân loại Kết luận (CHỈ 4 VERDICTS)
-- "TRUE": Có bằng chứng đáng tin cậy hỗ trợ claim.
+- "TRUE": Có bằng chứng đáng tin cậy hỗ trợ claim. (Lưu ý: Nếu tuyên bố nói "Có bài báo phản ánh về sự việc X" và thực tế các báo lớn đã đồng loạt đưa tin phản ánh sự việc đó, thì việc phản ánh là CÓ THẬT).
 - "FALSE": Có bằng chứng đáng tin cậy mâu thuẫn/bác bỏ claim.
-- "MISLEADING": Claim có một phần đúng nhưng cách diễn đạt gây hiểu sai, sai lệch bối cảnh hoặc thiếu ngữ cảnh quan trọng.
-- "INSUFFICIENT_EVIDENCE": Không có đủ bằng chứng đáng tin cậy để kết luận.
+- "MISLEADING": Claim có một phần đúng nhưng giật tít, quy chụp sai bản chất hoặc thiếu ngữ cảnh quan trọng.
+- "INSUFFICIENT_EVIDENCE": Khi sự việc mới ở mức phản ánh/băn khoăn từ phụ huynh hoặc bài báo ban đầu, cơ quan quản lý nhà nước (Sở GD&ĐT, cơ quan thanh tra) CHƯA BAN HÀNH KẾT LUẬN CHÍNH THỨC về tính đúng/sai. Khi đó PHẢI trích dẫn các bài báo đã có, đồng thời giải thích rõ: Đây là vụ việc đang diễn tiến, cần chờ kết luận chính thức để tránh kết luận vội vàng một chiều.
 
 Bước 5: Trả lời chuẩn phong cách Trực diện (Google AI Overview)
-- Trả lời dứt khoát câu hỏi trong explanation và factAnswer.
+- Trả lời dứt khoát câu hỏi trong explanation và factAnswer. Nêu rõ các góc nhìn khách quan của các bên liên quan.
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU TRÚC SAU (KHÔNG DÙNG BẤT KỲ VĂN BẢN NGOÀI):
 {
@@ -1062,8 +1063,12 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON HỢP LỆ VỚI CẤU
     const finalSources = Array.from(combinedSourcesMap.values());
     if (finalSources.length === 0 && realGroundingSources.length === 0) {
       verdict = 'INSUFFICIENT_EVIDENCE';
-      parsed.explanation = 'TrustNet chưa thu thập được đủ nguồn web độc lập qua Google Search Grounding để xác minh hoàn toàn thông tin này.';
-      parsed.summary = 'Không thu thập được đủ nguồn web để xác minh.';
+      if (!parsed.explanation || parsed.explanation.trim().length < 25) {
+        parsed.explanation = 'TrustNet chưa thu thập được đủ nguồn web độc lập qua Google Search Grounding để xác minh hoàn toàn thông tin này.';
+      }
+      if (!parsed.summary) {
+        parsed.summary = 'Chưa thu thập đủ nguồn web độc lập để xác minh.';
+      }
     }
 
     const hasDisagreement = finalSources.some(s => s.contradictsClaim) && finalSources.some(s => s.supportsClaim);
