@@ -270,7 +270,7 @@ export const AuthPage: React.FC<Props> = ({ onLoginSuccess, isDark, setIsDark })
             isDark ? 'bg-indigo-600 text-white' : 'bg-yellow-300 text-slate-900'
           }`}>
             <Sparkles className="w-4 h-4 text-orange-500" />
-            <span>Nền tảng an toàn số chính thức của Đoàn Trường</span>
+            <span>Nền tảng an toàn số của học đường</span>
           </div>
 
           {/* Heading + Robot side by side */}
