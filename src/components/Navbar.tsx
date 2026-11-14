@@ -83,7 +83,7 @@ export const Navbar: React.FC<Props> = ({
     : notifications;
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 dark:bg-slate-950/80 border-b border-slate-800/80 transition-colors">
+    <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl border-b-2 border-slate-900 dark:border-slate-800 shadow-[0_2px_0_0_#0f172a] dark:shadow-none transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         
         {/* Brand Logo & Motto */}
@@ -91,32 +91,30 @@ export const Navbar: React.FC<Props> = ({
           onClick={() => setActiveTab('feed')}
           className="flex items-center gap-3 cursor-pointer group select-none"
         >
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-[1.5px] shadow-glow-sm group-hover:shadow-glow-md transition-all">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
-            </div>
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+          <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 shadow-hard-sm group-hover:scale-105 transition-transform border-2 border-slate-900">
+            <ShieldCheck className="w-5 h-5 text-white" />
+            <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-yellow-400 border border-slate-900"></span>
             </span>
           </div>
 
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-100 to-cyan-300 bg-clip-text text-transparent">
+              <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 TrustNet
               </span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                AI Fact Check
+              <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-full bg-blue-600 text-white border-2 border-slate-900 shadow-hard-sm">
+                AI
               </span>
             </div>
-            <div className="hidden md:flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+            <div className="hidden md:flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
               <span>Đừng chỉ tin. Hãy kiểm chứng!</span>
-              <span className="text-slate-600">•</span>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
               <button 
                 onClick={(e) => { e.stopPropagation(); setActiveTab('school'); }}
-                className="text-cyan-400 hover:text-cyan-300 font-bold hover:underline transition-colors cursor-pointer"
-                title="Xem giới thiệu Trường THPT Số 1 Phan Đình Phùng"
+                className="text-blue-600 dark:text-cyan-400 hover:text-orange-500 font-bold hover:underline transition-colors cursor-pointer"
+                title="Xem giới thiệu Trường THPT"
               >
                 Giới thiệu trường
               </button>
@@ -124,51 +122,60 @@ export const Navbar: React.FC<Props> = ({
           </div>
         </div>
 
+        {/* Speech bubble mascot — desktop only */}
+        <div className="hidden xl:flex items-center">
+          <div className="relative bg-yellow-300 border-2 border-slate-900 rounded-2xl px-3 py-1.5 shadow-hard-sm text-[11px] font-bold text-slate-900 max-w-[200px] text-center">
+            Đừng để lừa đảo làm bạn lo lắng — TrustNet đây! 🤖🛡️
+            <span className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent border-r-[10px] border-r-slate-900"></span>
+            <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[9px] border-r-yellow-300"></span>
+          </div>
+        </div>
+
         {/* Center Quick Search Button */}
-        <div className="hidden lg:flex items-center flex-1 max-w-md mx-6">
+        <div className="hidden lg:flex items-center flex-1 max-w-sm mx-4">
           <button 
             onClick={() => setActiveTab('search')}
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 text-slate-400 hover:text-slate-200 text-sm transition-all group"
+            className="w-full flex items-center justify-between px-3.5 py-2 rounded-2xl bg-mint-100 dark:bg-slate-900/90 border-2 border-slate-900 dark:border-slate-700 hover:border-blue-600 dark:hover:border-indigo-500 text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-slate-200 text-sm transition-all group shadow-hard-sm hover:-translate-y-0.5"
           >
             <div className="flex items-center gap-2.5">
-              <Search className="w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors" />
-              <span>Tìm kiếm & kiểm tra nguồn tin uy tín...</span>
+              <Search className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
+              <span className="text-xs font-semibold">Tìm kiếm & kiểm tra nguồn tin...</span>
             </div>
-            <kbd className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-slate-400 border border-slate-700">
+            <kbd className="px-2 py-0.5 text-[10px] font-mono rounded-lg bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-2 border-slate-900 dark:border-slate-700">
               Ctrl+K
             </kbd>
           </button>
         </div>
 
         {/* Right Action Icons & User Stats */}
-        <div className="flex items-center gap-2.5 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           
-          {/* Admin Indicator - CHỈ HIỂN THỊ KHI ĐĂNG NHẬP VỚI TÀI KHOẢN ADMIN */}
+          {/* Admin Indicator */}
           {user.role === 'admin' && (
             <button
               onClick={() => setActiveTab('admin')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition-all cursor-pointer shadow-sm"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-rose-500 text-white border-2 border-slate-900 shadow-hard-sm hover:-translate-y-0.5 transition-all neo-btn"
               title="Mở Bảng Quản Trị & Kiểm Duyệt"
             >
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-              <span>Quản Trị Viên</span>
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Quản Trị</span>
             </button>
           )}
 
           {/* XP & Level Badge */}
           <div 
             onClick={() => setActiveTab('profile')}
-            className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-950/60 to-purple-950/40 border border-indigo-500/30 hover:border-indigo-500/60 transition-all group"
+            className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-yellow-300 border-2 border-slate-900 shadow-hard-sm hover:-translate-y-0.5 transition-all group"
           >
-            <div className="w-6 h-6 rounded-lg bg-indigo-500/20 flex items-center justify-center text-amber-400">
-              <Award className="w-4 h-4" />
+            <div className="w-6 h-6 rounded-lg bg-orange-500 flex items-center justify-center">
+              <Award className="w-3.5 h-3.5 text-white" />
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider group-hover:text-slate-300">
+              <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">
                 {user.rankTitle}
               </span>
-              <span className="text-xs font-bold text-amber-300 font-mono flex items-center gap-1">
-                {user.points} <span className="text-[10px] text-amber-500/80">XP</span>
+              <span className="text-xs font-black text-slate-900 font-mono flex items-center gap-1">
+                {user.points} <span className="text-[10px] text-slate-600">XP</span>
               </span>
             </div>
           </div>
@@ -177,39 +184,39 @@ export const Navbar: React.FC<Props> = ({
           <button
             onClick={() => setIsDark(!isDark)}
             aria-label="Toggle theme"
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-colors"
+            className="p-2 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-slate-900 bg-white dark:bg-slate-900/80 border-2 border-slate-900 dark:border-slate-700 shadow-hard-sm hover:-translate-y-0.5 transition-all"
           >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            {isDark ? <Sun className="w-4 h-4 text-yellow-500" /> : <Moon className="w-4 h-4 text-blue-600" />}
           </button>
 
           {/* Notifications Dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 rounded-xl text-slate-400 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-colors"
+              className="relative p-2 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-slate-900 bg-white dark:bg-slate-900/80 border-2 border-slate-900 dark:border-slate-700 shadow-hard-sm hover:-translate-y-0.5 transition-all"
               title="Thông báo hệ thống"
             >
               <Bell className="w-4 h-4" />
               {unreadCount > 0 ? (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center font-mono shadow-md animate-in zoom-in">
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-[10px] font-black text-white flex items-center justify-center border border-slate-900">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               ) : (
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-500/50 rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
               )}
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-700 shadow-hard p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b-2 border-slate-900 dark:border-slate-700">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-white">
+                    <span className="text-sm font-black text-slate-900 dark:text-white">
                       Thông báo
                     </span>
                     {unreadCount > 0 && (
-                      <span className="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold font-mono">
+                      <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white border border-slate-900 text-[10px] font-black">
                         {unreadCount} mới
                       </span>
                     )}
@@ -217,7 +224,7 @@ export const Navbar: React.FC<Props> = ({
                   {unreadCount > 0 && (
                     <button
                       onClick={handleMarkAllAsRead}
-                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer hover:underline"
+                      className="text-[11px] text-blue-600 dark:text-indigo-400 hover:text-orange-500 font-bold cursor-pointer hover:underline"
                     >
                       Đánh dấu tất cả đã đọc
                     </button>
@@ -225,23 +232,23 @@ export const Navbar: React.FC<Props> = ({
                 </div>
 
                 {/* Filter Pills */}
-                <div className="flex items-center gap-1.5 pb-2 mb-2 border-b border-slate-800/60">
+                <div className="flex items-center gap-1.5 pb-2 mb-2 border-b border-slate-200 dark:border-slate-800">
                   <button
                     onClick={() => setNotifFilter('all')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                    className={`px-3 py-1 rounded-full text-xs font-black transition-all border-2 border-slate-900 shadow-hard-sm ${
                       notifFilter === 'all'
-                        ? 'bg-indigo-600 text-white'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-mint-100'
                     }`}
                   >
                     Tất cả ({notifications.length})
                   </button>
                   <button
                     onClick={() => setNotifFilter('unread')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                    className={`px-3 py-1 rounded-full text-xs font-black transition-all border-2 border-slate-900 shadow-hard-sm ${
                       notifFilter === 'unread'
-                        ? 'bg-indigo-600 text-white'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-mint-100'
                     }`}
                   >
                     Chưa đọc ({unreadCount})
@@ -259,10 +266,10 @@ export const Navbar: React.FC<Props> = ({
                       <div 
                         key={n.id} 
                         onClick={() => handleNotificationClick(n)}
-                        className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer flex items-start gap-2.5 ${
+                        className={`p-2.5 rounded-2xl text-xs transition-colors cursor-pointer flex items-start gap-2.5 border-2 ${
                           n.read 
-                            ? 'bg-slate-950/40 hover:bg-slate-800/50 text-slate-400' 
-                            : 'bg-indigo-950/30 hover:bg-indigo-950/50 text-slate-200 border border-indigo-500/20'
+                            ? 'bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 hover:bg-mint-100 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400' 
+                            : 'bg-blue-50 dark:bg-indigo-950/30 border-blue-400 dark:border-indigo-500/40 hover:bg-blue-100 dark:hover:bg-indigo-950/50 text-slate-700 dark:text-slate-200'
                         }`}
                       >
                         {/* Actor Avatar with Icon Overlay */}
@@ -270,14 +277,14 @@ export const Navbar: React.FC<Props> = ({
                           <img
                             src={n.actor?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
                             alt={n.actor?.name || 'User'}
-                            className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-800"
+                            className="w-9 h-9 rounded-xl object-cover ring-2 ring-slate-900"
                           />
-                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${
+                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] border border-white ${
                             n.type === 'like' ? 'bg-rose-500 text-white' :
-                            n.type === 'comment' ? 'bg-indigo-500 text-white' :
+                            n.type === 'comment' ? 'bg-blue-600 text-white' :
                             n.type === 'share' ? 'bg-cyan-500 text-slate-950' :
                             n.type === 'fact_check' ? 'bg-emerald-500 text-white' :
-                            n.type === 'reward' ? 'bg-amber-500 text-slate-950' :
+                            n.type === 'reward' ? 'bg-yellow-400 text-slate-950' :
                             'bg-slate-700 text-white'
                           }`}>
                             {n.type === 'like' && <Heart className="w-2.5 h-2.5 fill-current" />}
@@ -291,22 +298,22 @@ export const Navbar: React.FC<Props> = ({
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold flex items-start justify-between gap-1 leading-snug">
-                            <span className={n.read ? 'text-slate-300' : 'text-white'}>
+                          <div className="font-bold flex items-start justify-between gap-1 leading-snug">
+                            <span className={n.read ? 'text-slate-600 dark:text-slate-300' : 'text-slate-900 dark:text-white'}>
                               {n.title}
                             </span>
                             {!n.read && (
-                              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0 mt-1" />
+                              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />
                             )}
                           </div>
                           {n.content && (
-                            <p className="text-[11px] text-slate-400 line-clamp-2 mt-0.5 leading-relaxed">
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5 leading-relaxed">
                               {n.content}
                             </p>
                           )}
                           <span 
                             title={formatFacebookFullTime(n.createdAt)}
-                            className="text-[10px] text-slate-500 mt-1 block"
+                            className="text-[10px] text-slate-400 mt-1 block"
                           >
                             {formatFacebookTime(n.createdAt)}
                           </span>
@@ -323,7 +330,7 @@ export const Navbar: React.FC<Props> = ({
           {/* User Profile Avatar */}
           <div 
             onClick={() => setActiveTab('profile')}
-            className="cursor-pointer relative flex items-center justify-center p-0.5 rounded-full ring-2 ring-indigo-500/40 hover:ring-indigo-400 transition-all"
+            className="cursor-pointer relative flex items-center justify-center p-0.5 rounded-full border-2 border-slate-900 shadow-hard-sm hover:-translate-y-0.5 transition-all"
             title={`Xem hồ sơ của ${user.name}`}
           >
             <img
@@ -331,7 +338,7 @@ export const Navbar: React.FC<Props> = ({
               alt={user.name}
               className="w-8 h-8 rounded-full object-cover"
             />
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-950 rounded-full" />
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-slate-900 rounded-full" />
           </div>
 
           {/* Quick Logout Button */}
@@ -342,7 +349,7 @@ export const Navbar: React.FC<Props> = ({
                   onLogout();
                 }
               }}
-              className="p-2 rounded-xl text-slate-400 hover:text-rose-400 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-colors"
+              className="p-2 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-rose-600 bg-white dark:bg-slate-900/80 border-2 border-slate-900 dark:border-slate-700 shadow-hard-sm hover:-translate-y-0.5 transition-all"
               title="Đăng xuất khỏi TrustNet"
             >
               <LogOut className="w-4 h-4" />

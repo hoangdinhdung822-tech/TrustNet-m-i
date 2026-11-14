@@ -20,7 +20,7 @@ export function App() {
   const [currentUser, setCurrentUser] = useState<User>(DatabaseService.getCurrentUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(DatabaseService.isLoggedIn());
   const [activeTab, setActiveTab] = useState<string>('feed');
-  const [isDark, setIsDark] = useState<boolean>(true);
+  const [isDark, setIsDark] = useState<boolean>(false);
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
 
   // Sync dark mode class with root html
@@ -59,15 +59,21 @@ export function App() {
 
   return (
     <div className={`min-h-screen transition-colors ${
-      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
-    }`}>
+      isDark ? 'bg-slate-950 text-slate-100' : 'text-slate-900'
+    }`} style={!isDark ? {
+      backgroundColor: '#ccfbf1',
+      backgroundImage: 'linear-gradient(rgba(37,99,235,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.07) 1px, transparent 1px)',
+      backgroundSize: '32px 32px'
+    } : {}}>
       
-      {/* Background Cyber Ambient Lights */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px]" />
-        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-[140px]" />
-        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px]" />
-      </div>
+      {/* Background Cyber Ambient Lights (dark only) */}
+      {isDark && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px]" />
+          <div className="absolute top-1/3 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-[140px]" />
+          <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px]" />
+        </div>
+      )}
 
       {/* Main Top Navbar */}
       <Navbar

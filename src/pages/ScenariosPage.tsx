@@ -218,21 +218,21 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
     switch (type) {
       case 'fill_in_the_blank':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 border-2 border-slate-900 text-amber-900 dark:text-amber-300 text-[11px] font-black shadow-[1px_1px_0_0_#0f172a]">
             <Edit3 className="w-3.5 h-3.5" />
             <span>Điền từ ô trống</span>
           </span>
         );
       case 'quick_reflex_judgment':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-100 dark:bg-cyan-950/60 border-2 border-slate-900 text-cyan-900 dark:text-cyan-300 text-[11px] font-black shadow-[1px_1px_0_0_#0f172a]">
             <Zap className="w-3.5 h-3.5" />
             <span>Phản xạ nhanh</span>
           </span>
         );
       case 'multi_select':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[11px] font-bold">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 border-2 border-slate-900 text-purple-900 dark:text-purple-300 text-[11px] font-black shadow-[1px_1px_0_0_#0f172a]">
             <CheckSquare className="w-3.5 h-3.5" />
             <span>Chọn nhiều đáp án</span>
           </span>
@@ -240,7 +240,7 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
       case 'single_choice':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 dark:bg-indigo-950/60 border-2 border-slate-900 text-blue-900 dark:text-indigo-300 text-[11px] font-black shadow-[1px_1px_0_0_#0f172a]">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Trắc nghiệm kịch bản</span>
           </span>
@@ -255,41 +255,41 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
     <div className="space-y-6 pb-20 md:pb-8">
       
       {/* Header Banner */}
-      <section className="glass-panel rounded-3xl p-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-amber-500/15 via-indigo-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <section className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-amber-200/40 via-yellow-100/30 to-transparent dark:from-amber-500/15 dark:via-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <Gamepad2 className="w-4 h-4" />
+        <div className="max-w-3xl relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-amber-900 dark:text-amber-400 text-xs font-black uppercase tracking-wider mb-3">
+            <Gamepad2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             <span>Cyber Sandbox & Crisis Simulator</span>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Phòng Thí Nghiệm Tình Huống Giả Lập
           </h1>
-          <p className="text-xs md:text-sm text-slate-300 mt-2 leading-relaxed">
+          <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed font-medium">
             Mô phỏng 12+ kịch bản tấn công mạng, Deepfake AI, tin giả thao túng tâm lý và lừa đảo tài chính với đa dạng hình thức trả lời: 
-            <strong> điền từ khuyết, phản xạ nhị phân tốc độ cao, chọn danh mục cấp cứu đa phương án</strong> và trắc nghiệm thực chiến.
+            <strong className="text-blue-700 dark:text-blue-300"> điền từ khuyết, phản xạ nhị phân tốc độ cao, chọn danh mục cấp cứu đa phương án</strong> và trắc nghiệm thực chiến.
           </p>
         </div>
 
         {/* Level & completed count */}
-        <div className="mt-5 flex flex-wrap items-center gap-4 text-xs">
-          <div className="flex items-center gap-2 font-semibold text-slate-300">
+        <div className="mt-5 flex flex-wrap items-center gap-4 text-xs relative z-10 pt-3 border-t-2 border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
             <span>Tiến độ chinh phục:</span>
-            <strong className="text-amber-400 font-mono text-sm">{completedCount}/{scenarios.length}</strong>
-            <span className="text-slate-400">({progressPercent}%)</span>
+            <strong className="text-amber-600 dark:text-amber-400 font-mono text-sm">{completedCount}/{scenarios.length}</strong>
+            <span className="text-slate-500 dark:text-slate-400 font-bold">({progressPercent}%)</span>
           </div>
 
-          <div className="w-44 h-2.5 rounded-full bg-slate-800 overflow-hidden ring-1 ring-slate-700">
+          <div className="w-44 h-3 rounded-full bg-slate-200 dark:bg-slate-800 border-2 border-slate-900 overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-500 transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
 
-          <div className="flex items-center gap-2 text-slate-400 text-[11px] ml-auto">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-[11px] font-bold ml-auto">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Mỗi tình huống hoàn thành nhận ngay +50 XP</span>
           </div>
         </div>
@@ -303,10 +303,10 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-black whitespace-nowrap transition-all border-2 border-slate-900 cursor-pointer ${
               activeFilter === 'all'
-                ? 'bg-indigo-600 text-white shadow-glow-sm'
-                : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800'
+                ? 'bg-blue-600 text-white shadow-[2px_2px_0_0_#0f172a]'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-[2px_2px_0_0_#0f172a]'
             }`}
           >
             Tất cả ({scenarios.length})
@@ -314,61 +314,61 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
           <button
             onClick={() => setActiveFilter('fill_in_the_blank')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-black whitespace-nowrap flex items-center gap-1.5 transition-all border-2 border-slate-900 cursor-pointer ${
               activeFilter === 'fill_in_the_blank'
-                ? 'bg-amber-600 text-white shadow-glow-sm'
-                : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800'
+                ? 'bg-amber-400 text-slate-950 shadow-[2px_2px_0_0_#0f172a]'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-[2px_2px_0_0_#0f172a]'
             }`}
           >
-            <Edit3 className="w-3 h-3 text-amber-400" />
+            <Edit3 className="w-3 h-3 text-amber-600" />
             <span>Điền ô trống ({scenarios.filter(s => s.questionType === 'fill_in_the_blank').length})</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('quick_reflex_judgment')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-black whitespace-nowrap flex items-center gap-1.5 transition-all border-2 border-slate-900 cursor-pointer ${
               activeFilter === 'quick_reflex_judgment'
-                ? 'bg-cyan-600 text-white shadow-glow-sm'
-                : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800'
+                ? 'bg-cyan-400 text-slate-950 shadow-[2px_2px_0_0_#0f172a]'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-[2px_2px_0_0_#0f172a]'
             }`}
           >
-            <Zap className="w-3 h-3 text-cyan-400" />
+            <Zap className="w-3 h-3 text-cyan-600" />
             <span>Phản xạ nhanh ({scenarios.filter(s => s.questionType === 'quick_reflex_judgment').length})</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('multi_select')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-black whitespace-nowrap flex items-center gap-1.5 transition-all border-2 border-slate-900 cursor-pointer ${
               activeFilter === 'multi_select'
-                ? 'bg-purple-600 text-white shadow-glow-sm'
-                : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800'
+                ? 'bg-purple-500 text-white shadow-[2px_2px_0_0_#0f172a]'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-[2px_2px_0_0_#0f172a]'
             }`}
           >
-            <CheckSquare className="w-3 h-3 text-purple-400" />
+            <CheckSquare className="w-3 h-3 text-purple-600" />
             <span>Chọn nhiều ({scenarios.filter(s => s.questionType === 'multi_select').length})</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('single_choice')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-black whitespace-nowrap flex items-center gap-1.5 transition-all border-2 border-slate-900 cursor-pointer ${
               activeFilter === 'single_choice'
-                ? 'bg-indigo-600 text-white shadow-glow-sm'
-                : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800'
+                ? 'bg-indigo-600 text-white shadow-[2px_2px_0_0_#0f172a]'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-[2px_2px_0_0_#0f172a]'
             }`}
           >
-            <HelpCircle className="w-3 h-3 text-indigo-400" />
+            <HelpCircle className="w-3 h-3 text-indigo-600" />
             <span>Trắc nghiệm ({scenarios.filter(s => !s.questionType || s.questionType === 'single_choice').length})</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('completed')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-black whitespace-nowrap flex items-center gap-1.5 transition-all border-2 border-slate-900 cursor-pointer ${
               activeFilter === 'completed'
-                ? 'bg-emerald-600 text-white shadow-glow-sm'
-                : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800'
+                ? 'bg-emerald-600 text-white shadow-[2px_2px_0_0_#0f172a]'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-[2px_2px_0_0_#0f172a]'
             }`}
           >
-            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
             <span>Đã hoàn thành ({completedCount})</span>
           </button>
         </div>
@@ -381,7 +381,7 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm kiếm kịch bản..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none font-bold"
           />
         </div>
 
@@ -393,17 +393,17 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
         {/* Left List (4 columns) */}
         <div className="lg:col-span-4 space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-400">
               Danh mục ({filteredScenarios.length} Kịch bản)
             </h2>
-            <span className="text-[11px] text-slate-500 font-mono">
+            <span className="text-[11px] text-slate-500 font-mono font-bold">
               Hiển thị: {activeFilter}
             </span>
           </div>
 
-          <div className="space-y-2 max-h-[750px] overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[750px] overflow-y-auto pr-1">
             {filteredScenarios.length === 0 ? (
-              <div className="glass-panel p-6 rounded-2xl text-center text-slate-400 text-xs">
+              <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] p-6 rounded-2xl text-center text-slate-500 text-xs font-bold">
                 Không tìm thấy kịch bản nào phù hợp với bộ lọc hiện tại.
               </div>
             ) : (
@@ -413,36 +413,36 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                   <div
                     key={scen.id}
                     onClick={() => handleSelectScenario(scen.id)}
-                    className={`p-4 rounded-2xl cursor-pointer border transition-all ${
+                    className={`p-4 rounded-2xl cursor-pointer border-2 border-slate-900 transition-all ${
                       isSelected
-                        ? 'bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-900 border-indigo-500/70 shadow-glow-sm'
-                        : 'glass-panel hover:bg-slate-900/90 hover:border-slate-700'
+                        ? 'bg-amber-100 dark:bg-indigo-950/80 shadow-[4px_4px_0_0_#0f172a] -translate-y-0.5'
+                        : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/90 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1 text-[11px] mb-1.5">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-indigo-400 uppercase text-[10px]">
+                        <span className="font-black text-blue-700 dark:text-indigo-400 uppercase text-[10px]">
                           {scen.categoryLabel}
                         </span>
                         {renderQuestionTypeBadge(scen.questionType)}
                       </div>
 
                       {scen.isCompleted ? (
-                        <span className="flex items-center gap-1 font-bold text-emerald-400 shrink-0 text-[11px]">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Xong
+                        <span className="flex items-center gap-1 font-black text-emerald-800 dark:text-emerald-400 shrink-0 text-[11px]">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Xong
                         </span>
                       ) : (
-                        <span className="font-bold text-amber-400 font-mono shrink-0 text-[11px]">
+                        <span className="font-black text-amber-700 dark:text-amber-400 font-mono shrink-0 text-[11px]">
                           +{scen.pointsReward} XP
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-xs md:text-sm font-bold text-white leading-snug line-clamp-2">
+                    <h3 className="text-xs md:text-sm font-black text-slate-900 dark:text-white leading-snug line-clamp-2">
                       {scen.title}
                     </h3>
 
-                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1 line-clamp-1 font-medium">
                       {scen.description}
                     </p>
                   </div>
@@ -455,73 +455,73 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
         {/* Right Sandbox (8 columns) */}
         <div className="lg:col-span-8 space-y-6">
           
-          <div className="glass-panel rounded-3xl p-6 md:p-8 space-y-6 text-slate-100 relative">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 md:p-8 space-y-6 text-slate-900 dark:text-slate-100 relative">
             
             {/* Context Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b-2 border-slate-100 dark:border-slate-800">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="flex items-center gap-1 text-xs font-bold text-amber-400">
-                    <Flame className="w-4 h-4 fill-amber-400" />
+                  <div className="flex items-center gap-1 text-xs font-black text-amber-600 dark:text-amber-400">
+                    <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
                     <span>Mô phỏng thực chiến</span>
                   </div>
-                  <span className="text-slate-600">•</span>
+                  <span className="text-slate-400 font-bold">•</span>
                   {renderQuestionTypeBadge(activeScenario.questionType)}
                 </div>
 
-                <h2 className="text-lg md:text-2xl font-black text-white leading-tight">
+                <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-white leading-tight">
                   {activeScenario.title}
                 </h2>
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-bold">
+                <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-900 dark:text-rose-400 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-xs font-black">
                   {activeScenario.urgencyLevel}
                 </span>
-                <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold font-mono">
+                <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-xs font-black font-mono">
                   +{activeScenario.pointsReward} XP
                 </span>
               </div>
             </div>
 
             {/* Context narrative description */}
-            <div className="text-xs md:text-sm text-slate-300 italic bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800/80">
+            <div className="text-xs md:text-sm text-slate-700 dark:text-slate-300 italic bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] font-medium">
               {activeScenario.description}
             </div>
 
             {/* Simulated Live Post / Message Box (Mock Social / Chat UI) */}
-            <div className="rounded-2xl border border-indigo-500/30 bg-slate-950 p-4 md:p-5 space-y-3 shadow-inner">
+            <div className="rounded-2xl border-2 border-slate-900 bg-slate-50 dark:bg-slate-950 p-4 md:p-5 space-y-3 shadow-[3px_3px_0_0_#0f172a]">
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <img
                     src={activeScenario.simulatedMessage.senderAvatar}
                     alt={activeScenario.simulatedMessage.senderName}
-                    className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/40"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]"
                   />
                   <div>
-                    <span className="font-bold text-white text-xs md:text-sm block">
+                    <span className="font-black text-slate-900 dark:text-white text-xs md:text-sm block">
                       {activeScenario.simulatedMessage.senderName}
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-slate-500 font-semibold">
                       {activeScenario.simulatedMessage.senderHandle} • {activeScenario.simulatedMessage.timeAgo}
                     </span>
                   </div>
                 </div>
 
-                <span className="px-2 py-0.5 rounded-md bg-slate-900 text-slate-300 border border-slate-800 text-[11px] font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-2 border-slate-900 text-[11px] font-mono font-bold shadow-[1px_1px_0_0_#0f172a]">
                   {activeScenario.simulatedMessage.platform}
                 </span>
               </div>
 
               {/* Message Content */}
-              <p className="text-xs md:text-sm text-slate-100 font-medium leading-relaxed whitespace-pre-line bg-slate-900/40 p-3 rounded-xl border border-slate-800/60">
+              <p className="text-xs md:text-sm text-slate-900 dark:text-slate-100 font-semibold leading-relaxed whitespace-pre-line bg-white dark:bg-slate-900/40 p-3.5 rounded-xl border-2 border-slate-900">
                 {activeScenario.simulatedMessage.messageText}
               </p>
 
               {/* Media attached if any */}
               {activeScenario.simulatedMessage.mediaUrl && (
-                <div className="rounded-xl overflow-hidden max-h-60 bg-slate-900 border border-slate-800">
+                <div className="rounded-xl overflow-hidden max-h-60 bg-slate-900 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
                   <img
                     src={activeScenario.simulatedMessage.mediaUrl}
                     alt="Ảnh tình huống"
@@ -532,7 +532,7 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
               {/* Tag marker */}
               {activeScenario.simulatedMessage.metadataTag && (
-                <div className="text-[11px] font-semibold text-rose-400 flex items-center gap-1.5">
+                <div className="text-[11px] font-black text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <span>{activeScenario.simulatedMessage.metadataTag}</span>
                 </div>
@@ -542,24 +542,24 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
             {/* Question Section Header */}
             <div className="space-y-4">
-              <h3 className="text-sm md:text-base font-extrabold text-white flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-indigo-400 shrink-0" />
+              <h3 className="text-sm md:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-blue-600 dark:text-indigo-400 shrink-0" />
                 <span>{activeScenario.question}</span>
               </h3>
 
               {/* MODE 1: FILL IN THE BLANK (Điền từ vào ô trống) */}
               {qType === 'fill_in_the_blank' && activeScenario.fillBlankData && (
-                <div className="space-y-4 p-5 rounded-2xl bg-slate-900/80 border border-amber-500/30">
+                <div className="space-y-4 p-5 rounded-2xl bg-amber-50 dark:bg-slate-950/80 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
                   
-                  <div className="text-xs text-amber-300/90 font-medium flex items-center gap-1.5">
-                    <Edit3 className="w-4 h-4 text-amber-400" />
+                  <div className="text-xs text-amber-900 dark:text-amber-300 font-black flex items-center gap-1.5">
+                    <Edit3 className="w-4 h-4 text-amber-700" />
                     <span>Điền từ hoặc cụm từ then chốt còn thiếu vào ô trống dưới đây:</span>
                   </div>
 
                   {/* Interactive Inline Sentence Display */}
-                  <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs md:text-sm leading-relaxed text-slate-200">
+                  <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-900 text-xs md:text-sm leading-relaxed text-slate-900 dark:text-slate-200 font-medium">
                     <span>{activeScenario.fillBlankData.prefixText} </span>
-                    <span className="inline-block px-3 py-1 mx-1.5 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-300 font-mono font-bold tracking-wide">
+                    <span className="inline-block px-3 py-1 mx-1.5 rounded-lg bg-amber-200 dark:bg-amber-500/20 border-2 border-slate-900 text-amber-950 dark:text-amber-300 font-mono font-black tracking-wide shadow-[1px_1px_0_0_#0f172a]">
                       {blankInput.trim() || activeScenario.fillBlankData.blankPlaceholder || '... ? ...'}
                     </span>
                     <span> {activeScenario.fillBlankData.suffixText}</span>
@@ -567,7 +567,7 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
                   {/* Input Form */}
                   <div className="space-y-2">
-                    <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    <label className="text-[11px] font-black text-slate-700 dark:text-slate-400 uppercase tracking-wider block">
                       Câu trả lời của bạn:
                     </label>
                     <div className="flex gap-2">
@@ -580,23 +580,23 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                           if (e.key === 'Enter' && canSubmit) handleConfirmDecision();
                         }}
                         placeholder="Nhập từ khóa (Ví dụ: OTP, cọc tiền, giấy triệu tập...)"
-                        className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-medium disabled:opacity-60"
+                        className="flex-1 bg-white dark:bg-slate-950 border-2 border-slate-900 rounded-xl px-4 py-2.5 text-xs md:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none font-bold disabled:opacity-60 shadow-[2px_2px_0_0_#0f172a]"
                       />
 
                       {activeScenario.fillBlankData.hint && !isAnswerRevealed && (
                         <button
                           type="button"
                           onClick={() => setShowHint(!showHint)}
-                          className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                          className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-100 text-amber-900 dark:text-amber-300 border-2 border-slate-900 text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0_0_#0f172a] cursor-pointer"
                         >
-                          <Lightbulb className="w-3.5 h-3.5" />
+                          <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
                           <span>{showHint ? 'Ẩn gợi ý' : 'Gợi ý'}</span>
                         </button>
                       )}
                     </div>
 
                     {showHint && activeScenario.fillBlankData.hint && !isAnswerRevealed && (
-                      <p className="text-xs text-amber-300/80 italic bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20 animate-in fade-in duration-150">
+                      <p className="text-xs text-amber-950 dark:text-amber-300/80 italic bg-amber-100 dark:bg-amber-500/10 p-3 rounded-xl border-2 border-slate-900 font-semibold animate-in fade-in duration-150">
                         💡 <strong>Gợi ý:</strong> {activeScenario.fillBlankData.hint}
                       </p>
                     )}
@@ -604,29 +604,29 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
                   {/* Feedback when revealed */}
                   {isAnswerRevealed && (
-                    <div className={`p-4 rounded-xl border text-xs md:text-sm space-y-2 animate-in fade-in duration-200 ${
+                    <div className={`p-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-xs md:text-sm space-y-2 animate-in fade-in duration-200 ${
                       isEvaluationSuccess 
-                        ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200' 
-                        : 'bg-rose-950/40 border-rose-500/60 text-rose-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 font-medium' 
+                        : 'bg-rose-100 dark:bg-rose-950/40 text-rose-950 dark:text-rose-200 font-medium'
                     }`}>
-                      <div className="flex items-center gap-2 font-bold text-sm">
+                      <div className="flex items-center gap-2 font-black text-sm">
                         {isEvaluationSuccess ? (
                           <>
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                             <span>Chính xác tuyệt đối!</span>
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-4 h-4 text-rose-400" />
+                            <XCircle className="w-4 h-4 text-rose-700" />
                             <span>Chưa chính xác!</span>
                           </>
                         )}
                       </div>
 
-                      <p className="text-xs">
+                      <p className="text-xs font-bold">
                         Từ khóa được chấp nhận: <strong className="font-mono underline">{activeScenario.fillBlankData.acceptableAnswers.join(' / ')}</strong>
                       </p>
-                      <p className="text-xs italic leading-relaxed text-slate-300 pt-1 border-t border-slate-800">
+                      <p className="text-xs italic leading-relaxed text-slate-800 dark:text-slate-300 pt-1 border-t-2 border-slate-900/10 dark:border-slate-800">
                         👉 {activeScenario.fillBlankData.explanation}
                       </p>
                     </div>
@@ -637,14 +637,14 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
               {/* MODE 2: MULTI SELECT (Chọn nhiều phương án) */}
               {qType === 'multi_select' && activeScenario.multiSelectData && (
-                <div className="space-y-3 p-5 rounded-2xl bg-slate-900/80 border border-purple-500/30">
-                  <div className="text-xs text-purple-300 font-medium flex items-center justify-between">
+                <div className="space-y-3 p-5 rounded-2xl bg-purple-50 dark:bg-slate-950/80 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+                  <div className="text-xs text-purple-900 dark:text-purple-300 font-black flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <CheckSquare className="w-4 h-4 text-purple-400" />
+                      <CheckSquare className="w-4 h-4 text-purple-700" />
                       <span>{activeScenario.multiSelectData.instruction}</span>
                     </span>
-                    <span className="font-mono text-[11px] text-slate-400">
-                      Đã chọn: <strong className="text-purple-300">{selectedMultiIds.length}</strong>
+                    <span className="font-mono text-[11px] text-slate-600 dark:text-slate-400 font-bold">
+                      Đã chọn: <strong className="text-purple-800 dark:text-purple-300 font-black">{selectedMultiIds.length}</strong>
                     </span>
                   </div>
 
@@ -652,15 +652,15 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                     {activeScenario.multiSelectData.items.map((item) => {
                       const isChecked = selectedMultiIds.includes(item.id);
                       
-                      let cardStyle = 'bg-slate-950 border-slate-800 hover:border-purple-500/50 text-slate-300';
+                      let cardStyle = 'bg-white dark:bg-slate-950 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:bg-slate-50 text-slate-800 dark:text-slate-200';
                       if (isAnswerRevealed) {
                         if (item.isCorrect) {
-                          cardStyle = 'bg-emerald-950/40 border-emerald-500/80 text-emerald-200';
+                          cardStyle = 'bg-emerald-100 dark:bg-emerald-950/40 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-emerald-950 dark:text-emerald-200 font-bold';
                         } else if (isChecked && !item.isCorrect) {
-                          cardStyle = 'bg-rose-950/40 border-rose-500/80 text-rose-200';
+                          cardStyle = 'bg-rose-100 dark:bg-rose-950/40 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-rose-950 dark:text-rose-200 font-bold';
                         }
                       } else if (isChecked) {
-                        cardStyle = 'bg-purple-950/50 border-purple-500 text-white shadow-glow-sm';
+                        cardStyle = 'bg-purple-100 dark:bg-purple-950/50 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-purple-950 dark:text-white font-bold -translate-y-0.5';
                       }
 
                       return (
@@ -671,20 +671,20 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                         >
                           <button
                             type="button"
-                            className="mt-0.5 text-purple-400 shrink-0"
+                            className="mt-0.5 text-purple-700 shrink-0"
                           >
                             {isChecked ? (
-                              <CheckSquare className="w-5 h-5 text-purple-400 fill-purple-500/20" />
+                              <CheckSquare className="w-5 h-5 text-purple-700" />
                             ) : (
-                              <Square className="w-5 h-5 text-slate-500" />
+                              <Square className="w-5 h-5 text-slate-400" />
                             )}
                           </button>
                           
                           <div className="space-y-1 flex-1">
-                            <p className="font-medium">{item.text}</p>
+                            <p className="font-bold">{item.text}</p>
                             {isAnswerRevealed && item.feedback && (
-                              <p className={`text-[11px] italic ${
-                                item.isCorrect ? 'text-emerald-400' : 'text-rose-300'
+                              <p className={`text-[11px] italic font-semibold ${
+                                item.isCorrect ? 'text-emerald-800 dark:text-emerald-400' : 'text-rose-800 dark:text-rose-300'
                               }`}>
                                 👉 {item.feedback}
                               </p>
@@ -696,25 +696,25 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                   </div>
 
                   {isAnswerRevealed && (
-                    <div className={`p-4 rounded-xl border text-xs md:text-sm space-y-1.5 animate-in fade-in duration-200 ${
+                    <div className={`p-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-xs md:text-sm space-y-1.5 animate-in fade-in duration-200 ${
                       isEvaluationSuccess 
-                        ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200' 
-                        : 'bg-rose-950/40 border-rose-500/60 text-rose-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200' 
+                        : 'bg-rose-100 dark:bg-rose-950/40 text-rose-950 dark:text-rose-200'
                     }`}>
-                      <div className="flex items-center gap-2 font-bold">
+                      <div className="flex items-center gap-2 font-black">
                         {isEvaluationSuccess ? (
                           <>
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                             <span>Bạn đã chọn chính xác toàn bộ các biện pháp xử lý an toàn!</span>
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-4 h-4 text-rose-400" />
+                            <XCircle className="w-4 h-4 text-rose-700" />
                             <span>Phương án chưa đầy đủ hoặc có lẫn hành động nguy hại!</span>
                           </>
                         )}
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed pt-1 border-t border-slate-800">
+                      <p className="text-xs text-slate-800 dark:text-slate-300 leading-relaxed pt-1 border-t-2 border-slate-900/10 dark:border-slate-800 font-medium">
                         {activeScenario.multiSelectData.explanation}
                       </p>
                     </div>
@@ -725,23 +725,23 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
               {/* MODE 3: QUICK REFLEX JUDGMENT (Phản xạ tức thì) */}
               {qType === 'quick_reflex_judgment' && activeScenario.quickReflexData && (
-                <div className="space-y-4 p-5 rounded-2xl bg-slate-900/80 border border-cyan-500/30">
+                <div className="space-y-4 p-5 rounded-2xl bg-teal-50 dark:bg-slate-950/80 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
                   
-                  <div className="text-xs text-cyan-300 font-medium flex items-center gap-1.5">
-                    <Zap className="w-4 h-4 text-cyan-400" />
+                  <div className="text-xs text-teal-900 dark:text-cyan-300 font-black flex items-center gap-1.5">
+                    <Zap className="w-4 h-4 text-teal-700 dark:text-cyan-400" />
                     <span>Kiểm tra đối tượng sau và quyết định trong chớp mắt:</span>
                   </div>
 
                   {/* Suspicious Target Inspection Terminal */}
-                  <div className="rounded-xl bg-slate-950 border border-cyan-500/40 p-4 space-y-2 font-mono">
-                    <div className="flex items-center justify-between text-[11px] text-cyan-400/80 pb-2 border-b border-slate-800">
+                  <div className="rounded-xl bg-slate-900 dark:bg-slate-950 border-2 border-slate-900 p-4 space-y-2 font-mono shadow-[2px_2px_0_0_#0f172a]">
+                    <div className="flex items-center justify-between text-[11px] text-cyan-300 pb-2 border-b border-slate-800 font-bold">
                       <span>TERMINAL SCANNER // FORENSIC VIEW</span>
                       <span className="flex items-center gap-1">
                         <Eye className="w-3.5 h-3.5" /> INSPECTING
                       </span>
                     </div>
 
-                    <div className="p-3 bg-black/60 rounded-lg border border-slate-800 text-xs md:text-sm text-cyan-200 break-all leading-relaxed whitespace-pre-wrap">
+                    <div className="p-3 bg-black/60 rounded-lg border border-slate-800 text-xs md:text-sm text-cyan-200 break-all leading-relaxed whitespace-pre-wrap font-semibold">
                       {activeScenario.quickReflexData.targetSnippet}
                     </div>
                   </div>
@@ -753,18 +753,18 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                       type="button"
                       disabled={isAnswerRevealed}
                       onClick={() => handleSelectQuickReflex('MALICIOUS')}
-                      className={`p-4 rounded-xl border text-left transition-all flex items-center gap-3 ${
+                      className={`p-4 rounded-2xl border-2 border-slate-900 text-left transition-all flex items-center gap-3 cursor-pointer ${
                         selectedVerdict === 'MALICIOUS'
-                          ? 'bg-rose-950 border-rose-500 text-white ring-2 ring-rose-500/50'
-                          : 'bg-slate-950 border-slate-800 hover:border-rose-500/50 text-slate-300'
+                          ? 'bg-rose-200 dark:bg-rose-950 shadow-[4px_4px_0_0_#0f172a] -translate-y-0.5'
+                          : 'bg-white dark:bg-slate-950 hover:bg-rose-50 shadow-[2px_2px_0_0_#0f172a]'
                       }`}
                     >
-                      <ShieldX className="w-6 h-6 text-rose-400 shrink-0" />
+                      <ShieldX className="w-6 h-6 text-rose-600 shrink-0" />
                       <div>
-                        <span className="block font-bold text-xs md:text-sm text-rose-300">
+                        <span className="block font-black text-xs md:text-sm text-rose-900 dark:text-rose-300">
                           {activeScenario.quickReflexData.maliciousLabel || '🔴 ĐỘC HẠI / LỪA ĐẢO'}
                         </span>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">
                           Chứa mã độc, link giả hoặc bẫy gian lận
                         </span>
                       </div>
@@ -774,18 +774,18 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                       type="button"
                       disabled={isAnswerRevealed}
                       onClick={() => handleSelectQuickReflex('SAFE')}
-                      className={`p-4 rounded-xl border text-left transition-all flex items-center gap-3 ${
+                      className={`p-4 rounded-2xl border-2 border-slate-900 text-left transition-all flex items-center gap-3 cursor-pointer ${
                         selectedVerdict === 'SAFE'
-                          ? 'bg-emerald-950 border-emerald-500 text-white ring-2 ring-emerald-500/50'
-                          : 'bg-slate-950 border-slate-800 hover:border-emerald-500/50 text-slate-300'
+                          ? 'bg-emerald-200 dark:bg-emerald-950 shadow-[4px_4px_0_0_#0f172a] -translate-y-0.5'
+                          : 'bg-white dark:bg-slate-950 hover:bg-emerald-50 shadow-[2px_2px_0_0_#0f172a]'
                       }`}
                     >
-                      <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0" />
+                      <ShieldCheck className="w-6 h-6 text-emerald-600 shrink-0" />
                       <div>
-                        <span className="block font-bold text-xs md:text-sm text-emerald-300">
+                        <span className="block font-black text-xs md:text-sm text-emerald-900 dark:text-emerald-300">
                           {activeScenario.quickReflexData.safeLabel || '🟢 AN TOÀN / CHÍNH THỐNG'}
                         </span>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">
                           Nguồn tin cậy, định dạng hợp lệ
                         </span>
                       </div>
@@ -794,25 +794,25 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                   </div>
 
                   {isAnswerRevealed && (
-                    <div className={`p-4 rounded-xl border text-xs md:text-sm space-y-1.5 animate-in fade-in duration-200 ${
+                    <div className={`p-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-xs md:text-sm space-y-1.5 animate-in fade-in duration-200 ${
                       isEvaluationSuccess 
-                        ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200' 
-                        : 'bg-rose-950/40 border-rose-500/60 text-rose-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200' 
+                        : 'bg-rose-100 dark:bg-rose-950/40 text-rose-950 dark:text-rose-200'
                     }`}>
-                      <div className="flex items-center gap-2 font-bold">
+                      <div className="flex items-center gap-2 font-black">
                         {isEvaluationSuccess ? (
                           <>
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                             <span>Phản xạ cực kỳ sắc bén! Bạn đã nhận diện chuẩn xác.</span>
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-4 h-4 text-rose-400" />
+                            <XCircle className="w-4 h-4 text-rose-700" />
                             <span>Phán đoán chưa chuẩn xác! Bạn đã bị đối tượng đánh lừa.</span>
                           </>
                         )}
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed pt-1 border-t border-slate-800">
+                      <p className="text-xs text-slate-800 dark:text-slate-300 leading-relaxed pt-1 border-t-2 border-slate-900/10 dark:border-slate-800 font-medium">
                         {activeScenario.quickReflexData.explanation}
                       </p>
                     </div>
@@ -827,34 +827,34 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                   {activeScenario.options.map((opt) => {
                     const isSelected = selectedOptionId === opt.id;
 
-                    let cardStyle = 'bg-slate-900/80 border-slate-800 hover:border-indigo-500/50 text-slate-300';
+                    let cardStyle = 'bg-white dark:bg-slate-900/80 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:bg-slate-50 text-slate-800 dark:text-slate-200';
                     if (isAnswerRevealed) {
                       if (opt.isCorrect) {
-                        cardStyle = 'bg-emerald-950/40 border-emerald-500 text-emerald-200 font-semibold shadow-glow-emerald';
+                        cardStyle = 'bg-emerald-100 dark:bg-emerald-950/40 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-emerald-950 dark:text-emerald-200 font-black';
                       } else if (isSelected && !opt.isCorrect) {
-                        cardStyle = 'bg-rose-950/40 border-rose-500 text-rose-200';
+                        cardStyle = 'bg-rose-100 dark:bg-rose-950/40 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-rose-950 dark:text-rose-200 font-black';
                       }
                     } else if (isSelected) {
-                      cardStyle = 'bg-indigo-950/60 border-indigo-500 text-white font-semibold shadow-glow-sm';
+                      cardStyle = 'bg-blue-100 dark:bg-indigo-950/60 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-blue-900 dark:text-white font-black -translate-y-0.5';
                     }
 
                     return (
                       <div
                         key={opt.id}
                         onClick={() => handleSelectSingleOption(opt.id)}
-                        className={`p-4 rounded-2xl border text-xs md:text-sm cursor-pointer transition-all ${cardStyle}`}
+                        className={`p-4 rounded-2xl border cursor-pointer transition-all ${cardStyle}`}
                       >
                         <div className="flex items-start gap-3">
-                          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border shrink-0 mt-0.5 ${
-                            isSelected ? 'bg-indigo-500 text-white border-indigo-400' : 'border-slate-700 text-slate-400'
+                          <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border-2 border-slate-900 shrink-0 mt-0.5 shadow-[1px_1px_0_0_#0f172a] ${
+                            isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300'
                           }`}>
                             {opt.id.replace('opt-', '').toUpperCase()}
                           </span>
                           <div className="space-y-1">
-                            <p>{opt.text}</p>
+                            <p className="font-bold">{opt.text}</p>
                             {isAnswerRevealed && (
-                              <p className={`text-xs mt-1 italic ${
-                                opt.isCorrect ? 'text-emerald-400 font-medium' : 'text-rose-300'
+                              <p className={`text-xs mt-1 italic font-semibold ${
+                                opt.isCorrect ? 'text-emerald-800 dark:text-emerald-400' : 'text-rose-800 dark:text-rose-300'
                               }`}>
                                 👉 {opt.feedback}
                               </p>
@@ -875,28 +875,28 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                 <button
                   onClick={handleConfirmDecision}
                   disabled={!canSubmit}
-                  className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 disabled:opacity-50 text-slate-950 font-black text-xs md:text-sm shadow-md transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs md:text-sm border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
                 >
                   <span>Chốt phương án xử lý</span>
                   <ArrowRight className="w-4 h-4 text-slate-950" />
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 pt-3 border-t border-slate-800 animate-in fade-in duration-200">
+              <div className="space-y-4 pt-3 border-t-2 border-slate-100 dark:border-slate-800 animate-in fade-in duration-200">
                 
                 {/* Expert Cyber Tip Callout */}
-                <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-xs md:text-sm text-indigo-200 flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-4 rounded-2xl bg-blue-50 dark:bg-indigo-950/40 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-xs md:text-sm text-blue-950 dark:text-indigo-200 flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-amber-300 block mb-0.5">
+                    <span className="font-black text-blue-900 dark:text-amber-300 block mb-0.5">
                       Bí quyết từ chuyên gia an ninh mạng TrustNet:
                     </span>
-                    <p className="leading-relaxed">{activeScenario.expertTip}</p>
+                    <p className="leading-relaxed font-semibold">{activeScenario.expertTip}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
-                  <span className="text-xs text-slate-400 text-center sm:text-left">
+                  <span className="text-xs text-slate-600 dark:text-slate-400 text-center sm:text-left font-bold">
                     {isEvaluationSuccess
                       ? '🎉 Bạn đã xuất sắc giải quyết tình huống an toàn và nâng cao kinh nghiệm số!'
                       : '💡 Hãy ghi nhớ kinh nghiệm này để áp dụng bảo vệ bản thân ngoài đời thực!'}
@@ -905,7 +905,7 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleResetCurrentScenario}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-800 dark:text-slate-200 text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] transition-all cursor-pointer"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       <span>Thử lại</span>
@@ -913,7 +913,7 @@ export const ScenariosPage: React.FC<Props> = ({ user, onUserUpdate }) => {
 
                     <button
                       onClick={handleGoNextScenario}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-glow-sm"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all cursor-pointer"
                     >
                       <span>Tình huống tiếp</span>
                       <ChevronRight className="w-3.5 h-3.5" />

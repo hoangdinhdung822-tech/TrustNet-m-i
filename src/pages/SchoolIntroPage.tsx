@@ -29,33 +29,33 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
     <div className="space-y-6 pb-20 md:pb-8">
       
       {/* Hero Header Section */}
-      <section className="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden text-slate-100">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-indigo-500/20 via-cyan-500/15 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <section className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 md:p-8 relative overflow-hidden text-slate-900 dark:text-slate-100">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-teal-200/40 via-cyan-100/30 to-transparent dark:from-indigo-500/20 dark:via-cyan-500/15 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-3 max-w-2xl">
             
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 border border-indigo-500/30 text-cyan-300 text-xs font-bold uppercase tracking-wider">
-              <School className="w-4 h-4 text-cyan-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 dark:bg-cyan-950/60 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-cyan-900 dark:text-cyan-300 text-xs font-black uppercase tracking-wider">
+              <School className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
               <span>Ngôi trường khởi nguồn dự án TrustNet</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               Trường THPT Số 1 Phan Đình Phùng
             </h1>
 
-            <div className="flex items-center gap-2 text-xs md:text-sm text-indigo-300 font-medium flex-wrap">
+            <div className="flex items-center gap-2 text-xs md:text-sm text-blue-700 dark:text-indigo-300 font-bold flex-wrap">
               <span className="flex items-center gap-1">
-                <MapPin className="w-4 h-4 text-rose-400" />
+                <MapPin className="w-4 h-4 text-rose-500" />
                 Xã Ea Kly, Huyện Krông Pắc, Tỉnh Đắk Lắk
               </span>
-              <span className="text-slate-600 hidden sm:inline">•</span>
-              <span className="flex items-center gap-1 text-emerald-400 font-bold">
+              <span className="text-slate-400 hidden sm:inline">•</span>
+              <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-black">
                 <Award className="w-4 h-4" /> Trường Chuẩn Quốc Gia Mức Độ 1
               </span>
             </div>
 
-            <p className="text-xs md:text-sm text-slate-300 leading-relaxed pt-1">
+            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pt-1 font-medium">
               Trải qua chặng đường 30 năm xây dựng và phát triển (1996 – 2026), Trường THPT Số 1 Phan Đình Phùng là điểm sáng giáo dục của huyện Krông Pắc, luôn đi đầu trong đổi mới phương pháp giảng dạy, phong trào STEM, nghiên cứu khoa học kỹ thuật và xây dựng văn hóa ứng xử văn minh, an toàn trên không gian mạng cho học sinh.
             </p>
 
@@ -65,7 +65,7 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
                 href={GOOGLE_MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-extrabold text-xs md:text-sm shadow-glow-sm hover:shadow-lg transition-all group"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs md:text-sm border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all group"
               >
                 <Compass className="w-4 h-4 group-hover:rotate-45 transition-transform" />
                 <span>Xem vị trí trên Google Maps 📍</span>
@@ -75,9 +75,9 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
               {setActiveTab && (
                 <button
                   onClick={() => setActiveTab('feed')}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-semibold text-xs md:text-sm transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-800 dark:text-slate-100 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] font-bold text-xs md:text-sm hover:-translate-y-0.5 transition-all cursor-pointer"
                 >
-                  <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                  <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-cyan-400" />
                   <span>Khám phá TrustNet</span>
                 </button>
               )}
@@ -86,20 +86,20 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
           </div>
 
           {/* School Badge / Emblem Visual Card */}
-          <div className="shrink-0 p-5 rounded-3xl bg-gradient-to-b from-indigo-950/70 to-slate-900 border border-indigo-500/30 text-center space-y-3 shadow-xl">
-            <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-400 p-[2px] shadow-glow-sm">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center flex-col">
-                <School className="w-10 h-10 text-cyan-300" />
-                <span className="text-[10px] font-black text-indigo-300 mt-1">1996 - 2026</span>
+          <div className="shrink-0 p-5 rounded-3xl bg-amber-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] text-center space-y-3">
+            <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-tr from-blue-500 to-teal-400 p-[3px] border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+              <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[12px] flex items-center justify-center flex-col">
+                <School className="w-10 h-10 text-blue-600 dark:text-cyan-300" />
+                <span className="text-[10px] font-black text-slate-900 dark:text-indigo-300 mt-1">1996 - 2026</span>
               </div>
             </div>
 
             <div>
-              <span className="text-sm font-bold text-white block">THPT Số 1 Phan Đình Phùng</span>
-              <span className="text-[11px] text-slate-400">Krông Pắc, Đắk Lắk</span>
+              <span className="text-sm font-black text-slate-900 dark:text-white block">THPT Số 1 Phan Đình Phùng</span>
+              <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Krông Pắc, Đắk Lắk</span>
             </div>
 
-            <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-bold text-emerald-400">
+            <div className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border-2 border-slate-900 text-[11px] font-black text-emerald-900 dark:text-emerald-400 shadow-[1px_1px_0_0_#0f172a]">
               30 Năm Trồng Người
             </div>
           </div>
@@ -107,72 +107,72 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
         </div>
 
         {/* 4 Stat Highlights */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-slate-800">
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <div className="flex items-center gap-2 text-cyan-400 text-xs font-semibold mb-1">
-              <Calendar className="w-4 h-4" /> Năm thành lập
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t-2 border-slate-100 dark:border-slate-800">
+          <div className="p-3.5 rounded-2xl bg-cyan-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <div className="flex items-center gap-2 text-cyan-800 dark:text-cyan-400 text-xs font-black mb-1">
+              <Calendar className="w-4 h-4 text-cyan-600" /> Năm thành lập
             </div>
-            <span className="text-xl md:text-2xl font-black text-white font-mono">1996</span>
-            <span className="text-[11px] text-slate-400 block">30 năm phát triển</span>
+            <span className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-mono">1996</span>
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 block font-semibold">30 năm phát triển</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <div className="flex items-center gap-2 text-indigo-400 text-xs font-semibold mb-1">
-              <Users className="w-4 h-4" /> Quy mô học sinh
+          <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <div className="flex items-center gap-2 text-blue-800 dark:text-indigo-400 text-xs font-black mb-1">
+              <Users className="w-4 h-4 text-blue-600" /> Quy mô học sinh
             </div>
-            <span className="text-xl md:text-2xl font-black text-white font-mono">&gt;1.200</span>
-            <span className="text-[11px] text-slate-400 block">Học sinh các khối 10, 11, 12</span>
+            <span className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-mono">&gt;1.200</span>
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 block font-semibold">Học sinh các khối 10, 11, 12</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold mb-1">
-              <Award className="w-4 h-4" /> Kiểm định chất lượng
+          <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 text-xs font-black mb-1">
+              <Award className="w-4 h-4 text-emerald-600" /> Kiểm định chất lượng
             </div>
-            <span className="text-base md:text-lg font-black text-emerald-400">Mức Độ 1</span>
-            <span className="text-[11px] text-slate-400 block">Trường chuẩn Quốc gia</span>
+            <span className="text-base md:text-lg font-black text-emerald-800 dark:text-emerald-400">Mức Độ 1</span>
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 block font-semibold">Trường chuẩn Quốc gia</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold mb-1">
-              <Sparkles className="w-4 h-4" /> Chuyển đổi số
+          <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 text-xs font-black mb-1">
+              <Sparkles className="w-4 h-4 text-amber-600" /> Chuyển đổi số
             </div>
-            <span className="text-base md:text-lg font-black text-amber-300">Tiên Phong</span>
-            <span className="text-[11px] text-slate-400 block">CLB STEM & Sáng tạo số</span>
+            <span className="text-base md:text-lg font-black text-amber-800 dark:text-amber-300">Tiên Phong</span>
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 block font-semibold">CLB STEM & Sáng tạo số</span>
           </div>
         </div>
 
       </section>
 
       {/* TrustNet Connection Spotlight Banner */}
-      <section className="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-indigo-950/90 via-slate-900 to-cyan-950/80 border border-indigo-500/40 relative overflow-hidden shadow-xl text-slate-100">
+      <section className="p-6 md:p-8 rounded-3xl bg-blue-50 dark:bg-indigo-950/80 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] relative overflow-hidden text-slate-900 dark:text-slate-100">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-cyan-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-indigo-500/20 border-2 border-slate-900 text-blue-900 dark:text-indigo-300 text-xs font-black uppercase tracking-wider shadow-[1px_1px_0_0_#0f172a]">
+              <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-cyan-400" />
               <span>Dấu ấn khoa học kỹ thuật học đường</span>
             </div>
-            <h2 className="text-lg md:text-xl font-extrabold text-white">
+            <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-white">
               Sứ Mạng Ra Đời Của Dự Án TrustNet Tại Trường
             </h2>
-            <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
               Nhận thấy nguy cơ học sinh THPT dễ rơi vào bẫy tin giả, thông tin độc hại và các chiêu trò lừa đảo qua mạng xã hội, nhóm học sinh trường <strong>THPT Số 1 Phan Đình Phùng</strong> đã nghiên cứu và phát triển nền tảng <strong>TrustNet</strong>.
               Dự án kết hợp trí tuệ nhân tạo (AI) giúp đoàn viên thanh niên hình thành tư duy phản biện <em>"Đọc → Kiểm tra → Suy nghĩ → Đánh giá → Quyết định"</em>, trở thành những công dân số gương mẫu.
             </p>
           </div>
 
-          <div className="shrink-0 p-4 rounded-2xl bg-slate-950/80 border border-indigo-500/30 text-xs space-y-2">
-            <span className="font-bold text-cyan-300 block">🏆 Mục tiêu dự án học đường:</span>
-            <ul className="space-y-1.5 text-slate-300">
+          <div className="shrink-0 p-4 rounded-2xl bg-white dark:bg-slate-950/80 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] text-xs space-y-2">
+            <span className="font-black text-blue-900 dark:text-cyan-300 block">🏆 Mục tiêu dự án học đường:</span>
+            <ul className="space-y-1.5 text-slate-700 dark:text-slate-300 font-semibold">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>100% học sinh được rèn luyện kỹ năng an toàn số</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Kiểm chứng tin đồn giả mạo trước khi chia sẻ</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Ứng dụng AI vì lợi ích giáo dục cộng đồng</span>
               </li>
             </ul>
@@ -184,17 +184,17 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: Direct Google Maps Embed Card (7 cols) */}
-        <div className="lg:col-span-7 glass-panel rounded-3xl p-5 md:p-6 space-y-4 text-slate-100">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-5 md:p-6 space-y-4 text-slate-900 dark:text-slate-100">
+          <div className="flex items-center justify-between pb-3 border-b-2 border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-rose-400" />
-              <h2 className="text-base font-bold text-white">Vị trí trường trên bản đồ</h2>
+              <MapPin className="w-5 h-5 text-rose-500" />
+              <h2 className="text-base font-black text-slate-900 dark:text-white">Vị trí trường trên bản đồ</h2>
             </div>
             <a
               href={GOOGLE_MAPS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold"
+              className="text-xs text-blue-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-bold"
             >
               <span>Mở Google Maps</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -202,7 +202,7 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
           </div>
 
           {/* Interactive Map Container */}
-          <div className="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 aspect-[16/10] group">
+          <div className="relative rounded-2xl overflow-hidden border-2 border-slate-900 bg-slate-950 aspect-[16/10] group shadow-[3px_3px_0_0_#0f172a]">
             {/* Embedded Google Maps Iframe */}
             <iframe
               title="Vị trí Trường THPT Số 1 Phan Đình Phùng"
@@ -213,27 +213,27 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
               allowFullScreen={true}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-full h-full filter invert-[0.9] hue-rotate-180 contrast-125 group-hover:filter-none transition-all duration-300"
+              className="w-full h-full transition-all duration-300"
             />
 
             {/* Float Overlay on bottom */}
-            <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-slate-950/90 backdrop-blur-md border border-slate-800 text-xs flex items-center justify-between">
+            <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-2 border-slate-900 text-xs flex items-center justify-between shadow-[2px_2px_0_0_#0f172a]">
               <div>
-                <span className="font-bold text-white block">Trường THPT Số 1 Phan Đình Phùng</span>
-                <span className="text-[11px] text-slate-400">Tọa độ: 12.751867, 108.4213146 (Ea Kly, Krông Pắc)</span>
+                <span className="font-black text-slate-900 dark:text-white block">Trường THPT Số 1 Phan Đình Phùng</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Tọa độ: 12.751867, 108.4213146 (Ea Kly, Krông Pắc)</span>
               </div>
               <a
                 href={GOOGLE_MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] shrink-0"
+                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] shrink-0 border-2 border-slate-900 shadow-[1px_1px_0_0_#0f172a]"
               >
                 Chỉ đường
               </a>
             </div>
           </div>
 
-          <p className="text-xs text-slate-400 italic">
+          <p className="text-xs text-slate-500 dark:text-slate-400 italic font-medium">
             * Nhấn nút <strong>"Mở Google Maps"</strong> hoặc <strong>"Chỉ đường"</strong> để mở ứng dụng Google Maps trực tiếp trên thiết bị của bạn với lộ trình di chuyển chính xác nhất.
           </p>
         </div>
@@ -242,41 +242,41 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
         <div className="lg:col-span-5 space-y-4">
           
           {/* Contact Details Card */}
-          <div className="glass-panel rounded-3xl p-5 md:p-6 space-y-4 text-slate-100">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
-              <BookOpen className="w-5 h-5 text-indigo-400" />
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-5 md:p-6 space-y-4 text-slate-900 dark:text-slate-100">
+            <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 pb-3 border-b-2 border-slate-100 dark:border-slate-800">
+              <BookOpen className="w-5 h-5 text-blue-600 dark:text-indigo-400" />
               Thông tin liên hệ & Địa chỉ
             </h2>
 
             <div className="space-y-3 text-xs md:text-sm">
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
-                <MapPin className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <MapPin className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-white block">Địa chỉ chính thức:</span>
-                  <span className="text-slate-300">Xã Ea Kly, Huyện Krông Pắc, Tỉnh Đắk Lắk</span>
+                  <span className="font-black text-slate-900 dark:text-white block">Địa chỉ chính thức:</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">Xã Ea Kly, Huyện Krông Pắc, Tỉnh Đắk Lắk</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
-                <Globe className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <Globe className="w-5 h-5 text-teal-600 dark:text-cyan-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-white block">Cổng thông tin điện tử:</span>
+                  <span className="font-black text-slate-900 dark:text-white block">Cổng thông tin điện tử:</span>
                   <a
                     href="http://c3phandinhphungdaklak.edu.vn"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-cyan-400 hover:underline break-all"
+                    className="text-blue-600 dark:text-cyan-400 hover:underline break-all font-bold"
                   >
                     c3phandinhphungdaklak.edu.vn
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
-                <Phone className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <Phone className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-white block">Cơ quan chủ quản:</span>
-                  <span className="text-slate-300">Sở Giáo dục và Đào tạo tỉnh Đắk Lắk</span>
+                  <span className="font-black text-slate-900 dark:text-white block">Cơ quan chủ quản:</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">Sở Giáo dục và Đào tạo tỉnh Đắk Lắk</span>
                 </div>
               </div>
             </div>
@@ -286,7 +286,7 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
               href={GOOGLE_MAPS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs md:text-sm shadow-md transition-all"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs md:text-sm border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all"
             >
               <MapPin className="w-4 h-4" />
               <span>Xem vị trí chính xác trên Google Maps</span>
@@ -295,28 +295,28 @@ export const SchoolIntroPage: React.FC<Props> = ({ setActiveTab }) => {
           </div>
 
           {/* Core Values Card */}
-          <div className="glass-panel rounded-3xl p-5 md:p-6 space-y-3 text-slate-100">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Heart className="w-4 h-4 text-rose-400 fill-rose-400" />
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-5 md:p-6 space-y-3 text-slate-900 dark:text-slate-100">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-400 flex items-center gap-1.5">
+              <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
               Giá trị cốt lõi nhà trường
             </h3>
 
-            <div className="grid grid-cols-2 gap-2 text-center text-xs">
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <span className="text-cyan-300 font-bold block">TRÍ TUỆ</span>
-                <span className="text-[11px] text-slate-400">Hiếu học & Sáng tạo</span>
+            <div className="grid grid-cols-2 gap-2.5 text-center text-xs">
+              <div className="p-3 rounded-2xl bg-cyan-50 dark:bg-slate-900 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <span className="text-cyan-900 dark:text-cyan-300 font-black block">TRÍ TUỆ</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Hiếu học & Sáng tạo</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <span className="text-emerald-300 font-bold block">BẢN LĨNH</span>
-                <span className="text-[11px] text-slate-400">Tự tin & Phản biện</span>
+              <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-slate-900 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <span className="text-emerald-900 dark:text-emerald-300 font-black block">BẢN LĨNH</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Tự tin & Phản biện</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <span className="text-indigo-300 font-bold block">TRÁCH NHIỆM</span>
-                <span className="text-[11px] text-slate-400">Công dân số gương mẫu</span>
+              <div className="p-3 rounded-2xl bg-blue-50 dark:bg-slate-900 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <span className="text-blue-900 dark:text-indigo-300 font-black block">TRÁCH NHIỆM</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Công dân số gương mẫu</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                <span className="text-amber-300 font-bold block">ĐỔI MỚI</span>
-                <span className="text-[11px] text-slate-400">Tiên phong công nghệ</span>
+              <div className="p-3 rounded-2xl bg-amber-50 dark:bg-slate-900 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+                <span className="text-amber-900 dark:text-amber-300 font-black block">ĐỔI MỚI</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Tiên phong công nghệ</span>
               </div>
             </div>
           </div>

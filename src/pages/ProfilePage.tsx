@@ -416,15 +416,15 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-4 md:right-8 z-50 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-emerald-400/30 animate-in fade-in slide-in-from-top-3 duration-200">
-          <Sparkles className="w-5 h-5 text-amber-300 animate-spin" />
-          <span className="text-sm font-bold">{toastMessage}</span>
+        <div className="fixed top-20 right-4 md:right-8 z-50 bg-emerald-500 text-white px-5 py-3 rounded-2xl shadow-[4px_4px_0_0_#0f172a] border-2 border-slate-900 flex items-center gap-3 animate-in fade-in slide-in-from-top-3 duration-200">
+          <Sparkles className="w-5 h-5 text-yellow-300 animate-spin" />
+          <span className="text-sm font-black">{toastMessage}</span>
         </div>
       )}
 
       {/* Profile Card Header */}
-      <section className="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden text-slate-100 shadow-2xl border border-slate-800">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-indigo-500/20 via-cyan-500/15 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <section className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 md:p-8 relative overflow-hidden text-slate-900 dark:text-slate-100">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-teal-200/40 via-cyan-100/30 to-transparent dark:from-indigo-500/20 dark:via-cyan-500/15 rounded-full blur-2xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           
@@ -434,9 +434,9 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               <img
                 src={user.avatar}
                 alt={user.name}
-                className="w-24 h-24 md:w-28 md:h-28 rounded-3xl object-cover ring-4 ring-indigo-500/40 shadow-2xl transition-transform group-hover:scale-105"
+                className="w-24 h-24 md:w-28 md:h-28 rounded-3xl object-cover border-4 border-slate-900 shadow-[3px_3px_0_0_#0f172a] transition-transform group-hover:scale-105"
               />
-              <span className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-4 border-slate-950 rounded-full flex items-center justify-center shadow-lg" title="Trạng thái: Trực tuyến">
+              <span className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-2 border-slate-900 rounded-full flex items-center justify-center shadow-[1px_1px_0_0_#0f172a]" title="Trạng thái: Trực tuyến">
                 <CheckCircle className="w-3.5 h-3.5 text-white" />
               </span>
               {/* Tải ảnh đại diện trực tiếp từ thiết bị */}
@@ -451,7 +451,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 type="button"
                 onClick={() => headerAvatarFileInputRef.current?.click()}
                 disabled={isUploadingAvatar}
-                className="absolute inset-0 bg-slate-950/75 rounded-3xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-xs font-semibold text-white transition-opacity gap-1 cursor-pointer p-1 text-center"
+                className="absolute inset-0 bg-slate-950/80 rounded-3xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-xs font-bold text-white transition-opacity gap-1 cursor-pointer p-1 text-center"
                 title="Tải ảnh đại diện mới từ thiết bị cá nhân (Điện thoại / Máy tính)"
               >
                 {isUploadingAvatar ? (
@@ -459,7 +459,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 ) : (
                   <>
                     <Upload className="w-5 h-5 text-cyan-300" />
-                    <span className="text-[10px] font-bold leading-tight">Tải ảnh từ máy</span>
+                    <span className="text-[10px] font-black leading-tight">Tải ảnh từ máy</span>
                   </>
                 )}
               </button>
@@ -467,55 +467,55 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
 
             <div className="space-y-2">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                   {user.name}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/25 text-indigo-300 border border-indigo-500/40 text-xs font-bold font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-indigo-500/25 text-blue-900 dark:text-indigo-300 border-2 border-slate-900 text-xs font-black font-mono shadow-[1px_1px_0_0_#0f172a]">
                   @{user.username}
                 </span>
                 {user.role === 'admin' && (
-                  <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-bold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-900 border-2 border-slate-900 text-xs font-black shadow-[1px_1px_0_0_#0f172a]">
                     Admin
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border-2 border-slate-900 text-[10px] font-black shadow-[1px_1px_0_0_#0f172a]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   Đã bảo mật
                 </span>
               </div>
 
               {/* School and Class Badges */}
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900/90 text-slate-200 border border-slate-700/80 font-medium">
-                  <School className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-2 border-slate-900 font-bold shadow-[2px_2px_0_0_#0f172a]">
+                  <School className="w-3.5 h-3.5 text-blue-600" />
                   {user.school || 'Trường THPT Số 1 Phan Đình Phùng'}
                 </span>
                 {user.className && (
-                  <span className="px-2.5 py-1 rounded-xl bg-slate-900/80 text-indigo-300 border border-indigo-500/30 font-medium">
+                  <span className="px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-slate-900 text-blue-900 dark:text-indigo-300 border-2 border-slate-900 font-bold shadow-[2px_2px_0_0_#0f172a]">
                     {user.className}
                   </span>
                 )}
-                <span className="px-2.5 py-1 rounded-xl bg-indigo-950/60 text-cyan-400 border border-cyan-500/30 font-bold">
+                <span className="px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 border-2 border-slate-900 font-black shadow-[2px_2px_0_0_#0f172a]">
                   {user.rankTitle}
                 </span>
               </div>
 
               {/* Bio */}
-              <p className="text-xs md:text-sm text-slate-300 max-w-xl leading-relaxed pt-1">
+              <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed pt-1 font-medium">
                 {user.bio || 'Học sinh năng động, đam mê an toàn số & xây dựng môi trường mạng lành mạnh, nói không với tin giả.'}
               </p>
 
               {/* XP Progress Bar */}
               <div className="pt-2 max-w-md space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-amber-300 font-bold flex items-center gap-1">
+                  <span className="text-amber-700 dark:text-amber-400 font-black flex items-center gap-1">
                     ⭐ {currentXP} XP
                   </span>
-                  <span className="text-slate-400">Mục tiêu mốc tiếp theo: {nextTarget} XP</span>
+                  <span className="text-slate-500 font-semibold">Mục tiêu mốc tiếp theo: {nextTarget} XP</span>
                 </div>
-                <div className="w-full h-2.5 rounded-full bg-slate-900 border border-slate-800 overflow-hidden p-0.5">
+                <div className="w-full h-3 rounded-full bg-slate-200 dark:bg-slate-800 border-2 border-slate-900 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 rounded-full transition-all duration-700 shadow-sm"
+                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-400 transition-all duration-700"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -524,11 +524,11 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
           </div>
 
           {/* Action Buttons: Edit, Switch/Login, Logout */}
-          <div className="flex flex-wrap lg:flex-col items-stretch gap-2.5 shrink-0 self-start lg:self-center border-t lg:border-t-0 lg:border-l border-slate-800/80 pt-4 lg:pt-0 lg:pl-6 w-full lg:w-auto">
+          <div className="flex flex-wrap lg:flex-col items-stretch gap-2.5 shrink-0 self-start lg:self-center border-t-2 lg:border-t-0 lg:border-l-2 border-slate-200 dark:border-slate-800 pt-4 lg:pt-0 lg:pl-6 w-full lg:w-auto">
             
             <button
               onClick={() => requestAccessPersonalSecurity('profile')}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
               title="Yêu cầu nhập đúng tài khoản và mật khẩu để mở"
             >
               <Edit3 className="w-4 h-4" />
@@ -537,10 +537,10 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
 
             <button
               onClick={() => requestAccessPersonalSecurity('security')}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
               title="Quản lý mật khẩu và an toàn tài khoản"
             >
-              <ShieldCheck className="w-4 h-4 text-emerald-200" />
+              <ShieldCheck className="w-4 h-4" />
               <span>Bảo mật & Đổi MK</span>
             </button>
 
@@ -549,15 +549,15 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 setAuthTab('switch');
                 setIsAuthModalOpen(true);
               }}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 font-bold text-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-900 dark:text-slate-100 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] font-black text-xs hover:-translate-y-0.5 transition-all cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 text-blue-600" />
               <span>Đổi tài khoản / Đăng nhập</span>
             </button>
 
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-950/60 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-800 hover:border-rose-500/30 text-xs font-semibold transition-all"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-rose-50 dark:bg-slate-950 hover:bg-rose-100 text-rose-800 dark:text-rose-300 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-xs font-bold transition-all cursor-pointer"
               title="Đăng xuất hoặc chuyển tài khoản"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -569,25 +569,25 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
         </div>
 
         {/* 4 Stats Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-slate-800">
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <span className="text-xl md:text-2xl font-black text-white font-mono">{user.factChecksCount}</span>
-            <span className="text-xs text-slate-400 block mt-0.5">Lượt Fact-Check</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t-2 border-slate-100 dark:border-slate-800">
+          <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <span className="text-xl md:text-2xl font-black text-blue-900 dark:text-white font-mono">{user.factChecksCount}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400 block mt-0.5 font-bold">Lượt Fact-Check</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <span className="text-xl md:text-2xl font-black text-cyan-400 font-mono">{completedLessonsCount}/5</span>
-            <span className="text-xs text-slate-400 block mt-0.5">Bài học hoàn thành</span>
+          <div className="p-3.5 rounded-2xl bg-cyan-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <span className="text-xl md:text-2xl font-black text-cyan-900 dark:text-cyan-400 font-mono">{completedLessonsCount}/5</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400 block mt-0.5 font-bold">Bài học hoàn thành</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <span className="text-xl md:text-2xl font-black text-emerald-400 font-mono">{completedScenariosCount}/5</span>
-            <span className="text-xs text-slate-400 block mt-0.5">Tình huống vượt qua</span>
+          <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <span className="text-xl md:text-2xl font-black text-emerald-900 dark:text-emerald-400 font-mono">{completedScenariosCount}/5</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400 block mt-0.5 font-bold">Tình huống vượt qua</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80">
-            <span className="text-xl md:text-2xl font-black text-amber-300 font-mono">{user.quizAccuracy}%</span>
-            <span className="text-xs text-slate-400 block mt-0.5">Độ chuẩn xác Quiz</span>
+          <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a]">
+            <span className="text-xl md:text-2xl font-black text-amber-900 dark:text-amber-400 font-mono">{user.quizAccuracy}%</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400 block mt-0.5 font-bold">Độ chuẩn xác Quiz</span>
           </div>
         </div>
 
@@ -596,22 +596,22 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       {/* ============================================================ */}
       {/* SECTION: BẢO MẬT THÔNG TIN CÁ NHÂN & TÀI KHOẢN HỌC ĐƯỜNG      */}
       {/* ============================================================ */}
-      <section className="glass-panel rounded-3xl p-6 md:p-8 space-y-5 text-slate-100 border border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 md:p-8 space-y-5 text-slate-900 dark:text-slate-100 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-200/30 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-slate-100 dark:border-slate-800 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-glow-emerald">
-              <ShieldCheck className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-900 flex items-center justify-center border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
+              <ShieldCheck className="w-7 h-7 text-emerald-700" />
             </div>
             <div>
-              <h2 className="text-base md:text-lg font-bold text-white flex items-center gap-2 flex-wrap">
+              <h2 className="text-base md:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
                 Bảo Mật Thông Tin Cá Nhân & Quyền Riêng Tư
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border-2 border-slate-900 text-[10px] font-black shadow-[1px_1px_0_0_#0f172a]">
                   Bảo vệ mức cao
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                 Chỉ người dùng nhập đúng tài khoản và mật khẩu mới được vào xem và chỉnh sửa thông tin cá nhân.
               </p>
             </div>
@@ -620,63 +620,63 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
           <div className="flex items-center gap-2">
             <button
               onClick={() => requestAccessPersonalSecurity('profile')}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 hover:scale-105 active:scale-95"
+              className="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Xác thực vào thông tin cá nhân</span>
             </button>
             <button
               onClick={() => requestAccessPersonalSecurity('security')}
-              className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 hover:border-amber-400 font-bold text-xs transition-all flex items-center gap-1.5"
+              className="px-3.5 py-2.5 rounded-2xl bg-amber-300 hover:bg-amber-400 text-slate-950 font-black text-xs border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <Key className="w-3.5 h-3.5" />
+              <Key className="w-3.5 h-3.5 text-slate-950" />
               <span>Đổi mật khẩu</span>
             </button>
           </div>
         </div>
 
         {/* 3 Security Status Badges */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1 relative z-10">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300">Khóa tài khoản</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-xs font-black text-slate-700 dark:text-slate-300">Khóa tài khoản</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900 animate-ping" />
             </div>
-            <p className="text-sm font-black text-white font-mono">@{user.username}</p>
-            <span className="text-[11px] text-slate-400 block truncate">Liên kết email: {user.email || 'Học sinh TrustNet'}</span>
+            <p className="text-sm font-black text-blue-900 dark:text-white font-mono">@{user.username}</p>
+            <span className="text-[11px] text-slate-500 font-semibold block truncate">Liên kết email: {user.email || 'Học sinh TrustNet'}</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-1.5">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300">Cơ chế bảo vệ</span>
-              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">Xác thực 100%</span>
+              <span className="text-xs font-black text-slate-700 dark:text-slate-300">Cơ chế bảo vệ</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-slate-900 text-[10px] font-black">Xác thực 100%</span>
             </div>
-            <p className="text-sm font-black text-emerald-400">Yêu cầu đúng Mật khẩu</p>
-            <span className="text-[11px] text-slate-400 block">Ngăn chặn đổi thông tin trái phép và mạo danh</span>
+            <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">Yêu cầu đúng Mật khẩu</p>
+            <span className="text-[11px] text-slate-500 font-semibold block">Ngăn chặn đổi thông tin trái phép và mạo danh</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-1.5">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300">Định danh học đường</span>
-              <span className="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">Chính thức</span>
+              <span className="text-xs font-black text-slate-700 dark:text-slate-300">Định danh học đường</span>
+              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 border border-slate-900 text-[10px] font-black">Chính thức</span>
             </div>
-            <p className="text-sm font-black text-cyan-300 truncate">{user.school || 'THPT Số 1 Phan Đình Phùng'}</p>
-            <span className="text-[11px] text-slate-400 block truncate">{user.className || 'Khối 11'} • Đã kích hoạt lá chắn số</span>
+            <p className="text-sm font-black text-blue-700 dark:text-cyan-300 truncate">{user.school || 'THPT Số 1 Phan Đình Phùng'}</p>
+            <span className="text-[11px] text-slate-500 font-semibold block truncate">{user.className || 'Khối 11'} • Đã kích hoạt lá chắn số</span>
           </div>
         </div>
       </section>
 
       {/* Badges Showcase Section */}
-      <section className="glass-panel rounded-3xl p-6 md:p-8 space-y-4 text-slate-100 border border-slate-800">
+      <section className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 md:p-8 space-y-4 text-slate-900 dark:text-slate-100">
         
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b-2 border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-amber-400" />
-            <h2 className="text-base md:text-lg font-bold text-white">
+            <Award className="w-5 h-5 text-amber-500" />
+            <h2 className="text-base md:text-lg font-black text-slate-900 dark:text-white">
               Bộ Sưu Tập Huy Hiệu An Toàn Số
             </h2>
           </div>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="text-xs text-slate-500 font-mono font-bold">
             {user.badges.filter(b => b.isUnlocked).length}/{user.badges.length} đã mở khóa
           </span>
         </div>
@@ -685,33 +685,33 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
           {user.badges.map((b) => (
             <div
               key={b.id}
-              className={`p-4 rounded-2xl border transition-all ${
+              className={`p-4 rounded-2xl border-2 border-slate-900 transition-all ${
                 b.isUnlocked
-                  ? 'bg-gradient-to-b from-indigo-950/40 to-slate-900 border-indigo-500/40 shadow-sm'
-                  : 'bg-slate-950/40 border-slate-800/80 opacity-60'
+                  ? 'bg-amber-50 dark:bg-slate-950 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5'
+                  : 'bg-slate-100/70 dark:bg-slate-950/40 opacity-60 shadow-[1px_1px_0_0_#0f172a]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-3xl">{b.icon}</span>
                 {b.isUnlocked ? (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border-2 border-slate-900 font-black shadow-[1px_1px_0_0_#0f172a]">
                     Đã đạt
                   </span>
                 ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 flex items-center gap-1">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 border border-slate-400 font-bold flex items-center gap-1">
                     <Lock className="w-2.5 h-2.5" /> Chưa mở
                   </span>
                 )}
               </div>
 
-              <h3 className="text-sm font-bold text-white mb-1">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white mb-1">
                 {b.name}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                 {b.description}
               </p>
               {b.unlockedAt && (
-                <span className="text-[10px] text-slate-500 mt-2 block font-mono">
+                <span className="text-[10px] text-slate-500 mt-2 block font-mono font-bold">
                   Ngày nhận: {b.unlockedAt}
                 </span>
               )}
@@ -722,22 +722,22 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       </section>
 
       {/* Fact-Check History Logs */}
-      <section className="glass-panel rounded-3xl p-6 md:p-8 space-y-4 text-slate-100 border border-slate-800">
+      <section className="bg-white dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rounded-3xl p-6 md:p-8 space-y-4 text-slate-900 dark:text-slate-100">
         
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b-2 border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-base md:text-lg font-bold text-white">
+            <History className="w-5 h-5 text-blue-600" />
+            <h2 className="text-base md:text-lg font-black text-slate-900 dark:text-white">
               Lịch Sử Kiểm Tra Thông Tin Gần Đây
             </h2>
           </div>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="text-xs text-slate-500 font-mono font-bold">
             {history.length} bản ghi
           </span>
         </div>
 
         {history.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-500 italic">
+          <div className="p-8 text-center text-xs text-slate-500 italic font-semibold">
             Chưa có lượt kiểm tra nào được lưu trữ. Hãy thử tính năng "AI Fact Check" để kiểm tra một phát ngôn bạn nghi ngờ!
           </div>
         ) : (
@@ -759,20 +759,20 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               return (
                 <div
                   key={record.id}
-                  className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2.5 text-xs transition-all hover:border-slate-700/80"
+                  className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] space-y-2.5 text-xs transition-all hover:-translate-y-0.5"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-mono flex-wrap">
-                      <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-slate-500 text-[11px] font-mono flex-wrap font-bold">
+                      <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                       <span 
                         title={timeInfo.tooltip} 
-                        className="text-slate-200 font-semibold cursor-help hover:text-indigo-300 transition-colors"
+                        className="text-slate-900 dark:text-slate-200 font-black cursor-help hover:underline"
                       >
                         {timeInfo.exactFull}
                       </span>
-                      <span className="text-indigo-400 font-medium">({timeInfo.relative})</span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-slate-400">Thể loại: {getCategoryLabel(record.inputCategory)}</span>
+                      <span className="text-blue-700 dark:text-indigo-400">({timeInfo.relative})</span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-slate-600 dark:text-slate-400">Thể loại: {getCategoryLabel(record.inputCategory)}</span>
                     </div>
 
                     <AiStatusBadge 
@@ -783,12 +783,12 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     />
                   </div>
 
-                  <p className="font-semibold text-slate-200 line-clamp-2">
+                  <p className="font-bold text-slate-900 dark:text-slate-100 line-clamp-2">
                     "{record.inputText}"
                   </p>
 
-                  <p className="text-slate-400 text-[11px] leading-relaxed">
-                    <span className="text-indigo-400 font-semibold">Kết luận: </span>
+                  <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed font-medium">
+                    <span className="text-blue-700 dark:text-indigo-400 font-bold">Kết luận: </span>
                     {record.result.summary}
                   </p>
                 </div>
@@ -800,12 +800,12 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       </section>
 
       {/* Gen Z Safety Pledge */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-indigo-950/80 via-slate-900 to-cyan-950/60 border border-cyan-500/30 text-center space-y-2">
-        <Sparkles className="w-6 h-6 mx-auto text-cyan-400" />
-        <h3 className="text-sm font-extrabold text-white">
+      <div className="p-5 rounded-3xl bg-amber-100 dark:bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0_0_#0f172a] text-center space-y-2 text-slate-900 dark:text-slate-100">
+        <Sparkles className="w-6 h-6 mx-auto text-amber-600" />
+        <h3 className="text-sm font-black text-slate-900 dark:text-white">
           Cam Kết Công Dân Số TrustNet - THPT Số 1 Phan Đình Phùng
         </h3>
-        <p className="text-xs text-slate-300 max-w-md mx-auto italic">
+        <p className="text-xs text-slate-700 dark:text-slate-300 max-w-md mx-auto italic font-medium">
           "Tôi cam kết không lan truyền tin giả, luôn kiểm tra nguồn chính thống trước khi nhấn Like hoặc Share, và giữ vững tinh thần phản biện lành mạnh trên mạng xã hội."
         </p>
       </div>
@@ -815,23 +815,23 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       {/* (BẮT BUỘC NHẬP ĐÚNG TÀI KHOẢN VÀ MẬT KHẨU MỚI VÀO ĐƯỢC)      */}
       {/* ============================================================ */}
       {isSecurityVerifyOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-md rounded-3xl bg-slate-900 border border-indigo-500/50 p-6 md:p-8 shadow-2xl space-y-5 text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-900 p-6 md:p-8 shadow-[6px_6px_0_0_#0f172a] space-y-5 text-slate-900 dark:text-slate-100">
             
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b-2 border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center border border-amber-500/30">
+                <div className="w-10 h-10 rounded-xl bg-amber-200 text-amber-900 border-2 border-slate-900 flex items-center justify-center shadow-[1px_1px_0_0_#0f172a]">
                   <Lock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Xác thực bảo mật thông tin cá nhân</h3>
-                  <p className="text-xs text-slate-400">Phải nhập đúng tài khoản và mật khẩu để mở khóa</p>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">Xác thực bảo mật thông tin</h3>
+                  <p className="text-xs text-slate-500 font-semibold">Phải nhập đúng tài khoản và mật khẩu</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsSecurityVerifyOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -839,14 +839,14 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
 
             <form onSubmit={handleVerifySecurityAccess} className="space-y-4">
               {verifyError && (
-                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-semibold flex items-start gap-2 animate-in fade-in duration-200">
-                  <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/40 border-2 border-slate-900 text-rose-950 dark:text-rose-200 text-xs font-black flex items-start gap-2 shadow-[2px_2px_0_0_#0f172a]">
+                  <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                   <span>{verifyError}</span>
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">
+                <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                   Tên tài khoản người dùng (@username) *
                 </label>
                 <input
@@ -855,16 +855,16 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                   value={verifyAccountInput}
                   onChange={(e) => setVerifyAccountInput(e.target.value)}
                   placeholder="VD: hoangdinhdung822"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs font-mono font-bold focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                     Mật khẩu cá nhân *
                   </label>
-                  <span className="text-[10px] text-amber-300 font-mono">
+                  <span className="text-[10px] text-amber-700 dark:text-amber-400 font-mono font-bold">
                     Mẫu: 123456 (Admin: admin123)
                   </span>
                 </div>
@@ -876,29 +876,29 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     value={verifyPasswordInput}
                     onChange={(e) => setVerifyPasswordInput(e.target.value)}
                     placeholder="Nhập mật khẩu của bạn..."
-                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs font-bold focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowVerifyPassword(!showVerifyPassword)}
-                    className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300"
+                    className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-900"
                   >
                     {showVerifyPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t-2 border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsSecurityVerifyOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-bold border-2 border-slate-900 shadow-[1px_1px_0_0_#0f172a] transition-all cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>Xác nhận & Vào khu vực</span>
@@ -914,37 +914,37 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       {/* MODAL 1: QUẢN LÝ & BẢO MẬT THÔNG TIN CÁ NHÂN                  */}
       {/* ============================================================ */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-slate-900 border border-indigo-500/40 p-6 md:p-8 shadow-2xl space-y-6 text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-900 p-6 md:p-8 shadow-[6px_6px_0_0_#0f172a] space-y-6 text-slate-900 dark:text-slate-100">
             
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b-2 border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-900 border-2 border-slate-900 flex items-center justify-center shadow-[1px_1px_0_0_#0f172a]">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Quản Lý & Bảo Mật Thông Tin Cá Nhân</h3>
-                  <p className="text-xs text-slate-400">Đã xác thực danh tính • Cho phép chỉnh sửa hồ sơ và đổi mật khẩu</p>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">Quản Lý & Bảo Mật Thông Tin Cá Nhân</h3>
+                  <p className="text-xs text-slate-500 font-medium">Đã xác thực danh tính • Cho phép chỉnh sửa hồ sơ và đổi mật khẩu</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Sub-tabs inside Personal Security Modal */}
-            <div className="flex rounded-2xl bg-slate-950 p-1 border border-slate-800">
+            <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-950 p-1 border-2 border-slate-900">
               <button
                 type="button"
                 onClick={() => setProfileModalTab('profile')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
                   profileModalTab === 'profile'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-blue-600 text-white border-slate-900 shadow-[1px_1px_0_0_#0f172a]'
+                    : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900'
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -953,13 +953,13 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               <button
                 type="button"
                 onClick={() => setProfileModalTab('security')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
                   profileModalTab === 'security'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-blue-600 text-white border-slate-900 shadow-[1px_1px_0_0_#0f172a]'
+                    : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900'
                 }`}
               >
-                <Key className="w-3.5 h-3.5 text-amber-300" />
+                <Key className="w-3.5 h-3.5 text-yellow-300" />
                 <span>Bảo mật & Đổi mật khẩu</span>
               </button>
             </div>
@@ -971,23 +971,23 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 {/* Avatar Selector with Device Upload */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
                       Ảnh đại diện cá nhân
                     </label>
-                    <span className="text-[11px] text-cyan-400 font-medium">Hỗ trợ JPG, PNG, WEBP từ thiết bị</span>
+                    <span className="text-[11px] text-blue-700 dark:text-cyan-400 font-bold">Hỗ trợ JPG, PNG, WEBP từ thiết bị</span>
                   </div>
 
                   {/* Device Upload Bar */}
-                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] space-y-3">
                     <div className="flex flex-col sm:flex-row items-center gap-4">
                       <div className="relative shrink-0">
                         <img
                           src={editAvatar}
                           alt="Preview"
-                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-500 shadow-md"
+                          className="w-16 h-16 rounded-2xl object-cover border-2 border-slate-900 shadow-md"
                         />
                         {editAvatar.startsWith('data:image') && (
-                          <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500 text-[9px] font-bold text-white shadow">
+                          <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500 text-[9px] font-black text-white shadow border border-slate-900">
                             Từ máy
                           </span>
                         )}
@@ -1007,7 +1007,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                             type="button"
                             onClick={() => editAvatarFileInputRef.current?.click()}
                             disabled={isUploadingAvatar}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-glow-sm transition-all cursor-pointer"
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all cursor-pointer"
                           >
                             {isUploadingAvatar ? (
                               <>
@@ -1022,13 +1022,13 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                             )}
                           </button>
 
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-slate-500 font-semibold">
                             (Điện thoại, máy tính, thư viện ảnh)
                           </span>
                         </div>
 
                         {avatarUploadError && (
-                          <p className="text-xs text-rose-400 font-medium">
+                          <p className="text-xs text-rose-600 font-bold">
                             ⚠️ {avatarUploadError}
                           </p>
                         )}
@@ -1039,7 +1039,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                             value={editAvatar}
                             onChange={(e) => setEditAvatar(e.target.value)}
                             placeholder="Hoặc dán URL ảnh trực tuyến..."
-                            className="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-900 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-900 text-slate-900 dark:text-slate-200 focus:outline-none font-mono font-bold"
                           />
                         </div>
                       </div>
@@ -1048,7 +1048,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
 
                   {/* Ready-to-use Presets */}
                   <div className="space-y-1.5">
-                    <span className="text-[11px] text-slate-400 block">
+                    <span className="text-[11px] text-slate-500 font-bold block">
                       Hoặc chọn nhanh từ các mẫu avatar an toàn số chọn lọc:
                     </span>
                     <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
@@ -1057,17 +1057,17 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                           type="button"
                           key={idx}
                           onClick={() => setEditAvatar(preset.url)}
-                          className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
+                          className={`relative rounded-xl overflow-hidden aspect-square border-2 border-slate-900 transition-all cursor-pointer ${
                             editAvatar === preset.url
-                              ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
-                              : 'border-slate-800 hover:border-slate-600 opacity-70 hover:opacity-100'
+                              ? 'scale-105 shadow-[2px_2px_0_0_#0f172a] ring-2 ring-blue-500'
+                              : 'opacity-70 hover:opacity-100 hover:scale-105'
                           }`}
                           title={preset.label}
                         >
                           <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
                           {editAvatar === preset.url && (
-                            <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-cyan-300 drop-shadow" />
+                            <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-white drop-shadow" />
                             </div>
                           )}
                         </button>
@@ -1079,7 +1079,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 {/* Name & Username */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">
+                    <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                       Họ và tên hiển thị *
                     </label>
                     <input
@@ -1088,23 +1088,23 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       placeholder="VD: Hoàng Đình Dũng"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-sm font-bold focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">
+                    <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                       Tên người dùng (@username) *
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3.5 top-2.5 text-slate-500 font-mono text-sm">@</span>
+                      <span className="absolute left-3.5 top-2.5 text-slate-400 font-mono text-sm font-bold">@</span>
                       <input
                         type="text"
                         required
                         value={editUsername}
                         onChange={(e) => setEditUsername(e.target.value)}
                         placeholder="hoangdinhdung822"
-                        className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-mono focus:outline-none focus:border-indigo-500"
+                        className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-sm font-mono font-bold focus:outline-none"
                       />
                     </div>
                   </div>
@@ -1113,7 +1113,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 {/* School and Class */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">
+                    <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                       Trường học
                     </label>
                     <input
@@ -1121,12 +1121,12 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                       value={editSchool}
                       onChange={(e) => setEditSchool(e.target.value)}
                       placeholder="Trường THPT Số 1 Phan Đình Phùng"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-sm font-bold focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">
+                    <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                       Lớp / Khối / Đơn vị
                     </label>
                     <input
@@ -1134,14 +1134,14 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                       value={editClass}
                       onChange={(e) => setEditClass(e.target.value)}
                       placeholder="Khối 11 - Đoàn Trường"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-sm font-bold focus:outline-none"
                     />
                   </div>
                 </div>
 
                 {/* Bio */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                     Tiểu sử / Châm ngôn an toàn mạng
                   </label>
                   <textarea
@@ -1149,22 +1149,22 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     value={editBio}
                     onChange={(e) => setEditBio(e.target.value)}
                     placeholder="Chia sẻ đôi điều về bạn và quan điểm chống tin giả..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 leading-relaxed resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-sm font-medium focus:outline-none leading-relaxed resize-none"
                   />
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-slate-100 dark:border-slate-800">
                   <button
                     type="button"
                     onClick={() => setIsEditModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors"
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-bold border-2 border-slate-900 shadow-[1px_1px_0_0_#0f172a] transition-all cursor-pointer"
                   >
                     Hủy bỏ
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95"
+                    className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
                   >
                     Lưu thay đổi
                   </button>
@@ -1178,32 +1178,32 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
                 
                 {/* Security info card */}
-                <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-xs space-y-1.5">
-                  <div className="flex items-center gap-2 text-indigo-300 font-bold">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-indigo-950/40 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-xs space-y-1.5">
+                  <div className="flex items-center gap-2 text-blue-900 dark:text-indigo-300 font-black">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>Bảo vệ tài khoản @{user.username}</span>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                  <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed font-medium">
                     Mật khẩu giúp bảo vệ lịch sử Fact-Check, điểm XP và thông tin học sinh của bạn khỏi việc bị người khác truy cập trái phép.
                   </p>
                 </div>
 
                 {passwordChangeError && (
-                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-semibold flex items-start gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <div className="p-3 rounded-xl bg-rose-100 dark:bg-rose-500/20 border-2 border-slate-900 text-rose-950 dark:text-rose-200 text-xs font-bold flex items-start gap-2 shadow-[2px_2px_0_0_#0f172a]">
+                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <span>{passwordChangeError}</span>
                   </div>
                 )}
 
                 {passwordChangeSuccess && (
-                  <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs font-semibold flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 border-2 border-slate-900 text-emerald-950 dark:text-emerald-200 text-xs font-bold flex items-center gap-2 shadow-[2px_2px_0_0_#0f172a]">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>{passwordChangeSuccess}</span>
                   </div>
                 )}
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                     Mật khẩu hiện tại *
                   </label>
                   <input
@@ -1212,16 +1212,16 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     value={currentPasswordInput}
                     onChange={(e) => setCurrentPasswordInput(e.target.value)}
                     placeholder="Nhập mật khẩu đang dùng..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs font-bold focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-300">
+                    <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                       Mật khẩu mới *
                     </label>
-                    <span className="text-[10px] text-slate-400">Tối thiểu 3 ký tự</span>
+                    <span className="text-[10px] text-slate-500 font-semibold">Tối thiểu 3 ký tự</span>
                   </div>
                   <div className="relative">
                     <input
@@ -1230,12 +1230,12 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                       value={newPasswordInput}
                       onChange={(e) => setNewPasswordInput(e.target.value)}
                       placeholder="Nhập mật khẩu mới..."
-                      className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400"
+                      className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs font-bold focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-900"
                     >
                       {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -1243,7 +1243,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-black text-slate-700 dark:text-slate-300">
                     Xác nhận mật khẩu mới *
                   </label>
                   <input
@@ -1252,21 +1252,21 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     value={confirmNewPasswordInput}
                     onChange={(e) => setConfirmNewPasswordInput(e.target.value)}
                     placeholder="Nhập lại mật khẩu mới..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs font-bold focus:outline-none"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-slate-100 dark:border-slate-800">
                   <button
                     type="button"
                     onClick={() => setIsEditModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors"
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-bold border-2 border-slate-900 shadow-[1px_1px_0_0_#0f172a] transition-all cursor-pointer"
                   >
                     Đóng
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+                    className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <Key className="w-3.5 h-3.5" />
                     <span>Lưu mật khẩu mới</span>
@@ -1286,36 +1286,36 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       {/* ============================================================ */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-slate-900 border border-cyan-500/40 p-6 md:p-8 shadow-2xl space-y-6 text-slate-100">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-900 p-6 md:p-8 shadow-[6px_6px_0px_0px_#0f172a] space-y-6 text-slate-900 dark:text-slate-100">
             
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b-2 border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
+                <div className="w-10 h-10 rounded-2xl bg-amber-300 dark:bg-amber-400 text-slate-900 flex items-center justify-center border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]">
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Quản lý Tài Khoản & Đăng Nhập</h3>
-                  <p className="text-xs text-slate-400">Yêu cầu xác thực tài khoản và mật khẩu trước khi đăng nhập</p>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">Quản lý Tài Khoản & Đăng Nhập</h3>
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Yêu cầu xác thực tài khoản và mật khẩu trước khi đăng nhập</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAuthModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border-2 border-transparent hover:border-slate-900 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex rounded-2xl bg-slate-950 p-1 border border-slate-800">
+            <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-950 p-1.5 border-2 border-slate-900 gap-1.5">
               <button
                 type="button"
                 onClick={() => setAuthTab('switch')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
                   authTab === 'switch'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-amber-300 text-slate-900 border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-2 border-transparent'
                 }`}
               >
                 Danh sách tài khoản
@@ -1323,10 +1323,10 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               <button
                 type="button"
                 onClick={() => setAuthTab('login')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
                   authTab === 'login'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-amber-300 text-slate-900 border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-2 border-transparent'
                 }`}
               >
                 Đăng nhập bằng mật khẩu
@@ -1334,10 +1334,10 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
               <button
                 type="button"
                 onClick={() => setAuthTab('register')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
                   authTab === 'register'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-amber-300 text-slate-900 border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-2 border-transparent'
                 }`}
               >
                 Đăng ký mới
@@ -1347,7 +1347,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
             {/* TAB 1: QUICK ACCOUNT SWITCHER WITH PASSWORD PROMPT */}
             {authTab === 'switch' && (
               <div className="space-y-3">
-                <p className="text-xs text-slate-400">
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
                   Chọn tài khoản bên dưới và nhập đúng mật khẩu để chuyển đổi:
                 </p>
 
@@ -1358,52 +1358,52 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     return (
                       <div
                         key={acc.id}
-                        className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                        className={`flex items-center justify-between p-3.5 rounded-2xl border-2 transition-all ${
                           isCurrent
-                            ? 'bg-indigo-950/40 border-cyan-400/60 ring-1 ring-cyan-400/40'
-                            : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 dark:border-emerald-400 shadow-[2px_2px_0px_0px_#0f172a]'
+                            : 'bg-slate-50 dark:bg-slate-950 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:-translate-y-0.5'
                         }`}
                       >
                         <div className="flex items-center gap-3.5 min-w-0">
                           <img
                             src={acc.avatar}
                             alt={acc.name}
-                            className="w-12 h-12 rounded-xl object-cover ring-2 ring-slate-700 shrink-0"
+                            className="w-12 h-12 rounded-xl object-cover border-2 border-slate-900 shrink-0"
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h4 className="text-sm font-bold text-white truncate">{acc.name}</h4>
+                              <h4 className="text-sm font-black text-slate-900 dark:text-white truncate">{acc.name}</h4>
                               {isCurrent && (
-                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-500 text-[10px] font-black">
                                   Đang chọn
                                 </span>
                               )}
                               {acc.role === 'admin' && (
-                                <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold">
+                                <span className="px-1.5 py-0.2 rounded-md bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-500 text-[10px] font-black">
                                   Admin
                                 </span>
                               )}
-                              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono font-bold">
+                              <span className="px-1.5 py-0.2 rounded-md bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-500 text-[9px] font-mono font-bold">
                                 MK: {pwd}
                               </span>
                             </div>
-                            <span className="text-xs text-indigo-300 font-mono">@{acc.username}</span>
-                            <div className="text-[11px] text-slate-400 truncate">
-                              {acc.school || 'Trường THPT Số 1 Phan Đình Phùng'} • ⭐ {acc.points} XP
+                            <span className="text-xs text-blue-600 dark:text-blue-400 font-mono font-bold">@{acc.username}</span>
+                            <div className="text-[11px] text-slate-600 dark:text-slate-400 truncate font-medium">
+                              {acc.school || 'Trường THPT Toàn Quốc'} • ⭐ {acc.points} XP
                             </div>
                           </div>
                         </div>
 
                         <div>
                           {isCurrent ? (
-                            <span className="text-xs font-semibold text-cyan-400 flex items-center gap-1">
+                            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                               <Check className="w-4 h-4" /> Hiện tại
                             </span>
                           ) : (
                             <button
                               type="button"
                               onClick={() => handleSelectSwitchAccount(acc)}
-                              className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all shadow-md hover:scale-105 active:scale-95 flex items-center gap-1"
+                              className="px-3.5 py-1.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-black text-xs transition-all border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1"
                             >
                               <Lock className="w-3 h-3" />
                               <span>Đăng nhập</span>
@@ -1421,14 +1421,14 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
             {authTab === 'login' && (
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 {authModalLoginError && (
-                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-semibold flex items-start gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border-2 border-rose-500 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-start gap-2 shadow-[2px_2px_0px_0px_#0f172a]">
+                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <span>{authModalLoginError}</span>
                   </div>
                 )}
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-black text-slate-800 dark:text-slate-200">
                     Tên tài khoản (@username) hoặc Email *
                   </label>
                   <input
@@ -1437,16 +1437,16 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     value={loginInput}
                     onChange={(e) => setLoginInput(e.target.value)}
                     placeholder="VD: hoangdinhdung822 hoặc baotram_digital"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400 font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 font-mono shadow-[2px_2px_0px_0px_#0f172a]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-300">
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">
                       Mật khẩu tài khoản *
                     </label>
-                    <span className="text-[10px] text-amber-300 font-mono">
+                    <span className="text-[10px] text-amber-700 dark:text-amber-300 font-mono font-bold">
                       Mẫu: 123456 (Admin: admin123)
                     </span>
                   </div>
@@ -1457,12 +1457,12 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                       value={loginPasswordInput}
                       onChange={(e) => setLoginPasswordInput(e.target.value)}
                       placeholder="Nhập mật khẩu..."
-                      className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400"
+                      className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                     />
                     <button
                       type="button"
                       onClick={() => setShowLoginModalPassword(!showLoginModalPassword)}
-                      className="absolute right-3.5 top-2.5 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3.5 top-2.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                     >
                       {showLoginModalPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -1471,7 +1471,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-black border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>Xác thực & Đăng nhập</span>
@@ -1483,40 +1483,40 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
             {authTab === 'register' && (
               <form onSubmit={handleRegisterSubmit} className="space-y-4">
                 {regError && (
-                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-semibold flex items-start gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border-2 border-rose-500 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-start gap-2 shadow-[2px_2px_0px_0px_#0f172a]">
+                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <span>{regError}</span>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Họ và tên *</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Họ và tên *</label>
                     <input
                       type="text"
                       required
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
                       placeholder="VD: Nguyễn Văn An"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Username (@)</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Username (@)</label>
                     <input
                       type="text"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
                       placeholder="VD: an_genz"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Mật khẩu bảo vệ *</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Mật khẩu bảo vệ *</label>
                     <div className="relative">
                       <input
                         type={showRegPassword ? 'text' : 'password'}
@@ -1524,12 +1524,12 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                         value={regPassword}
                         onChange={(e) => setRegPassword(e.target.value)}
                         placeholder="Tối thiểu 3 ký tự"
-                        className="w-full pl-3 pr-9 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500"
+                        className="w-full pl-3 pr-9 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowRegPassword(!showRegPassword)}
-                        className="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300"
+                        className="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                       >
                         {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
@@ -1537,38 +1537,38 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Xác nhận mật khẩu *</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Xác nhận mật khẩu *</label>
                     <input
                       type={showRegPassword ? 'text' : 'password'}
                       required
                       value={regConfirmPassword}
                       onChange={(e) => setRegConfirmPassword(e.target.value)}
                       placeholder="Nhập lại mật khẩu"
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Trường học</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Trường học</label>
                     <input
                       type="text"
                       value={regSchool}
                       onChange={(e) => setRegSchool(e.target.value)}
                       placeholder="Trường THPT Số 1 Phan Đình Phùng"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Lớp / Khối</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Lớp / Khối</label>
                     <input
                       type="text"
                       value={regClass}
                       onChange={(e) => setRegClass(e.target.value)}
                       placeholder="Lớp 11A1"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                     />
                   </div>
                 </div>
@@ -1576,7 +1576,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                 {/* Avatar Selection with Device Upload */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-300">Ảnh đại diện</label>
+                    <label className="text-xs font-black text-slate-800 dark:text-slate-200">Ảnh đại diện</label>
                     
                     <input
                       type="file"
@@ -1588,20 +1588,20 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     <button
                       type="button"
                       onClick={() => regAvatarFileInputRef.current?.click()}
-                      className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       <span>Tải ảnh từ máy</span>
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]">
                     <img
                       src={regAvatar}
                       alt="Preview"
-                      className="w-12 h-12 rounded-xl object-cover ring-2 ring-indigo-500 shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border-2 border-slate-900 shrink-0"
                     />
-                    <span className="text-[11px] text-slate-400 flex-1">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 flex-1">
                       {regAvatar.startsWith('data:image') 
                         ? '🟢 Đã chọn ảnh từ thiết bị cá nhân' 
                         : 'Mẫu avatar an toàn số chọn lọc bên dưới'}
@@ -1614,10 +1614,10 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                         type="button"
                         key={idx}
                         onClick={() => setRegAvatar(preset.url)}
-                        className={`rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
+                        className={`rounded-xl overflow-hidden aspect-square border-2 border-slate-900 transition-all cursor-pointer ${
                           regAvatar === preset.url
-                            ? 'border-cyan-400 scale-105 shadow-md shadow-cyan-500/30 ring-2 ring-cyan-400'
-                            : 'border-slate-800 opacity-60 hover:opacity-100'
+                            ? 'scale-105 shadow-[3px_3px_0px_0px_#0f172a] ring-2 ring-amber-300'
+                            : 'opacity-60 hover:opacity-100 hover:shadow-[2px_2px_0px_0px_#0f172a]'
                         }`}
                         title={preset.label}
                       >
@@ -1629,7 +1629,7 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl bg-amber-300 hover:bg-amber-400 text-slate-900 text-xs font-black border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2"
                 >
                   <UserPlus className="w-4 h-4" />
                   <span>Tạo tài khoản & Đăng nhập</span>
@@ -1646,43 +1646,43 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
       {/* ============================================================ */}
       {selectedSwitchUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-cyan-500/40 p-5 space-y-4 shadow-2xl text-slate-100">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-900 p-5 space-y-4 shadow-[6px_6px_0px_0px_#0f172a] text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
                 <img
                   src={selectedSwitchUser.avatar}
                   alt={selectedSwitchUser.name}
-                  className="w-9 h-9 rounded-xl object-cover ring-2 ring-cyan-400/50"
+                  className="w-10 h-10 rounded-xl object-cover border-2 border-slate-900"
                 />
                 <div>
-                  <h4 className="text-sm font-bold text-white leading-tight">{selectedSwitchUser.name}</h4>
-                  <span className="text-[11px] text-cyan-400 font-mono">@{selectedSwitchUser.username}</span>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white leading-tight">{selectedSwitchUser.name}</h4>
+                  <span className="text-[11px] text-blue-600 dark:text-blue-400 font-mono font-bold">@{selectedSwitchUser.username}</span>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedSwitchUser(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleConfirmSwitchAccount} className="space-y-3.5">
-              <p className="text-xs text-slate-300">
-                Nhập mật khẩu của <strong className="text-white">@{selectedSwitchUser.username}</strong> để đăng nhập:
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Nhập mật khẩu của <strong className="text-slate-900 dark:text-white">@{selectedSwitchUser.username}</strong> để đăng nhập:
               </p>
 
               {switchError && (
-                <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-semibold flex items-start gap-1.5">
-                  <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border-2 border-rose-500 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-start gap-1.5 shadow-[2px_2px_0px_0px_#0f172a]">
+                  <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                   <span>{switchError}</span>
                 </div>
               )}
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">Mật khẩu *</span>
-                  <span className="text-amber-300 font-mono">
+                  <span className="font-bold text-slate-600 dark:text-slate-400">Mật khẩu *</span>
+                  <span className="text-amber-700 dark:text-amber-300 font-mono font-bold">
                     Gợi ý: {selectedSwitchUser.role === 'admin' ? 'admin123' : '123456'}
                   </span>
                 </div>
@@ -1694,29 +1694,29 @@ export const ProfilePage: React.FC<Props> = ({ user, onUserUpdate, onLogout }) =
                     value={switchPasswordInput}
                     onChange={(e) => setSwitchPasswordInput(e.target.value)}
                     placeholder="Nhập mật khẩu..."
-                    className="w-full pl-3 pr-9 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full pl-3 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border-2 border-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-[2px_2px_0px_0px_#0f172a]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowSwitchPassword(!showSwitchPassword)}
-                    className="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300"
+                    className="absolute right-2.5 top-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                   >
                     {showSwitchPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t-2 border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setSelectedSwitchUser(null)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-200"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>Xác nhận đăng nhập</span>

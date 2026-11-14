@@ -138,30 +138,30 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-5 md:p-6 shadow-2xl relative text-slate-100 max-h-[92vh] flex flex-col">
+      <div className="w-full max-w-lg bg-white dark:bg-slate-900 border-2 border-slate-900 rounded-3xl p-5 md:p-6 shadow-[6px_6px_0_0_#0f172a] relative text-slate-900 dark:text-slate-100 max-h-[92vh] flex flex-col">
         
         {/* Toast confirmation */}
         {sharedToast && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xl animate-in slide-in-from-top-3">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-black border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] animate-in slide-in-from-top-3">
             <CheckCircle2 className="w-4 h-4 text-emerald-200" />
             <span>{sharedToast}</span>
           </div>
         )}
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-3.5 border-b border-slate-800 shrink-0">
+        <div className="flex items-center justify-between pb-3.5 border-b-2 border-slate-900 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400">
+            <div className="p-2.5 rounded-2xl bg-blue-100 dark:bg-cyan-500/20 text-blue-700 dark:text-cyan-400 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
               <Share2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Chia sẻ bài đăng ra ngoài</h2>
-              <p className="text-xs text-slate-400">Lan tỏa tin tức đã kiểm chứng đến người thân & mạng xã hội</p>
+              <h2 className="text-base font-black text-slate-900 dark:text-white">Chia sẻ bài đăng ra ngoài</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Lan tỏa tin tức đã kiểm chứng đến người thân & mạng xã hội</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-600 hover:text-black dark:text-slate-400 dark:hover:text-white bg-mint-50 dark:bg-slate-800 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] transition-all hover:-translate-y-0.5"
           >
             <X className="w-4 h-4" />
           </button>
@@ -171,29 +171,29 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
         <div className="overflow-y-auto py-4 space-y-4 flex-1 pr-1">
           
           {/* Post Snippet Card Preview */}
-          <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2.5">
+          <div className="p-3.5 rounded-2xl bg-mint-50/70 dark:bg-slate-950/80 border-2 border-slate-900 space-y-2.5 shadow-[2px_2px_0_0_#0f172a]">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <img
                   src={post.author.avatar}
                   alt={post.author.name}
-                  className="w-7 h-7 rounded-full object-cover ring-1 ring-slate-700"
+                  className="w-7 h-7 rounded-full object-cover border border-slate-900 shadow-[1px_1px_0_0_#0f172a]"
                 />
                 <div>
-                  <span className="font-bold text-xs text-white block">{post.author.name}</span>
+                  <span className="font-black text-xs text-slate-900 dark:text-white block">{post.author.name}</span>
                   <span className="text-[10px] text-slate-500">@{post.author.username}</span>
                 </div>
               </div>
               <AiStatusBadge status={post.verificationStatus} score={post.verificationScore} size="sm" />
             </div>
-            <p className="text-xs text-slate-300 line-clamp-2 italic">
+            <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-2 italic font-medium">
               "{post.content}"
             </p>
           </div>
 
           {/* Section 1: External Social Media Channels */}
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2.5">
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-400 block mb-2.5">
               1. Chia sẻ trực tiếp qua mạng xã hội
             </span>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -201,10 +201,10 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
               {/* Facebook */}
               <button
                 onClick={handleShareFacebook}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-blue-950/40 border border-blue-600/30 hover:border-blue-500 hover:bg-blue-900/40 text-blue-300 text-xs font-semibold gap-1.5 transition-all group cursor-pointer"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white hover:bg-blue-50 border-2 border-slate-900 text-blue-700 text-xs font-black gap-1.5 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all group cursor-pointer"
                 title="Chia sẻ lên Facebook"
               >
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-base shadow-sm group-hover:scale-105 transition-transform">
                   f
                 </div>
                 <span className="text-[11px]">Facebook</span>
@@ -213,10 +213,10 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
               {/* Zalo */}
               <button
                 onClick={handleShareZalo}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-sky-950/40 border border-sky-600/30 hover:border-sky-500 hover:bg-sky-900/40 text-sky-300 text-xs font-semibold gap-1.5 transition-all group cursor-pointer"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white hover:bg-sky-50 border-2 border-slate-900 text-sky-700 text-xs font-black gap-1.5 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all group cursor-pointer"
                 title="Chia sẻ qua Zalo"
               >
-                <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-extrabold text-xs shadow-sm group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-black text-xs shadow-sm group-hover:scale-105 transition-transform">
                   Zalo
                 </div>
                 <span className="text-[11px]">Zalo</span>
@@ -225,7 +225,7 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
               {/* Telegram */}
               <button
                 onClick={handleShareTelegram}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-cyan-950/40 border border-cyan-600/30 hover:border-cyan-500 hover:bg-cyan-900/40 text-cyan-300 text-xs font-semibold gap-1.5 transition-all group cursor-pointer"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white hover:bg-cyan-50 border-2 border-slate-900 text-cyan-700 text-xs font-black gap-1.5 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all group cursor-pointer"
                 title="Chia sẻ qua Telegram"
               >
                 <div className="w-8 h-8 rounded-full bg-cyan-500 text-slate-950 flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
@@ -237,10 +237,10 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
               {/* X / Twitter */}
               <button
                 onClick={handleShareTwitter}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-slate-950 border border-slate-700/80 hover:border-slate-500 hover:bg-slate-800 text-slate-200 text-xs font-semibold gap-1.5 transition-all group cursor-pointer"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white hover:bg-slate-100 border-2 border-slate-900 text-slate-900 text-xs font-black gap-1.5 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all group cursor-pointer"
                 title="Chia sẻ lên X (Twitter)"
               >
-                <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-extrabold text-xs shadow-sm group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs shadow-sm group-hover:scale-105 transition-transform">
                   𝕏
                 </div>
                 <span className="text-[11px]">X (Twitter)</span>
@@ -249,7 +249,7 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
               {/* WhatsApp */}
               <button
                 onClick={handleShareWhatsApp}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-600/30 hover:border-emerald-500 hover:bg-emerald-900/40 text-emerald-300 text-xs font-semibold gap-1.5 transition-all group cursor-pointer"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white hover:bg-emerald-50 border-2 border-slate-900 text-emerald-700 text-xs font-black gap-1.5 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all group cursor-pointer"
                 title="Chia sẻ qua WhatsApp"
               >
                 <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
@@ -261,7 +261,7 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
               {/* Email */}
               <button
                 onClick={handleShareEmail}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-purple-950/40 border border-purple-600/30 hover:border-purple-500 hover:bg-purple-900/40 text-purple-300 text-xs font-semibold gap-1.5 transition-all group cursor-pointer"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white hover:bg-purple-50 border-2 border-slate-900 text-purple-700 text-xs font-black gap-1.5 shadow-[2px_2px_0_0_#0f172a] hover:-translate-y-0.5 transition-all group cursor-pointer"
                 title="Chia sẻ qua Email"
               >
                 <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
@@ -273,11 +273,11 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
             </div>
           </div>
 
-          {/* Native OS Share Button (nếu trình duyệt hỗ trợ) */}
+          {/* Native OS Share Button */}
           {canNativeShare && (
             <button
               onClick={handleNativeShare}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] transition-all hover:-translate-y-0.5 cursor-pointer"
             >
               <Smartphone className="w-4 h-4" />
               <span>Mở danh sách chia sẻ của thiết bị (Zalo, Messenger, SMS...)</span>
@@ -286,7 +286,7 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
 
           {/* Section 2: Copy Direct Post Link */}
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-400 block mb-2">
               2. Sao chép liên kết trực tiếp
             </span>
             <div className="flex items-center gap-2">
@@ -294,14 +294,14 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
                 type="text"
                 readOnly
                 value={postUrl}
-                className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 font-mono focus:outline-none select-all"
+                className="flex-1 px-3.5 py-2.5 rounded-xl bg-mint-50 dark:bg-slate-950 border-2 border-slate-900 text-xs text-slate-800 dark:text-slate-300 font-mono focus:outline-none select-all font-bold shadow-[2px_2px_0_0_#0f172a]"
               />
               <button
                 onClick={handleCopyLink}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer shrink-0 ${
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-black text-xs border-2 border-slate-900 transition-all cursor-pointer shrink-0 ${
                   copiedLink
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-glow-sm'
+                    ? 'bg-emerald-600 text-white shadow-[2px_2px_0_0_#0f172a]'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5'
                 }`}
               >
                 {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -310,26 +310,26 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
             </div>
           </div>
 
-          {/* Section 3: Copy Formatted AI Fact-Check Summary (Dành riêng cho nhóm chat Zalo/Facebook) */}
-          <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-2">
+          {/* Section 3: Copy Formatted AI Fact-Check Summary */}
+          <div className="p-3.5 rounded-2xl bg-mint-50/70 dark:bg-slate-950/90 border-2 border-slate-900 space-y-2 shadow-[3px_3px_0_0_#0f172a]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="text-xs font-black text-blue-800 dark:text-cyan-300 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />
                 3. Sao chép Thẻ Đánh Giá AI (Gửi vào nhóm lớp, Zalo, Messenger)
               </span>
               <button
                 onClick={handleCopyCardText}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-black border-2 border-slate-900 transition-all cursor-pointer ${
                   copiedCard
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30'
+                    ? 'bg-emerald-600 text-white shadow-[2px_2px_0_0_#0f172a]'
+                    : 'bg-white hover:bg-mint-100 text-slate-900 shadow-[2px_2px_0_0_#0f172a]'
                 }`}
               >
                 {copiedCard ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedCard ? 'Đã sao chép thẻ!' : 'Sao chép nội dung'}</span>
               </button>
             </div>
-            <pre className="text-[11px] text-slate-300 font-sans whitespace-pre-wrap bg-slate-900 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed max-h-32 overflow-y-auto">
+            <pre className="text-[11px] text-slate-800 dark:text-slate-300 font-sans whitespace-pre-wrap bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-900 leading-relaxed max-h-32 overflow-y-auto font-medium">
               {factCheckSummaryText}
             </pre>
           </div>
@@ -337,14 +337,14 @@ Nội dung: "${post.content.length > 120 ? post.content.slice(0, 117) + '...' : 
         </div>
 
         {/* Modal Footer */}
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 shrink-0">
+        <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 shrink-0 font-bold">
           <span className="flex items-center gap-1 text-[11px]">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             Mỗi lượt chia sẻ tin xác thực được thưởng <strong>+5 XP</strong>
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-mint-50 dark:bg-slate-800 hover:bg-mint-100 text-slate-900 dark:text-slate-200 font-black border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] transition-all cursor-pointer"
           >
             Đóng
           </button>

@@ -26,9 +26,9 @@ export const AiStatusBadge: React.FC<Props> = ({
             label: 'THÔNG TIN ĐÚNG',
             subLabel: 'Có bằng chứng đáng tin cậy hỗ trợ',
             icon: CheckCircle2,
-            bgColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40',
-            dotColor: 'bg-emerald-400',
-            glow: 'shadow-[0_0_14px_rgba(16,185,129,0.3)]',
+            bgColor: 'bg-emerald-100 text-emerald-950 border-slate-900 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/40',
+            dotColor: 'bg-emerald-500',
+            glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_14px_rgba(16,185,129,0.3)]',
             badgeText: '🟢'
           };
         case 'FALSE':
@@ -36,9 +36,9 @@ export const AiStatusBadge: React.FC<Props> = ({
             label: 'THÔNG TIN SAI',
             subLabel: 'Có bằng chứng đáng tin cậy mâu thuẫn',
             icon: XCircle,
-            bgColor: 'bg-rose-500/10 text-rose-400 border-rose-500/40',
-            dotColor: 'bg-rose-400',
-            glow: 'shadow-[0_0_14px_rgba(244,63,94,0.35)]',
+            bgColor: 'bg-rose-100 text-rose-950 border-slate-900 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/40',
+            dotColor: 'bg-rose-500',
+            glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_14px_rgba(244,63,94,0.35)]',
             badgeText: '🔴'
           };
         case 'MISLEADING':
@@ -46,9 +46,9 @@ export const AiStatusBadge: React.FC<Props> = ({
             label: 'THÔNG TIN GÂY HIỂU LẦM',
             subLabel: 'Một phần đúng nhưng sai bối cảnh',
             icon: AlertTriangle,
-            bgColor: 'bg-amber-500/10 text-amber-300 border-amber-500/40',
-            dotColor: 'bg-amber-400',
-            glow: 'shadow-[0_0_14px_rgba(245,158,11,0.25)]',
+            bgColor: 'bg-amber-100 text-amber-950 border-slate-900 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/40',
+            dotColor: 'bg-amber-500',
+            glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_14px_rgba(245,158,11,0.25)]',
             badgeText: '🟡'
           };
         case 'INSUFFICIENT_EVIDENCE':
@@ -57,9 +57,9 @@ export const AiStatusBadge: React.FC<Props> = ({
             label: 'CHƯA ĐỦ DỮ LIỆU',
             subLabel: 'Chưa đủ bằng chứng để kết luận',
             icon: HelpCircle,
-            bgColor: 'bg-slate-700/30 text-slate-300 border-slate-500/40',
-            dotColor: 'bg-slate-300',
-            glow: 'shadow-[0_0_12px_rgba(148,163,184,0.2)]',
+            bgColor: 'bg-slate-100 text-slate-900 border-slate-900 dark:bg-slate-700/30 dark:text-slate-300 dark:border-slate-500/40',
+            dotColor: 'bg-slate-500',
+            glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_12px_rgba(148,163,184,0.2)]',
             badgeText: '⚪'
           };
       }
@@ -72,9 +72,9 @@ export const AiStatusBadge: React.FC<Props> = ({
           label: 'THÔNG TIN ĐÚNG',
           subLabel: 'Có cơ sở chính thống',
           icon: CheckCircle2,
-          bgColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-          dotColor: 'bg-emerald-400',
-          glow: 'shadow-[0_0_12px_rgba(16,185,129,0.25)]',
+          bgColor: 'bg-emerald-100 text-emerald-950 border-slate-900 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30',
+          dotColor: 'bg-emerald-500',
+          glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_12px_rgba(16,185,129,0.25)]',
           badgeText: '🟢'
         };
       case 'unverified':
@@ -82,9 +82,9 @@ export const AiStatusBadge: React.FC<Props> = ({
           label: 'CHƯA ĐỦ DỮ LIỆU',
           subLabel: 'Cần kiểm chứng thêm',
           icon: HelpCircle,
-          bgColor: 'bg-slate-700/30 text-slate-300 border-slate-500/40',
-          dotColor: 'bg-slate-300',
-          glow: 'shadow-[0_0_12px_rgba(148,163,184,0.2)]',
+          bgColor: 'bg-slate-100 text-slate-900 border-slate-900 dark:bg-slate-700/30 dark:text-slate-300 dark:border-slate-500/40',
+          dotColor: 'bg-slate-500',
+          glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_12px_rgba(148,163,184,0.2)]',
           badgeText: '⚪'
         };
       case 'suspicious':
@@ -92,9 +92,9 @@ export const AiStatusBadge: React.FC<Props> = ({
           label: 'THÔNG TIN GÂY HIỂU LẦM',
           subLabel: 'Thiếu căn cứ khoa học',
           icon: AlertTriangle,
-          bgColor: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-          dotColor: 'bg-amber-400',
-          glow: 'shadow-[0_0_12px_rgba(245,158,11,0.25)]',
+          bgColor: 'bg-amber-100 text-amber-950 border-slate-900 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/30',
+          dotColor: 'bg-amber-500',
+          glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_12px_rgba(245,158,11,0.25)]',
           badgeText: '🟡'
         };
       case 'debunked':
@@ -102,9 +102,9 @@ export const AiStatusBadge: React.FC<Props> = ({
           label: 'THÔNG TIN SAI',
           subLabel: 'Cảnh báo tin giả / Sai lệch',
           icon: XCircle,
-          bgColor: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
-          dotColor: 'bg-rose-400',
-          glow: 'shadow-[0_0_12px_rgba(244,63,94,0.3)]',
+          bgColor: 'bg-rose-100 text-rose-950 border-slate-900 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30',
+          dotColor: 'bg-rose-500',
+          glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_12px_rgba(244,63,94,0.3)]',
           badgeText: '🔴'
         };
       case 'analyzing':
@@ -113,9 +113,9 @@ export const AiStatusBadge: React.FC<Props> = ({
           label: 'AI đang phân tích...',
           subLabel: 'Đang quét nguồn dữ liệu',
           icon: Loader2,
-          bgColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30',
-          dotColor: 'bg-indigo-400',
-          glow: 'shadow-[0_0_12px_rgba(99,102,241,0.25)]',
+          bgColor: 'bg-blue-100 text-blue-950 border-slate-900 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30',
+          dotColor: 'bg-blue-500',
+          glow: 'shadow-[2px_2px_0_0_#0f172a] dark:shadow-[0_0_12px_rgba(99,102,241,0.25)]',
           badgeText: '🤖'
         };
     }
@@ -166,18 +166,18 @@ export const AiStatusBadge: React.FC<Props> = ({
   const displayScore = getSanitizedScore();
 
   return (
-    <div className={`inline-flex items-center rounded-full border backdrop-blur-md transition-all ${config.bgColor} ${config.glow} ${sizeClasses[size]}`}>
+    <div className={`inline-flex items-center rounded-full border-2 backdrop-blur-md transition-all ${config.bgColor} ${config.glow} ${sizeClasses[size]}`}>
       <span className="relative flex h-2.5 w-2.5">
         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${config.dotColor}`}></span>
         <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${config.dotColor}`}></span>
       </span>
       <span className="text-xs mr-0.5">{config.badgeText}</span>
       <Icon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${status === 'analyzing' ? 'animate-spin' : ''}`} />
-      <span className="font-extrabold uppercase">{config.label}</span>
+      <span className="font-extrabold uppercase tracking-wide">{config.label}</span>
       {showScore && displayScore !== undefined && (
         <span 
           title={`Mức độ tin cậy của thông tin: ${displayScore}/100`}
-          className="ml-1 px-1.5 py-0.5 rounded-full bg-black/35 text-[11px] font-mono font-bold tracking-tight"
+          className="ml-1 px-2 py-0.5 rounded-full bg-slate-900 text-white dark:bg-black/50 text-[11px] font-mono font-black tracking-tight"
         >
           {displayScore}/100
         </span>

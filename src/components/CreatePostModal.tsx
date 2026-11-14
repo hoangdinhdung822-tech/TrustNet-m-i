@@ -119,23 +119,23 @@ export const CreatePostModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative text-slate-100 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 border-2 border-slate-900 rounded-3xl p-6 shadow-[6px_6px_0_0_#0f172a] relative text-slate-900 dark:text-slate-100 max-h-[90vh] flex flex-col">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+        <div className="flex items-center justify-between pb-4 border-b-2 border-slate-900 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-indigo-500/20 text-indigo-400">
+            <div className="p-2.5 rounded-2xl bg-blue-100 dark:bg-indigo-500/20 text-blue-700 dark:text-indigo-400 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Tạo bài viết mới & Kiểm chứng AI</h2>
-              <p className="text-xs text-slate-400">Đăng tin có trách nhiệm – AI tự động hỗ trợ xác minh</p>
+              <h2 className="text-base md:text-lg font-black text-slate-900 dark:text-white">Tạo bài viết mới & Kiểm chứng AI</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Đăng tin có trách nhiệm – AI tự động hỗ trợ xác minh</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-600 hover:text-black dark:text-slate-400 dark:hover:text-white bg-mint-50 dark:bg-slate-800 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] transition-all hover:-translate-y-0.5"
           >
             <X className="w-4 h-4" />
           </button>
@@ -149,16 +149,16 @@ export const CreatePostModal: React.FC<Props> = ({
             <img 
               src={currentUser.avatar} 
               alt={currentUser.name} 
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500/30" 
+              className="w-10 h-10 rounded-full object-cover border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a]" 
             />
             <div>
-              <div className="text-sm font-bold text-white flex items-center gap-1.5">
+              <div className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
                 {currentUser.name}
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-500/20">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-mint-100 text-slate-900 dark:bg-indigo-950 dark:text-indigo-300 border border-slate-900 font-bold">
                   {currentUser.rankTitle}
                 </span>
               </div>
-              <p className="text-xs text-slate-500">Mọi bài đăng sẽ được AI cấp chứng chỉ kiểm chứng trước khi công khai</p>
+              <p className="text-xs text-slate-500 font-medium">Mọi bài đăng sẽ được AI cấp chứng chỉ kiểm chứng trước khi công khai</p>
             </div>
           </div>
 
@@ -172,19 +172,19 @@ export const CreatePostModal: React.FC<Props> = ({
               }}
               placeholder="Bạn muốn chia sẻ thông tin hoặc phát hiện tin tức gì hôm nay? Đừng quên đính kèm nguồn để đạt điểm uy tín cao..."
               rows={4}
-              className="w-full px-4 py-3 rounded-2xl bg-slate-950/70 border border-slate-800 focus:border-indigo-500 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-2xl bg-mint-50/50 dark:bg-slate-950/70 border-2 border-slate-900 focus:border-blue-600 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-none transition-all resize-none shadow-[2px_2px_0_0_#0f172a] font-medium"
             />
           </div>
 
           {/* Optional Attachments Toggle */}
-          <div className="flex items-center gap-3 text-xs text-slate-400">
+          <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 font-bold">
             <button
               type="button"
               onClick={() => setShowSourceInput(!showSourceInput)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 transition-all ${
                 showSourceInput || sourceUrl
-                  ? 'bg-cyan-950/50 border-cyan-500/40 text-cyan-300'
-                  : 'bg-slate-800/50 border-slate-700/60 hover:text-slate-200'
+                  ? 'bg-blue-100 dark:bg-cyan-950/50 border-slate-900 text-blue-700 dark:text-cyan-300 shadow-[2px_2px_0_0_#0f172a]'
+                  : 'bg-white dark:bg-slate-800/50 border-slate-900 hover:bg-mint-100'
               }`}
             >
               <LinkIcon className="w-3.5 h-3.5" />
@@ -194,10 +194,10 @@ export const CreatePostModal: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => setShowImageInput(!showImageInput)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 transition-all ${
                 showImageInput || imageUrl
-                  ? 'bg-indigo-950/50 border-indigo-500/40 text-indigo-300'
-                  : 'bg-slate-800/50 border-slate-700/60 hover:text-slate-200'
+                  ? 'bg-blue-100 dark:bg-indigo-950/50 border-slate-900 text-blue-700 dark:text-indigo-300 shadow-[2px_2px_0_0_#0f172a]'
+                  : 'bg-white dark:bg-slate-800/50 border-slate-900 hover:bg-mint-100'
               }`}
             >
               <ImageIcon className="w-3.5 h-3.5" />
@@ -207,8 +207,8 @@ export const CreatePostModal: React.FC<Props> = ({
 
           {/* Source URL Input */}
           {(showSourceInput || sourceUrl) && (
-            <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1 animate-in fade-in">
-              <label className="text-[11px] font-semibold text-cyan-400 flex items-center gap-1">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-950/60 border-2 border-slate-900 space-y-1 animate-in fade-in shadow-[2px_2px_0_0_#0f172a]">
+              <label className="text-[11px] font-black text-blue-700 dark:text-cyan-400 flex items-center gap-1">
                 <LinkIcon className="w-3 h-3" />
                 Đường dẫn liên kết nguồn (VD: https://chinhphu.vn/...):
               </label>
@@ -220,15 +220,15 @@ export const CreatePostModal: React.FC<Props> = ({
                   if (aiResult) setAiResult(null);
                 }}
                 placeholder="https://tuoitre.vn/bai-viet-goc..."
-                className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-mint-50 dark:bg-slate-900 border-2 border-slate-900 text-xs text-slate-900 dark:text-slate-200 placeholder:text-slate-500 focus:outline-none font-medium"
               />
             </div>
           )}
 
           {/* Image URL Input */}
           {(showImageInput || imageUrl) && (
-            <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1 animate-in fade-in">
-              <label className="text-[11px] font-semibold text-indigo-400 flex items-center gap-1">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-950/60 border-2 border-slate-900 space-y-1 animate-in fade-in shadow-[2px_2px_0_0_#0f172a]">
+              <label className="text-[11px] font-black text-blue-700 dark:text-indigo-400 flex items-center gap-1">
                 <ImageIcon className="w-3 h-3" />
                 URL hình ảnh trực quan:
               </label>
@@ -237,24 +237,24 @@ export const CreatePostModal: React.FC<Props> = ({
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://images.unsplash.com/..."
-                className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-mint-50 dark:bg-slate-900 border-2 border-slate-900 text-xs text-slate-900 dark:text-slate-200 placeholder:text-slate-500 focus:outline-none font-medium"
               />
             </div>
           )}
 
           {/* AI Scanning Banner Animation */}
           {isAnalyzing && (
-            <div className="p-4 rounded-2xl bg-indigo-950/50 border border-indigo-500/40 space-y-3 animate-pulse">
+            <div className="p-4 rounded-2xl bg-blue-50 dark:bg-indigo-950/50 border-2 border-slate-900 space-y-3 animate-pulse shadow-[3px_3px_0_0_#0f172a]">
               <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
-                <div className="text-xs font-semibold text-slate-200">
+                <Loader2 className="w-5 h-5 text-blue-600 dark:text-cyan-400 animate-spin" />
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-200">
                   {analysisStep || 'Hệ thống AI đang khởi động kiểm tra chéo dữ liệu...'}
                 </div>
               </div>
-              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 animate-shimmer" style={{ width: '100%' }} />
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-900">
+                <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 animate-shimmer" style={{ width: '100%' }} />
               </div>
-              <p className="text-[11px] text-slate-400 italic">
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 italic">
                 * AI phân tích tính nhất quán, tra cứu cổng thông tin chính thống và cảnh báo dấu hiệu bóp méo ngữ cảnh.
               </p>
             </div>
@@ -262,21 +262,21 @@ export const CreatePostModal: React.FC<Props> = ({
 
           {/* AI Result Card Preview */}
           {aiResult && !isAnalyzing && (
-            <div className="p-4 rounded-2xl bg-slate-950 border border-indigo-500/30 space-y-3 animate-in zoom-in-95 duration-200">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-950 border-2 border-slate-900 space-y-3 animate-in zoom-in-95 duration-200 shadow-[3px_3px_0_0_#0f172a]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-400 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-indigo-400" />
                   Kết quả đánh giá từ AI Trợ lý:
                 </span>
                 <AiStatusBadge status={aiResult.status} score={aiResult.score} />
               </div>
 
-              <div className="text-xs text-slate-200 leading-relaxed bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <p className="font-semibold text-white mb-1">
+              <div className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed bg-mint-50 dark:bg-slate-900/80 p-3.5 rounded-xl border-2 border-slate-900">
+                <p className="font-black text-slate-900 dark:text-white mb-1">
                   {aiResult.summary}
                 </p>
-                <p className="text-slate-400">
-                  <span className="text-indigo-300 font-medium">Lý do: </span>
+                <p className="text-slate-700 dark:text-slate-400 font-medium">
+                  <span className="text-blue-700 dark:text-indigo-300 font-bold">Lý do: </span>
                   {aiResult.reasoning}
                 </p>
               </div>
@@ -284,8 +284,8 @@ export const CreatePostModal: React.FC<Props> = ({
               {/* Claims Breakdown */}
               {aiResult.claims.length > 0 && (
                 <div className="text-xs space-y-1">
-                  <span className="font-semibold text-slate-400">Các tuyên bố chính phát hiện:</span>
-                  <ul className="list-disc list-inside text-slate-300 space-y-0.5">
+                  <span className="font-bold text-slate-700 dark:text-slate-400">Các tuyên bố chính phát hiện:</span>
+                  <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-0.5 font-medium">
                     {aiResult.claims.map((c, i) => (
                       <li key={i} className="line-clamp-1">{c}</li>
                     ))}
@@ -294,8 +294,8 @@ export const CreatePostModal: React.FC<Props> = ({
               )}
 
               {/* Recommendation */}
-              <div className="text-xs p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300">
-                <span className="font-bold">Khuyến nghị: </span>
+              <div className="text-xs p-3 rounded-xl bg-amber-100 dark:bg-amber-500/10 border-2 border-slate-900 text-amber-950 dark:text-amber-300 shadow-[2px_2px_0_0_#0f172a] font-medium">
+                <span className="font-black">Khuyến nghị: </span>
                 {aiResult.recommendation}
               </div>
             </div>
@@ -304,8 +304,8 @@ export const CreatePostModal: React.FC<Props> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between shrink-0">
-          <div className="text-xs text-slate-500 hidden sm:block">
+        <div className="pt-4 border-t-2 border-slate-900 flex items-center justify-between shrink-0">
+          <div className="text-xs text-slate-600 dark:text-slate-500 font-bold hidden sm:block">
             {aiResult ? '✨ Đã sẵn sàng xuất bản' : '⚠️ Cần kiểm chứng AI trước khi đăng'}
           </div>
 
@@ -313,7 +313,7 @@ export const CreatePostModal: React.FC<Props> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-black dark:hover:text-white bg-mint-50 dark:bg-slate-800 border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] transition-all"
             >
               Hủy
             </button>
@@ -323,7 +323,7 @@ export const CreatePostModal: React.FC<Props> = ({
                 type="button"
                 onClick={handleStartVerification}
                 disabled={!content.trim() || isAnalyzing}
-                className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-glow-sm hover:shadow-glow-cyan transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 transition-all"
               >
                 {isAnalyzing ? (
                   <>
@@ -342,7 +342,7 @@ export const CreatePostModal: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={handleStartVerification}
-                  className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs"
+                  className="p-2.5 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:text-black dark:hover:text-white border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] text-xs transition-all"
                   title="Kiểm tra lại"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -350,7 +350,7 @@ export const CreatePostModal: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={handlePublish}
-                  className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-glow-emerald transition-all"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 border-2 border-slate-900 shadow-[3px_3px_0_0_#0f172a] hover:-translate-y-0.5 transition-all"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Xác nhận xuất bản (+25 XP)</span>
