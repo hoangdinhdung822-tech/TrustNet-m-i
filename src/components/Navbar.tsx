@@ -5,7 +5,6 @@ import {
   Bell, 
   Sun, 
   Moon, 
-  Search, 
   Award, 
   CheckCircle, 
   LogOut, 
@@ -124,27 +123,11 @@ export const Navbar: React.FC<Props> = ({
 
         {/* Speech bubble mascot — desktop only */}
         <div className="hidden xl:flex items-center">
-          <div className="relative bg-yellow-300 border-2 border-slate-900 rounded-2xl px-3 py-1.5 shadow-hard-sm text-[11px] font-bold text-slate-900 max-w-[200px] text-center">
+          <div className="relative bg-yellow-300 border-2 border-slate-900 rounded-2xl px-3 py-1.5 shadow-hard-sm text-[11px] font-bold text-slate-900 max-w-[240px] text-center">
             Đừng để lừa đảo làm bạn lo lắng — TrustNet đây! 🤖🛡️
             <span className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent border-r-[10px] border-r-slate-900"></span>
             <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[9px] border-r-yellow-300"></span>
           </div>
-        </div>
-
-        {/* Center Quick Search Button */}
-        <div className="hidden lg:flex items-center flex-1 max-w-sm mx-4">
-          <button 
-            onClick={() => setActiveTab('search')}
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-2xl bg-mint-100 dark:bg-slate-900/90 border-2 border-slate-900 dark:border-slate-700 hover:border-blue-600 dark:hover:border-indigo-500 text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-slate-200 text-sm transition-all group shadow-hard-sm hover:-translate-y-0.5"
-          >
-            <div className="flex items-center gap-2.5">
-              <Search className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
-              <span className="text-xs font-semibold">Tìm kiếm & kiểm tra nguồn tin...</span>
-            </div>
-            <kbd className="px-2 py-0.5 text-[10px] font-mono rounded-lg bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-2 border-slate-900 dark:border-slate-700">
-              Ctrl+K
-            </kbd>
-          </button>
         </div>
 
         {/* Right Action Icons & User Stats */}
